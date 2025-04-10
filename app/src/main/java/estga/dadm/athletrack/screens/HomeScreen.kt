@@ -1,5 +1,6 @@
 package estga.dadm.athletrack.screens
 
+// Importações necessárias para UI e comportamento
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,16 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Icon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import estga.dadm.athletrack.ui.theme.*
-import androidx.compose.ui.graphics.Color.Companion. DarkGray
+import estga.dadm.athletrack.ui.theme.* // Importa cores personalizadas
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(userName: String) {
+    // Lista de treinos a exibir (simulação local)
     val treinos = listOf(
         "Treino Cardio - 02/04",
         "Treino Força - 04/04",
@@ -41,17 +41,20 @@ fun HomeScreen(userName: String) {
         "Treino Livre - 13/04",
         "Treino Tático - 14/04",
         "Avaliação Física - 15/04"
-    ).take(10)
+    ).take(10) // Limita a lista a 10 elementos
 
+    // Estado do menu lateral (drawer)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope() // Necessário para abrir/fechar drawer com coroutine
 
+    // Componente que permite ter um menu lateral (ModalNavigationDrawer)
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            // Conteúdo do menu lateral
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(0.7f) // Ocupa 70% da largura do ecrã
                     .fillMaxHeight()
                     .background(DarkGray)
                     .padding(24.dp),
@@ -59,6 +62,7 @@ fun HomeScreen(userName: String) {
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
 
+                // Ícone de perfil simulado
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -76,6 +80,7 @@ fun HomeScreen(userName: String) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // Nome do utilizador (passado como parâmetro)
                 Text(
                     text = userName,
                     fontSize = 18.sp,
@@ -85,11 +90,13 @@ fun HomeScreen(userName: String) {
             }
         }
     ) {
+        // Conteúdo principal do ecrã com Scaffold
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background), // Usa a cor de fundo do tema
             topBar = {
+                // Barra superior com menu e calendário
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -98,6 +105,7 @@ fun HomeScreen(userName: String) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Botão de menu hambúrguer para abrir o drawer
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }
                     }) {
@@ -109,6 +117,7 @@ fun HomeScreen(userName: String) {
                         )
                     }
 
+                    // Ícone de calendário à direita
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Calendário",
@@ -118,6 +127,7 @@ fun HomeScreen(userName: String) {
                 }
             }
         ) { innerPadding ->
+            // Corpo do ecrã
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -128,12 +138,15 @@ fun HomeScreen(userName: String) {
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Título principal
                 Text("Bem vindo", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = White)
 
                 Spacer(modifier = Modifier.height(40.dp))
 
+                // Subtítulo
                 Text("Próximos Treinos", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = White)
 
+                // Separador horizontal
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -142,6 +155,7 @@ fun HomeScreen(userName: String) {
                     color = GrayNeutral
                 )
 
+                // Listagem dos treinos centralizados
                 treinos.forEach {
                     Text(
                         it,
@@ -157,6 +171,7 @@ fun HomeScreen(userName: String) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Botão de registar presença (ícone de câmara)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
@@ -180,6 +195,7 @@ fun HomeScreen(userName: String) {
     }
 }
 
+// Composable de pré-visualização para desenvolvimento no Android Studio
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
