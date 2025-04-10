@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.screens
+package estga.dadm.athletrack.screens.home
 
 // Importações necessárias para UI e comportamento
 import androidx.compose.foundation.background
@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(userName: String) {
+fun HomeScreenAtleta(userName: String) {
     // Lista de treinos a exibir (simulação local)
     val treinos = listOf(
         "Treino Cardio - 02/04",
@@ -199,5 +199,5 @@ fun HomeScreen(userName: String) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(userName = "João")
+    HomeScreenAtleta(userName = "João")
 }
