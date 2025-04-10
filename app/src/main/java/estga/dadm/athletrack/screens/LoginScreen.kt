@@ -1,8 +1,8 @@
 package estga.dadm.athletrack.screens
 
 // Importações das bibliotecas Compose necessárias
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
@@ -103,8 +103,10 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp)) // Espaço antes do link
 
         // Link "Esqueceste da palavra-passe?"
-        TextButton(onClick = { onForgotPasswordClick() }) {
-            Text("Esqueceste da palavra-passe?")
-        }
+        Text(
+            text = "Esqueceste da palavra-passe?",
+            color = White, // Cor da frase
+            modifier = Modifier.clickable { onForgotPasswordClick() } // Torna a frase clicável
+        )
     }
 }
