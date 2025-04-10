@@ -1,6 +1,10 @@
 package estga.dadm.athletrack.screens.home
 
 // Importações necessárias para UI e comportamento
+import estga.dadm.athletrack.components.MenuAtleta
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,16 +24,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import estga.dadm.athletrack.ui.theme.* // Importa cores personalizadas
-import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import kotlinx.coroutines.launch
 
 @Composable
+
 fun HomeScreenAtleta(userName: String) {
-    // Lista de treinos a exibir (simulação local)
     val treinos = listOf(
         "Treino Cardio - 02/04",
         "Treino Força - 04/04",
@@ -41,62 +43,20 @@ fun HomeScreenAtleta(userName: String) {
         "Treino Livre - 13/04",
         "Treino Tático - 14/04",
         "Avaliação Física - 15/04"
-    ).take(10) // Limita a lista a 10 elementos
+    ).take(10)
 
-    // Estado do menu lateral (drawer)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope() // Necessário para abrir/fechar drawer com coroutine
+    val scope = rememberCoroutineScope()
 
-    // Componente que permite ter um menu lateral (ModalNavigationDrawer)
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            // Conteúdo do menu lateral
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f) // Ocupa 70% da largura do ecrã
-                    .fillMaxHeight()
-                    .background(DarkGray)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(48.dp))
-
-                // Ícone de perfil simulado
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(GrayNeutral),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Foto de Perfil",
-                        tint = White,
-                        modifier = Modifier.size(64.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Nome do utilizador (passado como parâmetro)
-                Text(
-                    text = userName,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = White
-                )
-            }
+            MenuAtleta(userName = userName)
         }
     ) {
-        // Conteúdo principal do ecrã com Scaffold
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background), // Usa a cor de fundo do tema
+            modifier = Modifier.fillMaxSize(),
             topBar = {
-                // Barra superior com menu e calendário
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -105,7 +65,6 @@ fun HomeScreenAtleta(userName: String) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botão de menu hambúrguer para abrir o drawer
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }
                     }) {
@@ -117,7 +76,6 @@ fun HomeScreenAtleta(userName: String) {
                         )
                     }
 
-                    // Ícone de calendário à direita
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Calendário",
@@ -127,7 +85,6 @@ fun HomeScreenAtleta(userName: String) {
                 }
             }
         ) { innerPadding ->
-            // Corpo do ecrã
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -138,15 +95,12 @@ fun HomeScreenAtleta(userName: String) {
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Título principal
                 Text("Bem vindo", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = White)
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Subtítulo
                 Text("Próximos Treinos", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = White)
 
-                // Separador horizontal
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -155,7 +109,6 @@ fun HomeScreenAtleta(userName: String) {
                     color = GrayNeutral
                 )
 
-                // Listagem dos treinos centralizados
                 treinos.forEach {
                     Text(
                         it,
@@ -171,7 +124,6 @@ fun HomeScreenAtleta(userName: String) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Botão de registar presença (ícone de câmara)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier

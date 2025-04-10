@@ -15,7 +15,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             LoginScreen(
                 onLoginClick = { socio, password ->
                     if (socio == "1" && password == "1") {
-                        navController.navigate("homeAlteta")
+                        navController.navigate("homeAtleta")
                     } else {
                         navController.navigate("homeProfessor")
                     }
