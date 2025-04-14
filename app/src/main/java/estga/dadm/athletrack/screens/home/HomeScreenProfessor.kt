@@ -2,7 +2,9 @@ package estga.dadm.athletrack.screens.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
@@ -19,16 +21,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import estga.dadm.athletrack.components.MenuProfessor
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreenProfessor(userName: String) {
-    // Dados de exemplo para as próximas aulas
+
     val aulasHoje = listOf(
         "Aula xxxx - 09:00",
         "Aula xxxxx- 10:30",
         "Aula xxxx - 14:00",
         "Aula xxxxx - 16:15"
+    )
+    val aulasAmanha = listOf(
+        "Aula xxxx - 10:00",
+        "Aula xxxxx- 11:30",
+        "Aula xxxx - 15:00",
+        "Aula xxxxx - 17:15"
     )
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -37,7 +46,7 @@ fun HomeScreenProfessor(userName: String) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            // Seu conteúdo do menu aqui
+            MenuProfessor("João Professor");
         }
     ) {
         Scaffold(
@@ -79,6 +88,7 @@ fun HomeScreenProfessor(userName: String) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -105,36 +115,43 @@ fun HomeScreenProfessor(userName: String) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn {
-                    items(aulasHoje.size) { index ->
-                        Column {
-                            Text(
-                                text = aulasHoje[index],
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
+                // Lista de aulas
+                aulasHoje.forEachIndexed { index, aula ->
+                    Column {
+                        Text(
+                            text = aula,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        )
+                        if (index < aulasHoje.size - 1) {
+                            Divider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                thickness = 1.dp
                             )
-                            if (index < aulasHoje.size - 1) {
-                                Divider(
-                                    modifier = Modifier.padding(vertical = 8.dp),
-                                    thickness = 1.dp
-                                )
-                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Botões fixos ao final
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 32.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    TextButton(onClick = { /* Hoje */ }) {
+                    Button(onClick = {},
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White),
+                        ) {
                         Text("Hoje", fontWeight = FontWeight.Bold)
+
                     }
-                    TextButton(onClick = { /* Amanhã */ }) {
+                    Button(onClick = {}, colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color.White
+                    )) {
                         Text("Amanhã")
                     }
                 }
@@ -143,8 +160,9 @@ fun HomeScreenProfessor(userName: String) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenProfessorPreview() {
-    HomeScreenProfessor(userName = "Nome Sobrenome")
+    HomeScreenProfessor(userName = "João Professor")
 }

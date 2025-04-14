@@ -151,5 +151,5 @@ fun HomeScreenAtleta(userName: String) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreenAtleta(userName = "João")
+    HomeScreenAtleta(userName = "João Aluno")
 }
