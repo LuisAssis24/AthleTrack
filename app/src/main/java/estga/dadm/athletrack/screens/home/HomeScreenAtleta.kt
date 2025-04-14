@@ -26,12 +26,13 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.ui.theme.* // Importa cores personalizadas
 import kotlinx.coroutines.launch
 
 @Composable
 
-fun HomeScreenAtleta(userName: String) {
+fun HomeScreenAtleta(user: LoginResponse) {
     val treinos = listOf(
         "Treino Cardio - 02/04",
         "Treino Força - 04/04",
@@ -51,7 +52,7 @@ fun HomeScreenAtleta(userName: String) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            MenuAtleta(userName = userName)
+            MenuAtleta(userName = user.nome)
         }
     ) {
         Scaffold(
@@ -145,11 +146,4 @@ fun HomeScreenAtleta(userName: String) {
             }
         }
     }
-}
-
-// Composable de pré-visualização para desenvolvimento no Android Studio
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreenAtleta(userName = "João Aluno")
 }

@@ -21,11 +21,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.components.MenuProfessor
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreenProfessor(userName: String) {
+fun HomeScreenProfessor(user: LoginResponse) {
 
     val aulasHoje = listOf(
         "Aula xxxx - 09:00",
@@ -46,7 +47,7 @@ fun HomeScreenProfessor(userName: String) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            MenuProfessor("João Professor");
+            MenuProfessor(user.nome);
         }
     ) {
         Scaffold(
@@ -100,7 +101,7 @@ fun HomeScreenProfessor(userName: String) {
                 )
 
                 Text(
-                    text = userName,
+                    text = user.nome,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -158,11 +159,4 @@ fun HomeScreenProfessor(userName: String) {
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenProfessorPreview() {
-    HomeScreenProfessor(userName = "João Professor")
 }
