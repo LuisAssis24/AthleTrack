@@ -1,29 +1,29 @@
 package estga.dadm.athletrack.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import estga.dadm.athletrack.api.Aula
 import estga.dadm.athletrack.api.RetrofitClient
+import estga.dadm.athletrack.api.Treino
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableStateOf
+import estga.dadm.athletrack.api.ProfessorIdDTO
 
 class HomeProfessorViewModel : ViewModel() {
 
-    val aulasHoje = mutableStateOf<List<Aula>>(emptyList())
-    val aulasAmanha = mutableStateOf<List<Aula>>(emptyList())
+    val treinosHoje = mutableStateOf<List<Treino>>(emptyList())
+    val treinosAmanha = mutableStateOf<List<Treino>>(emptyList())
 
-    fun carregarAulas(professor: String) {
+    fun carregarTreinos(idProfessor: Int) {
         viewModelScope.launch {
             try {
-                val aulasHojeResponse = RetrofitClient.aulasService.getAulasDeHoje(professor)
-                val aulasAmanhaResponse = RetrofitClient.aulasService.getAulasDeAmanha(professor)
-
-                aulasHoje.value = aulasHojeResponse
-                aulasAmanha.value = aulasAmanhaResponse
-
+                val request = ProfessorIdDTO(idProfessor)
+                val hoje = RetrofitClient.treinosService.getTreinosHoje(request)
+                val amanha = RetrofitClient.treinosService.getTreinosAmanha(request)
+                treinosHoje.value = hoje
+                treinosAmanha.value = amanha
             } catch (e: Exception) {
-                Log.e("HomeProfessorViewModel", "Erro ao carregar aulas: ${e.message}", e)
+                Log.e("ViewModel", "Erro ao carregar treinos: ${e.message}")
             }
         }
     }

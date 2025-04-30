@@ -22,23 +22,29 @@ data class LoginResponse(
     val tipo: String
 )
 
+// Modelo de dados do treino
+data class Treino(
+    val nomeModalidade: String,
+    val hora: String
+)
+
+// Modelo de dados do treino com data
+data class ProfessorIdDTO(
+    val id_professor: Int
+)
+
+
 interface LoginService {
     @Headers("Content-Type: application/json")
     @POST("/api/login")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
 }
 
+interface TreinosService {
 
-data class Aula(
-    val nomeAula: String,
-    val data: LocalDate,
-    val hora: LocalTime,
-)
+    @POST("/api/treinos/hoje")
+    suspend fun getTreinosHoje(@Body request: ProfessorIdDTO): List<Treino>
 
-interface AulasService {
-    @GET("aulas/hoje")
-    suspend fun getAulasDeHoje(@Query("professor") nome: String): List<Aula>
-
-    @GET("aulas/amanha")
-    suspend fun getAulasDeAmanha(@Query("professor") nome: String): List<Aula>
+    @POST("/api/treinos/amanha")
+    suspend fun getTreinosAmanha(@Body request: ProfessorIdDTO): List<Treino>
 }

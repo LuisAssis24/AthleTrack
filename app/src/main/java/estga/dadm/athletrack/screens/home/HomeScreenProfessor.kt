@@ -34,8 +34,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import estga.dadm.athletrack.api.*
-import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 
 
 class LoginResponsePreviewProvider : PreviewParameterProvider<LoginResponse> {
@@ -61,8 +61,8 @@ fun PreviewHomeScreenProfessor(
 @Composable
 fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel = viewModel()) {
 
-    val aulasHoje by viewModel.aulasHoje
-    val aulasAmanha by viewModel.aulasAmanha
+    val aulasHoje by viewModel.treinosHoje
+    val aulasAmanha by viewModel.treinosAmanha
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -71,7 +71,7 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
 
     // Carregar as aulas assim que a composable for criada
     LaunchedEffect(Unit) {
-        viewModel.carregarAulas(user.nome)
+        viewModel.carregarTreinos(user.idSocio)
     }
 
     ModalNavigationDrawer(
@@ -157,12 +157,12 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
                 val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
 
                 if (aulasParaMostrar.isEmpty()) {
-                    Text("Sem aulas para ${selected.value}.")
+                    Text("Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.")
                 } else {
-                    aulasParaMostrar.forEachIndexed { index, aula ->
+                    aulasParaMostrar.forEachIndexed { index: Int, aula: Treino ->
                         Column {
                             Text(
-                                text = "${aula.nomeAula} - ${aula.hora}",
+                                text = "${aula.nomeModalidade} - ${aula.hora}",
                                 fontSize = 16.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
