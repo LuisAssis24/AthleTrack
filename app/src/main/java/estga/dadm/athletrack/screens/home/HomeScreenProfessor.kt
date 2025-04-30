@@ -1,4 +1,5 @@
 package estga.dadm.athletrack.screens.home
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,33 +31,53 @@ import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.components.MenuProfessor
 import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import estga.dadm.athletrack.api.*
+import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+
+class LoginResponsePreviewProvider : PreviewParameterProvider<LoginResponse> {
+    override val values = sequenceOf(
+        LoginResponse(
+            idSocio = 1,
+            nome = "João Silva",
+            tipo = "professor",
+        )
+    )
+}
+
+
+@Preview
+@Composable
+fun PreviewHomeScreenProfessor(
+    @PreviewParameter(LoginResponsePreviewProvider::class) user: LoginResponse
+) {
+    HomeScreenProfessor(user)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenProfessor(user: LoginResponse) {
+fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel = viewModel()) {
 
-
-
-    val aulasHoje = listOf(
-        "Aula xxxx - 09:00",
-        "Aula xxxxx- 10:30",
-        "Aula xxxx - 14:00",
-        "Aula xxxxx - 16:15"
-    )
-    val aulasAmanha = listOf(
-        "Aula xxxx - 10:00",
-        "Aula xxxxx- 11:30",
-        "Aula xxxx - 15:00",
-        "Aula xxxxx - 17:15"
-    )
+    val aulasHoje by viewModel.aulasHoje
+    val aulasAmanha by viewModel.aulasAmanha
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val selected = remember { mutableStateOf("hoje") }
+
+    // Carregar as aulas assim que a composable for criada
+    LaunchedEffect(Unit) {
+        viewModel.carregarAulas(user.nome)
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            MenuProfessor(user.nome);
+            MenuProfessor(user.nome)
         }
     ) {
         Scaffold(
@@ -79,7 +102,7 @@ fun HomeScreenProfessor(user: LoginResponse) {
                     }
 
                     Text(
-                        text = "9:41", // Hora atual
+                        text = "9:41", // (Opcional: hora real futuramente)
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -98,7 +121,7 @@ fun HomeScreenProfessor(user: LoginResponse) {
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally // centraliza conteúdos da coluna
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -122,7 +145,7 @@ fun HomeScreenProfessor(user: LoginResponse) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Próximas Aulas Hoje",
+                    text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -131,29 +154,32 @@ fun HomeScreenProfessor(user: LoginResponse) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Lista de aulas
-                aulasHoje.forEachIndexed { index, aula ->
-                    Column {
-                        Text(
-                            text = aula,
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center
-                        )
-                        if (index < aulasHoje.size - 1) {
-                            Divider(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                thickness = 1.dp
+                val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
+
+                if (aulasParaMostrar.isEmpty()) {
+                    Text("Sem aulas para ${selected.value}.")
+                } else {
+                    aulasParaMostrar.forEachIndexed { index, aula ->
+                        Column {
+                            Text(
+                                text = "${aula.nomeAula} - ${aula.hora}",
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                textAlign = TextAlign.Center
                             )
+                            if (index < aulasParaMostrar.size - 1) {
+                                Divider(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    thickness = 1.dp
+                                )
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
-
-                val selected = remember { mutableStateOf("hoje") }
 
                 Column(
                     modifier = Modifier
@@ -181,8 +207,6 @@ fun HomeScreenProfessor(user: LoginResponse) {
                         }
                     }
                 }
-
-
             }
         }
     }
