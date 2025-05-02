@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
 interface TreinoRepository : JpaRepository<Treino, Long> {
-    fun findByProfessorIdSocioAndDataHoraBetween(
+    fun findByProfessorIdSocioAndData(
         idSocio: Int,
-        inicio: LocalDateTime,
-        fim: LocalDateTime
+        data: String
     ): List<Treino>
 }

@@ -1,10 +1,10 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.model.Treino
 import estga.dadm.backend.repository.TreinoRepository
+import estga.dadm.backend.dto.ProfessorIdDTO
+import estga.dadm.backend.dto.TreinoDTO
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/treinos")
@@ -12,32 +12,29 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
 
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: ProfessorIdDTO): List<TreinoDTO> {
-        val hoje = LocalDate.now()
-        val inicio = hoje.atStartOfDay()
-        val fim = hoje.plusDays(1).atStartOfDay()
+        val hoje = LocalDate.now().toString()
         return treinoRepository
-            .findByProfessorIdSocioAndDataHoraBetween(request.id_professor, inicio, fim)
-            .map { TreinoDTO(it.modalidade.nomeModalidade, it.dataHora.toLocalTime().toString()) }
+            .findByProfessorIdSocioAndData(request.id_professor, hoje)
+            .map { treino ->
+                TreinoDTO(
+                    nomeModalidade = treino.modalidade.nomeModalidade,
+                    data = treino.data,
+                    hora = treino.hora
+                )
+            }
     }
 
     @PostMapping("/amanha")
     fun getTreinosAmanha(@RequestBody request: ProfessorIdDTO): List<TreinoDTO> {
-        val amanha = LocalDate.now().plusDays(1)
-        val inicio = amanha.atStartOfDay()
-        val fim = amanha.plusDays(1).atStartOfDay()
+        val amanha = LocalDate.now().plusDays(1).toString()
         return treinoRepository
-            .findByProfessorIdSocioAndDataHoraBetween(request.id_professor, inicio, fim)
+            .findByProfessorIdSocioAndData(request.id_professor, amanha)
             .map { treino ->
                 TreinoDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
-                    data = treino.dataHora.toLocalDate().toString(),
-                    hora = treino.dataHora.toLocalTime().toString()
+                    data = treino.data,
+                    hora = treino.hora
                 )
             }
     }
 }
-
-data class TreinoDTO(
-    val nomeModalidade: String,
-    val hora: String
-)
