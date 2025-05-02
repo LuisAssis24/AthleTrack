@@ -25,6 +25,7 @@ data class LoginResponse(
 // Modelo de dados do treino
 data class Treino(
     val nomeModalidade: String,
+    val diaSemana: String,
     val hora: String
 )
 

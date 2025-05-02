@@ -18,7 +18,7 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
             .map { treino ->
                 TreinoDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
-                    data = treino.data,
+                    diaSemana = treino.diaSemana.name,
                     hora = treino.hora
                 )
             }
@@ -32,7 +32,7 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
             .map { treino ->
                 TreinoDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
-                    data = treino.data,
+                    diaSemana = treino.diaSemana.name,
                     hora = treino.hora
                 )
             }

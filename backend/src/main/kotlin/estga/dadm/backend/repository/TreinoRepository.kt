@@ -7,6 +7,6 @@ import java.time.LocalDateTime
 interface TreinoRepository : JpaRepository<Treino, Long> {
     fun findByProfessorIdSocioAndData(
         idSocio: Int,
-        data: String
+        diaSemana: DiaDaSemana
     ): List<Treino>
 }

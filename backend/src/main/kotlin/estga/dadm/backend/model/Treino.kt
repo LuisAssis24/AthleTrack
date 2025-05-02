@@ -9,7 +9,9 @@ data class Treino(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    val data: String,
+    @Enumerated(EnumType.STRING)
+    val diaSemana: DiaDaSemana,
+
     val hora: String,
 
     @ManyToOne
