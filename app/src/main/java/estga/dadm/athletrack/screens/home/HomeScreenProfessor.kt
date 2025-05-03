@@ -1,5 +1,6 @@
 package estga.dadm.athletrack.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
@@ -11,20 +12,18 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.components.MenuProfessor
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import estga.dadm.athletrack.api.Treino
+import androidx.navigation.NavHostController
+import estga.dadm.athletrack.components.QrCodeDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -44,7 +43,13 @@ fun detetarDiaSemana(): String {
 }
 
 @Composable
-fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel = viewModel()) {
+fun HomeScreenProfessor(
+    user: LoginResponse,
+    navController: NavHostController,
+    viewModel: HomeProfessorViewModel = viewModel()
+) {
+    var showQrCode by remember { mutableStateOf(false) }
+    var qrCodeAtivo by remember { mutableStateOf("") }
 
     val aulasHoje by viewModel.treinosHoje.collectAsState()
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
@@ -158,15 +163,15 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
                             )
                         } else {
                             aulasParaMostrar.take(10).forEachIndexed { index, aula ->
-                                val horaFormatada = try {
-                                    LocalTime.parse(aula.hora).let { "${it.hour.toString().padStart(2, '0')}:${it.minute.toString().padStart(2, '0')}" }
-                                } catch (e: Exception) {
-                                    aula.hora // fallback
-                                }
-
-                                Column {
+                                Column(
+                                    modifier = Modifier
+                                        .clickable {
+                                            qrCodeAtivo = aula.qrCode
+                                            showQrCode = true
+                                        }
+                                ) {
                                     Text(
-                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}", // Só os primeiros 5 chars "HH:mm"
+                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
                                         fontSize = 16.sp,
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -180,9 +185,9 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
                                         )
                                     }
                                 }
+
                             }
                         }
-
                     }
                 }
 
@@ -217,6 +222,10 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
             }
         }
     }
+    if (showQrCode) {
+        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+    }
+
 }
 
 @Preview(showBackground = true)
@@ -227,5 +236,8 @@ fun PreviewHomeScreenProfessor() {
         nome = "Professor Exemplo",
         tipo = "Professor"
     )
-    HomeScreenProfessor(user = user)
+    HomeScreenProfessor(
+        user = user,
+        navController = TODO(),
+    )
 }

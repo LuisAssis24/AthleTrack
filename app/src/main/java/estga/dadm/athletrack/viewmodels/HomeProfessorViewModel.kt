@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 
 
 class HomeProfessorViewModel : ViewModel() {
+    private val api = RetrofitClient.treinosService
+
     private val _treinosHoje = MutableStateFlow<List<Treino>>(emptyList())
     val treinosHoje: StateFlow<List<Treino>> = _treinosHoje
 
@@ -23,12 +25,12 @@ class HomeProfessorViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val respostaHoje = RetrofitClient.treinosService.getTreinosHoje(
+                val respostaHoje = api.getTreinosHoje(
                     TreinosRequest(idProfessor = idProfessor, diaSemana = diaSemana)
                 )
                 _treinosHoje.value = respostaHoje
 
-                val respostaAmanha = RetrofitClient.treinosService.getTreinosAmanha(
+                val respostaAmanha = api.getTreinosAmanha(
                     TreinosRequest(idProfessor = idProfessor, diaSemana = diaSemana)
                 )
                 _treinosAmanha.value = respostaAmanha

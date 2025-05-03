@@ -18,7 +18,8 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora
+                    hora = treino.hora,
+                    qrCode = treino.qrCode
                 )
             }
     }
@@ -32,7 +33,8 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora
+                    hora = treino.hora,
+                    qrCode = treino.qrCode
                 )
             }
     }
@@ -45,6 +47,7 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
             "QUI" -> return "SEX"
             "SEX" -> return "SAB"
             "SAB" -> return null
+            "DOM" -> return "SEG"
         }
         return null
     }

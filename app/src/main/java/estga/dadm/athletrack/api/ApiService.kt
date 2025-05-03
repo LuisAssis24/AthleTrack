@@ -38,7 +38,8 @@ data class TreinosRequest(
 data class Treino(
     val nomeModalidade: String,
     val diaSemana: String,
-    val hora: String
+    val hora: String,
+    val qrCode: String
 )
 
 interface TreinosService {

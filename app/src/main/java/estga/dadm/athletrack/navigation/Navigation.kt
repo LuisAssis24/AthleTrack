@@ -10,10 +10,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.screens.LoginScreen
-import estga.dadm.athletrack.screens.home.HomeScreenAtleta
-import estga.dadm.athletrack.screens.home.HomeScreenProfessor
-import java.net.URLDecoder
-import java.net.URLEncoder
+import estga.dadm.athletrack.screens.home.*
+import estga.dadm.athletrack.components.*
+import java.net.*
 
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
@@ -50,7 +49,11 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user =
                 gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), LoginResponse::class.java)
-            HomeScreenProfessor(user = user)
+            HomeScreenProfessor(
+                user = user,
+                navController = navController,
+            )
         }
+
     }
 }

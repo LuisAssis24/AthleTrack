@@ -12,6 +12,7 @@ data class Treino(
 
     val hora: String,
 
+    val qrCode: String,
 
     @ManyToOne
     @JoinColumn(name = "id_modalidade")
