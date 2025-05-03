@@ -2,11 +2,8 @@ package estga.dadm.backend.repository
 
 import estga.dadm.backend.model.Treino
 import org.springframework.data.jpa.repository.JpaRepository
-import java.time.LocalDateTime
+import estga.dadm.backend.model.DiaDaSemana
 
 interface TreinoRepository : JpaRepository<Treino, Long> {
-    fun findByProfessorIdSocioAndData(
-        idSocio: Int,
-        diaSemana: DiaDaSemana
-    ): List<Treino>
+    fun findByProfessorIdSocioAndDiaSemana(id_socio: Int, diaSemana: DiaDaSemana): List<Treino>
 }
