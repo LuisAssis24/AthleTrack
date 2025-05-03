@@ -28,24 +28,23 @@ interface LoginService {
     fun login(@Body request: LoginRequest): Call<LoginResponse>
 }
 
+// Modelo da Request do treino
+data class TreinosRequest(
+    val idProfessor: Int,
+    val diaSemana: String
+)
 
-// Modelo de dados do treino
+// Modelo de Resposta do treino
 data class Treino(
     val nomeModalidade: String,
     val diaSemana: String,
     val hora: String
 )
 
-// Modelo de dados do treino com data
-data class ProfessorIdDTO(
-    val id_professor: Int
-)
-
 interface TreinosService {
-
     @POST("/api/treinos/hoje")
-    suspend fun getTreinosHoje(@Body request: ProfessorIdDTO): List<Treino>
+    suspend fun getTreinosHoje(@Body request: TreinosRequest): List<Treino>
 
     @POST("/api/treinos/amanha")
-    suspend fun getTreinosAmanha(@Body request: ProfessorIdDTO): List<Treino>
+    suspend fun getTreinosAmanha(@Body request: TreinosRequest): List<Treino>
 }

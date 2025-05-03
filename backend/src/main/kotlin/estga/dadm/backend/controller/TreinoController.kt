@@ -1,11 +1,9 @@
 package estga.dadm.backend.controller
 
 import estga.dadm.backend.repository.TreinoRepository
-import estga.dadm.backend.dto.ProfessorIdDTO
-import estga.dadm.backend.dto.TreinoDTO
+import estga.dadm.backend.dto.TreinoProfRequestDTO
+import estga.dadm.backend.dto.TreinoProfResponseDTO
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
-import estga.dadm.backend.enum.DiaSemana
 import estga.dadm.backend.model.Treino
 
 @RestController
@@ -13,30 +11,41 @@ import estga.dadm.backend.model.Treino
 class TreinoController(private val treinoRepository: TreinoRepository) {
 
     @PostMapping("/hoje")
-    fun getTreinosHoje(@RequestBody request: ProfessorIdDTO): List<TreinoDTO> {
-        val hoje = DiaSemana.valueOf(LocalDate.now().dayOfWeek.name)
+    fun getTreinosHoje(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemana(request.id_professor, hoje)
+            .findByProfessorIdSocioAndDiaSemana(request.idProfessor, request.diaSemana)
             .map { treino: Treino ->
-                TreinoDTO(
+                TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
-                    diaSemana = treino.diaSemana.name,
+                    diaSemana = treino.diaSemana,
                     hora = treino.hora
                 )
             }
     }
 
     @PostMapping("/amanha")
-    fun getTreinosAmanha(@RequestBody request: ProfessorIdDTO): List<TreinoDTO> {
-        val amanha = DiaSemana.valueOf(LocalDate.now().plusDays(1).dayOfWeek.name)
+    fun getTreinosAmanha(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
+        val amanha = calculaAmanha(request.diaSemana)
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemana(request.id_professor, amanha)
+            .findByProfessorIdSocioAndDiaSemana(request.idProfessor, amanha)
             .map { treino: Treino ->
-                TreinoDTO(
+                TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
-                    diaSemana = treino.diaSemana.name,
+                    diaSemana = treino.diaSemana,
                     hora = treino.hora
                 )
             }
+    }
+
+    fun calculaAmanha(dia: String): String? {
+        when (dia) {
+            "SEG" -> return "TER"
+            "TER" -> return "QUA"
+            "QUA" -> return "QUI"
+            "QUI" -> return "SEX"
+            "SEX" -> return "SAB"
+            "SAB" -> return null
+        }
+        return null
     }
 }

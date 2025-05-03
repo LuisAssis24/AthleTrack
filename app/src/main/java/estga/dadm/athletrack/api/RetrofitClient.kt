@@ -17,5 +17,7 @@ object RetrofitClient {
         retrofit.create(LoginService::class.java)
     }
 
-    val treinosService: TreinosService = retrofit.create(TreinosService::class.java)
+    val treinosService: TreinosService by lazy {
+        retrofit.create(TreinosService::class.java)
+    }
 }

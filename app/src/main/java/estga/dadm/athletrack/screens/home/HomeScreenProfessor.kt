@@ -1,68 +1,53 @@
 package estga.dadm.athletrack.screens.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.components.MenuProfessor
-import kotlinx.coroutines.launch
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import estga.dadm.athletrack.api.*
-import androidx.lifecycle.viewmodel.compose.viewModel
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import estga.dadm.athletrack.api.Treino
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
 
-
-class LoginResponsePreviewProvider : PreviewParameterProvider<LoginResponse> {
-    override val values = sequenceOf(
-        LoginResponse(
-            idSocio = 1,
-            nome = "João Silva",
-            tipo = "professor",
-        )
-    )
+fun detetarDiaSemana(): String {
+    val diaAtual = LocalDate.now().dayOfWeek.value
+    return when (diaAtual) {
+        1 -> "SEG"
+        2 -> "TER"
+        3 -> "QUA"
+        4 -> "QUI"
+        5 -> "SEX"
+        6 -> "SAB"
+        7 -> "DOM"
+        else -> ""
+    }
 }
 
-
-@Preview
-@Composable
-fun PreviewHomeScreenProfessor(
-    @PreviewParameter(LoginResponsePreviewProvider::class) user: LoginResponse
-) {
-    HomeScreenProfessor(user)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel = viewModel()) {
 
-    val aulasHoje by viewModel.treinosHoje
-    val aulasAmanha by viewModel.treinosAmanha
+    val aulasHoje by viewModel.treinosHoje.collectAsState()
+    val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -71,7 +56,10 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
 
     // Carregar as aulas assim que a composable for criada
     LaunchedEffect(Unit) {
-        viewModel.carregarTreinos(user.idSocio)
+        viewModel.carregarTreinos(
+            user.idSocio,
+            diaSemana = detetarDiaSemana()
+        )
     }
 
     ModalNavigationDrawer(
@@ -144,38 +132,57 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(
-                    text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(40.dp))
 
-                val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
+                        val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
 
-                if (aulasParaMostrar.isEmpty()) {
-                    Text("Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.")
-                } else {
-                    aulasParaMostrar.forEachIndexed { index: Int, aula: Treino ->
-                        Column {
+                        if (aulasParaMostrar.isEmpty()) {
                             Text(
-                                text = "${aula.nomeModalidade} - ${aula.hora}",
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                textAlign = TextAlign.Center
+                                text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
-                            if (index < aulasParaMostrar.size - 1) {
-                                Divider(
-                                    modifier = Modifier.padding(vertical = 8.dp),
-                                    thickness = 1.dp
-                                )
+                        } else {
+                            aulasParaMostrar.take(10).forEachIndexed { index, aula ->
+                                val horaFormatada = try {
+                                    LocalTime.parse(aula.hora).let { "${it.hour.toString().padStart(2, '0')}:${it.minute.toString().padStart(2, '0')}" }
+                                } catch (e: Exception) {
+                                    aula.hora // fallback
+                                }
+
+                                Column {
+                                    Text(
+                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}", // Só os primeiros 5 chars "HH:mm"
+                                        fontSize = 16.sp,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    if (index < aulasParaMostrar.size - 1) {
+                                        Divider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            thickness = 1.dp
+                                        )
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
 
@@ -210,4 +217,15 @@ fun HomeScreenProfessor(user: LoginResponse, viewModel: HomeProfessorViewModel =
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomeScreenProfessor() {
+    val user = LoginResponse(
+        idSocio = 1,
+        nome = "Professor Exemplo",
+        tipo = "Professor"
+    )
+    HomeScreenProfessor(user = user)
 }
