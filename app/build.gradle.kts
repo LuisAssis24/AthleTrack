@@ -42,9 +42,9 @@ android {
 dependencies {
 
 
-    implementation("androidx.compose.ui:ui:1.6.0") // ou versão mais recente
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
-    debugImplementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
+    implementation(libs.ui) // ou versão mais recente
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.espresso.core)
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation(libs.material3)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)

@@ -2,6 +2,7 @@ package estga.dadm.backend.model
 
 import jakarta.persistence.*
 import java.time.LocalDateTime
+import estga.dadm.backend.enum.DiaSemana
 
 @Entity
 @Table(name = "treinos")
@@ -10,7 +11,7 @@ data class Treino(
     val id: Long = 0,
 
     @Enumerated(EnumType.STRING)
-    val diaSemana: DiaDaSemana,
+    val diaSemana: DiaSemana,
 
     val hora: String,
 

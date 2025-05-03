@@ -22,6 +22,13 @@ data class LoginResponse(
     val tipo: String
 )
 
+interface LoginService {
+    @Headers("Content-Type: application/json")
+    @POST("/api/login")
+    fun login(@Body request: LoginRequest): Call<LoginResponse>
+}
+
+
 // Modelo de dados do treino
 data class Treino(
     val nomeModalidade: String,
@@ -33,13 +40,6 @@ data class Treino(
 data class ProfessorIdDTO(
     val id_professor: Int
 )
-
-
-interface LoginService {
-    @Headers("Content-Type: application/json")
-    @POST("/api/login")
-    fun login(@Body request: LoginRequest): Call<LoginResponse>
-}
 
 interface TreinosService {
 
