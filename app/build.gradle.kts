@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "estga.dadm.athletrack"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -41,6 +41,10 @@ android {
 
 dependencies {
 
+
+    implementation(libs.ui) // ou versão mais recente
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,7 +54,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.espresso.core)
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation(libs.material3)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)

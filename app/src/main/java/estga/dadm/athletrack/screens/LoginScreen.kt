@@ -109,7 +109,7 @@ fun LoginScreen(
                 if (socio.isNotBlank() && password.isNotBlank()) {
                     val request = LoginRequest(socio.toInt(), password)
 
-                    RetrofitClient.instance.login(request).enqueue(object : Callback<estga.dadm.athletrack.api.LoginResponse> {
+                    RetrofitClient.loginService.login(request).enqueue(object : Callback<estga.dadm.athletrack.api.LoginResponse> {
                         override fun onResponse(
                             call: Call<LoginResponse>,
                             response: Response<LoginResponse>

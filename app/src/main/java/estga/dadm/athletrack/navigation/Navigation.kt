@@ -1,7 +1,5 @@
 package estga.dadm.athletrack.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,14 +10,10 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.screens.LoginScreen
-import estga.dadm.athletrack.screens.calendar.CalendarScreen
-import estga.dadm.athletrack.screens.home.HomeScreenAtleta
-import estga.dadm.athletrack.screens.home.HomeScreenProfessor
-import estga.dadm.athletrack.screens.calendar.CalendarScreen
-import java.net.URLDecoder
-import java.net.URLEncoder
+import estga.dadm.athletrack.screens.home.*
+import estga.dadm.athletrack.components.*
+import java.net.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
     val gson = Gson()
@@ -55,11 +49,10 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user =
                 gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), LoginResponse::class.java)
-            HomeScreenProfessor(user = user)
-        }
-
-        composable("calendar") {
-            CalendarScreen(userName = "João Atleta")
+            HomeScreenProfessor(
+                user = user,
+                navController = navController,
+            )
         }
 
     }

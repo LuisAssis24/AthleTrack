@@ -1,25 +1,18 @@
 package estga.dadm.athletrack.screens.home
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,34 +20,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.LoginResponse
 import estga.dadm.athletrack.components.MenuProfessor
+import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import estga.dadm.athletrack.components.QrCodeDialog
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+fun detetarDiaSemana(): String {
+    val diaAtual = LocalDate.now().dayOfWeek.value
+    return when (diaAtual) {
+        1 -> "SEG"
+        2 -> "TER"
+        3 -> "QUA"
+        4 -> "QUI"
+        5 -> "SEX"
+        6 -> "SAB"
+        7 -> "DOM"
+        else -> ""
+    }
+}
+
 @Composable
-fun HomeScreenProfessor(user: LoginResponse) {
+fun HomeScreenProfessor(
+    user: LoginResponse,
+    navController: NavHostController,
+    viewModel: HomeProfessorViewModel = viewModel()
+) {
+    var showQrCode by remember { mutableStateOf(false) }
+    var qrCodeAtivo by remember { mutableStateOf("") }
 
-
-
-    val aulasHoje = listOf(
-        "Aula xxxx - 09:00",
-        "Aula xxxxx- 10:30",
-        "Aula xxxx - 14:00",
-        "Aula xxxxx - 16:15"
-    )
-    val aulasAmanha = listOf(
-        "Aula xxxx - 10:00",
-        "Aula xxxxx- 11:30",
-        "Aula xxxx - 15:00",
-        "Aula xxxxx - 17:15"
-    )
+    val aulasHoje by viewModel.treinosHoje.collectAsState()
+    val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val selected = remember { mutableStateOf("hoje") }
+
+    // Carregar as aulas assim que a composable for criada
+    LaunchedEffect(Unit) {
+        viewModel.carregarTreinos(
+            user.idSocio,
+            diaSemana = detetarDiaSemana()
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            MenuProfessor(user.nome);
+            MenuProfessor(user.nome)
         }
     ) {
         Scaffold(
@@ -79,7 +95,7 @@ fun HomeScreenProfessor(user: LoginResponse) {
                     }
 
                     Text(
-                        text = "9:41", // Hora atual
+                        text = "9:41", // (Opcional: hora real futuramente)
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -98,7 +114,7 @@ fun HomeScreenProfessor(user: LoginResponse) {
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally // centraliza conteúdos da coluna
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -121,39 +137,61 @@ fun HomeScreenProfessor(user: LoginResponse) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(
-                    text = "Próximas Aulas Hoje",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Lista de aulas
-                aulasHoje.forEachIndexed { index, aula ->
-                    Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = aula,
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center
+                            text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        if (index < aulasHoje.size - 1) {
-                            Divider(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                thickness = 1.dp
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                        val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
+
+                        if (aulasParaMostrar.isEmpty()) {
+                            Text(
+                                text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
+                        } else {
+                            aulasParaMostrar.take(10).forEachIndexed { index, aula ->
+                                Column(
+                                    modifier = Modifier
+                                        .clickable {
+                                            qrCodeAtivo = aula.qrCode
+                                            showQrCode = true
+                                        }
+                                ) {
+                                    Text(
+                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
+                                        fontSize = 16.sp,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    if (index < aulasParaMostrar.size - 1) {
+                                        Divider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            thickness = 1.dp
+                                        )
+                                    }
+                                }
+
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
-
-                val selected = remember { mutableStateOf("hoje") }
 
                 Column(
                     modifier = Modifier
@@ -181,9 +219,25 @@ fun HomeScreenProfessor(user: LoginResponse) {
                         }
                     }
                 }
-
-
             }
         }
     }
+    if (showQrCode) {
+        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomeScreenProfessor() {
+    val user = LoginResponse(
+        idSocio = 1,
+        nome = "Professor Exemplo",
+        tipo = "Professor"
+    )
+    HomeScreenProfessor(
+        user = user,
+        navController = TODO(),
+    )
 }

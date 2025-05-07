@@ -1,6 +1,6 @@
 package estga.dadm.backend.dto
 
-data class LoginRequest(
+data class LoginRequestDTO(
     val idSocio: Int,
     val password: String
 )
