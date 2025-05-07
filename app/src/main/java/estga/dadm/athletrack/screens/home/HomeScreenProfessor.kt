@@ -26,7 +26,6 @@ import androidx.navigation.NavHostController
 import estga.dadm.athletrack.components.QrCodeDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalTime
 
 fun detetarDiaSemana(): String {
     val diaAtual = LocalDate.now().dayOfWeek.value
@@ -45,7 +44,6 @@ fun detetarDiaSemana(): String {
 @Composable
 fun HomeScreenProfessor(
     user: LoginResponse,
-    navController: NavHostController,
     viewModel: HomeProfessorViewModel = viewModel()
 ) {
     var showQrCode by remember { mutableStateOf(false) }
@@ -238,6 +236,5 @@ fun PreviewHomeScreenProfessor() {
     )
     HomeScreenProfessor(
         user = user,
-        navController = TODO(),
     )
 }

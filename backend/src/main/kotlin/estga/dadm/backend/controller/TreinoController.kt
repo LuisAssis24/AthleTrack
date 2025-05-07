@@ -13,12 +13,12 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemana(request.idProfessor, request.diaSemana)
+            .findByProfessorIdSocioAndDiaSemanaOrderByHoraAsc(request.idProfessor, request.diaSemana)
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora,
+                    hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
                     qrCode = treino.qrCode
                 )
             }
@@ -28,12 +28,12 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
     fun getTreinosAmanha(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
         val amanha = calculaAmanha(request.diaSemana)
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemana(request.idProfessor, amanha)
+            .findByProfessorIdSocioAndDiaSemanaOrderByHoraAsc(request.idProfessor, amanha)
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora,
+                    hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
                     qrCode = treino.qrCode
                 )
             }

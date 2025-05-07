@@ -51,7 +51,6 @@ fun AthleTrackNavGraph(navController: NavHostController) {
                 gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), LoginResponse::class.java)
             HomeScreenProfessor(
                 user = user,
-                navController = navController,
             )
         }
 

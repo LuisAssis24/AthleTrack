@@ -1,6 +1,8 @@
 package estga.dadm.backend.model
 
 import jakarta.persistence.*
+import java.time.LocalTime
+
 
 @Entity
 @Table(name = "treinos")
@@ -10,7 +12,7 @@ data class Treino(
 
     val diaSemana: String,
 
-    val hora: String,
+    val hora: LocalTime,
 
     val qrCode: String,
 
