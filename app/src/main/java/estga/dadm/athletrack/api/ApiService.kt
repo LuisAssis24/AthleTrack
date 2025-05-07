@@ -46,3 +46,17 @@ interface TreinosService {
     @POST("/api/treinos/amanha")
     suspend fun getTreinosAmanha(@Body request: TreinosRequest): List<Treino>
 }
+
+
+interface EventosService {
+    @POST("/api/eventos/data")
+    suspend fun getEventosPorData(@Body data: String): List<Evento>
+}
+
+// Modelo de Evento
+data class Evento(
+    val idEvento: Long,
+    val localEvento: String,
+    val data: String,
+    val hora: String
+)

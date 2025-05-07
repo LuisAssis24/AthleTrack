@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import estga.dadm.athletrack.api.Evento
+import estga.dadm.athletrack.api.RetrofitClient
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
@@ -34,15 +36,30 @@ import java.util.*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(userName: String) {
-    val today = remember { LocalDate.now() }
-    var selectedDate by remember { mutableStateOf(today) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var eventos by remember { mutableStateOf<List<Evento>>(emptyList()) }
+    /*var eventos = listOf(
+        Evento(idEvento = 1, localEvento = "Teste", data = "2025-05-07", hora = "10:00")
+    )*/
+    val coroutineScope = rememberCoroutineScope()
+    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
 
-    val currentMonth = remember { YearMonth.from(today) }
+    LaunchedEffect(selectedDate) {
+        coroutineScope.launch {
+            try {
+                val response = RetrofitClient.eventosService.getEventosPorData(selectedDate.toString())
+                println("Resposta da API: $response")
+                eventos = response
+            } catch (e: Exception) {
+                println("Erro ao buscar eventos: ${e.message}")
+                eventos = emptyList() // Tratar erro
+            }
+        }
+    }
+
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstDayOfWeek = currentMonth.atDay(1).dayOfWeek.value % 7
     val monthLabel = currentMonth.month.getDisplayName(TextStyle.FULL, Locale("pt", "BR")).replaceFirstChar { it.uppercase() }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -54,9 +71,7 @@ fun CalendarScreen(userName: String) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    scope.launch { drawerState.open() }
-                }) {
+                IconButton(onClick = { /* Menu */ }) {
                     Icon(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu",
@@ -107,13 +122,21 @@ fun CalendarScreen(userName: String) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        IconButton(onClick = {
+                            currentMonth = currentMonth.minusMonths(1)
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Mês anterior")
+                        }
                         Text(
-                            "$monthLabel ${today.year}",
+                            "$monthLabel ${currentMonth.year}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
-                        Icon(Icons.Default.ArrowForward, contentDescription = null)
+                        IconButton(onClick = {
+                            currentMonth = currentMonth.plusMonths(1)
+                        }) {
+                            Icon(Icons.Default.ArrowForward, contentDescription = "Próximo mês")
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -174,37 +197,33 @@ fun CalendarScreen(userName: String) {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            // Lista de eventos
+            Column {
+                eventos.forEach { evento ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold)
+                            Text(evento.hora, fontSize = 12.sp, color = Color.Gray)
+                        }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Nome de Evento", fontWeight = FontWeight.SemiBold)
-                    Text("Local de evento", fontSize = 12.sp, color = Color.Gray)
-                    Text("hh:mm", fontSize = 12.sp, color = Color.Gray)
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${selectedDate.dayOfMonth}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Text(selectedDate.month.getDisplayName(TextStyle.SHORT, Locale("pt", "BR")), fontSize = 12.sp)
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(onClick = { /* Adicionar novo evento */ }) {
-                    Icon(Icons.Default.Add, contentDescription = "Adicionar", tint = Color.Black)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("${selectedDate.dayOfMonth}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(selectedDate.month.getDisplayName(TextStyle.SHORT, Locale("pt", "BR")), fontSize = 12.sp)
+                        }
+                    }
                 }
             }
         }
     }
 }
-
 
 // Composable de pré-visualização para desenvolvimento no Android Studio
 @RequiresApi(Build.VERSION_CODES.O)

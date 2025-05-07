@@ -3,6 +3,7 @@ package estga.dadm.athletrack.api
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 object RetrofitClient {
     private const val BASE_URL = "http://10.0.2.2:8080/api/" // ou sem /api se o endpoint não tiver
 
@@ -20,4 +21,9 @@ object RetrofitClient {
     val treinosService: TreinosService by lazy {
         retrofit.create(TreinosService::class.java)
     }
+
+    val eventosService: EventosService by lazy {
+        retrofit.create(EventosService::class.java)
+    }
+
 }
