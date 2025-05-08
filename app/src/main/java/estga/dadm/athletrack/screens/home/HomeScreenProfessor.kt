@@ -13,16 +13,18 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import estga.dadm.athletrack.api.LoginResponse
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.components.MenuProfessor
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import estga.dadm.athletrack.components.QrCodeDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -43,7 +45,8 @@ fun detetarDiaSemana(): String {
 
 @Composable
 fun HomeScreenProfessor(
-    user: LoginResponse,
+    user: User,
+    navController: NavHostController,
     viewModel: HomeProfessorViewModel = viewModel()
 ) {
     var showQrCode by remember { mutableStateOf(false) }
@@ -101,7 +104,13 @@ fun HomeScreenProfessor(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Calendário",
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clickable {
+                                // Ação para abrir o calendário
+                                navController.navigate("calendar")
+                            }
+
                     )
                 }
             }
@@ -151,7 +160,8 @@ fun HomeScreenProfessor(
 
                         Spacer(modifier = Modifier.height(40.dp))
 
-                        val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
+                        val aulasParaMostrar =
+                            if (selected.value == "hoje") aulasHoje else aulasAmanha
 
                         if (aulasParaMostrar.isEmpty()) {
                             Text(
@@ -229,12 +239,15 @@ fun HomeScreenProfessor(
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreenProfessor() {
-    val user = LoginResponse(
+    val user = User(
         idSocio = 1,
         nome = "Professor Exemplo",
         tipo = "Professor"
     )
+    // Apenas para preview — passar um navController falso
     HomeScreenProfessor(
         user = user,
+        navController = rememberNavController()
     )
+
 }

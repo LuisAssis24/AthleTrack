@@ -1,14 +1,12 @@
 package estga.dadm.athletrack.screens.calendar
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -20,46 +18,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import estga.dadm.athletrack.api.Evento
 import estga.dadm.athletrack.api.RetrofitClient
+import estga.dadm.athletrack.viewmodels.CalendarViewModel
+import kotlinx.coroutines.coroutineScope
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(userName: String) {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var eventos by remember { mutableStateOf<List<Evento>>(emptyList()) }
-    /*var eventos = listOf(
-        Evento(idEvento = 1, localEvento = "Teste", data = "2025-05-07", hora = "10:00")
-    )*/
-    val coroutineScope = rememberCoroutineScope()
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+    val viewModel: CalendarViewModel = viewModel()
 
-    LaunchedEffect(selectedDate) {
-        coroutineScope.launch {
-            try {
-                val response = RetrofitClient.eventosService.getEventosPorData(selectedDate.toString())
-                println("Resposta da API: $response")
-                eventos = response
-            } catch (e: Exception) {
-                println("Erro ao buscar eventos: ${e.message}")
-                eventos = emptyList() // Tratar erro
-            }
-        }
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val eventos by viewModel.eventos.collectAsState()
+    val currentMonth by viewModel.currentMonth.collectAsState()
+
+    LaunchedEffect(currentMonth) {
+        viewModel.carregarEventosParaMes()
     }
+
 
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstDayOfWeek = currentMonth.atDay(1).dayOfWeek.value % 7
-    val monthLabel = currentMonth.month.getDisplayName(TextStyle.FULL, Locale("pt", "BR")).replaceFirstChar { it.uppercase() }
+    val monthLabel = currentMonth.month.getDisplayName(TextStyle.FULL, Locale("pt", "BR"))
+        .replaceFirstChar { it.uppercase() }
 
     Scaffold(
         topBar = {
@@ -123,9 +111,12 @@ fun CalendarScreen(userName: String) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(onClick = {
-                            currentMonth = currentMonth.minusMonths(1)
+                            viewModel.irParaMesAnterior()
                         }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Mês anterior")
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Mês anterior"
+                            )
                         }
                         Text(
                             "$monthLabel ${currentMonth.year}",
@@ -133,15 +124,21 @@ fun CalendarScreen(userName: String) {
                             fontWeight = FontWeight.SemiBold
                         )
                         IconButton(onClick = {
-                            currentMonth = currentMonth.plusMonths(1)
+                            viewModel.irParaMesSeguinte()
                         }) {
-                            Icon(Icons.Default.ArrowForward, contentDescription = "Próximo mês")
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "Próximo mês"
+                            )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         listOf("S", "M", "T", "W", "T", "F", "S").forEach {
                             Text(it, fontSize = 12.sp, color = Color.Gray)
                         }
@@ -169,7 +166,7 @@ fun CalendarScreen(userName: String) {
                                             .background(
                                                 if (date == selectedDate) Color.Gray else Color.Transparent
                                             )
-                                            .clickable { selectedDate = date },
+                                            .clickable { viewModel.selecionarData(date) },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -215,8 +212,17 @@ fun CalendarScreen(userName: String) {
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("${selectedDate.dayOfMonth}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                            Text(selectedDate.month.getDisplayName(TextStyle.SHORT, Locale("pt", "BR")), fontSize = 12.sp)
+                            Text(
+                                "${selectedDate.dayOfMonth}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                selectedDate.month.getDisplayName(
+                                    TextStyle.SHORT,
+                                    Locale("pt", "BR")
+                                ), fontSize = 12.sp
+                            )
                         }
                     }
                 }
@@ -226,10 +232,10 @@ fun CalendarScreen(userName: String) {
 }
 
 // Composable de pré-visualização para desenvolvimento no Android Studio
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Preview(showBackground = false)
 @Composable
-fun calendarScreenPreview() {
+fun CalendarScreenPreview() {
     CalendarScreen(userName = "João")
 }
 

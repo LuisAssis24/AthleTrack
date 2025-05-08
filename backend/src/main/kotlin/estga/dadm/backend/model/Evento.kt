@@ -7,13 +7,18 @@ import java.time.LocalTime
 @Entity
 @Table(name = "eventos")
 data class Evento(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val idEvento: Long = 0,
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int,
 
     val localEvento: String,
 
     val data: LocalDate,
 
-    val hora: LocalTime
+    val hora: LocalTime,
+
+    val descricao: String,
+
+    @OneToMany(mappedBy = "evento")
+    val modalidades: List<EventoModalidade> = emptyList()
 )

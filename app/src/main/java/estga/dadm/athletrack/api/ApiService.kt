@@ -13,7 +13,7 @@ data class LoginRequest(
 )
 
 // Modelo de dados da resposta
-data class LoginResponse(
+data class User(
     val idSocio: Int,
     val nome: String,
     val tipo: String
@@ -22,7 +22,7 @@ data class LoginResponse(
 interface LoginService {
     @Headers("Content-Type: application/json")
     @POST("/api/login")
-    fun login(@Body request: LoginRequest): Call<LoginResponse>
+    fun login(@Body request: LoginRequest): Call<User>
 }
 
 // Modelo da Request do treino
@@ -47,16 +47,19 @@ interface TreinosService {
     suspend fun getTreinosAmanha(@Body request: TreinosRequest): List<Treino>
 }
 
+data class EventosRequest(
+    val idSocio: Int,
+)
 
-interface EventosService {
-    @POST("/api/eventos/data")
-    suspend fun getEventosPorData(@Body data: String): List<Evento>
-}
-
-// Modelo de Evento
+// Modelo de Resposta dos Eventos
 data class Evento(
-    val idEvento: Long,
     val localEvento: String,
     val data: String,
     val hora: String
 )
+
+interface EventosService {
+    @POST("/api/eventos/listar")
+    suspend fun getEventos(@Body request: EventosRequest): List<Evento>
+}
+

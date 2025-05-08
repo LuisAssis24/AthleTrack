@@ -5,12 +5,16 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "users")
 data class User(
-    @Id
-    val idSocio: Int,
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int,
 
     val nome: String,
 
     val tipo: String,
 
-    val password: String
+    val password: String,
+
+    @OneToMany(mappedBy = "socio")
+    val modalidades: List<SocioModalidade> = emptyList()
 )

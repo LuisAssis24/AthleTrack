@@ -7,5 +7,6 @@ import java.time.LocalDate
 
 @Repository
 interface EventoRepository : JpaRepository<Evento, Long> {
+
     fun findByData(data: LocalDate): List<Evento>
 }

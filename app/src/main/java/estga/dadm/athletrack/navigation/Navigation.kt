@@ -10,19 +10,18 @@ import com.google.gson.Gson
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import estga.dadm.athletrack.api.LoginResponse
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.screens.LoginScreen
 import estga.dadm.athletrack.screens.calendar.CalendarScreen
 import estga.dadm.athletrack.screens.home.*
 import estga.dadm.athletrack.components.*
 import java.net.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
     val gson = Gson()
 
-    NavHost(navController, startDestination = "calendar") {
+    NavHost(navController, startDestination = "login") {
         composable("login") {
             LoginScreen(
                 onLoginClick = { user ->
@@ -42,7 +41,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
-            val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), LoginResponse::class.java)
+            val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
             HomeScreenAtleta(user = user)
         }
 
@@ -51,10 +50,10 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
-            val user =
-                gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), LoginResponse::class.java)
+            val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
             HomeScreenProfessor(
                 user = user,
+                navController = navController,
             )
         }
 

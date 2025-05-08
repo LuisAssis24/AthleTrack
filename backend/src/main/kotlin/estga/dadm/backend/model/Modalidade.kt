@@ -5,10 +5,12 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "modalidades")
 data class Modalidade(
-    @Id
-    @Column(name = "id_modalidade")
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
 
-    @Column(name = "nome_modalidade")
-    val nomeModalidade: String
+    val nomeModalidade: String,
+
+    @OneToMany(mappedBy = "modalidade")
+    val socios: List<SocioModalidade> = emptyList()
 )

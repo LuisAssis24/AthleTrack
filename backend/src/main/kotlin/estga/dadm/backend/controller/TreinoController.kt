@@ -13,7 +13,7 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemanaOrderByHoraAsc(request.idProfessor, request.diaSemana)
+            .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.idProfessor, request.diaSemana)
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
@@ -28,7 +28,7 @@ class TreinoController(private val treinoRepository: TreinoRepository) {
     fun getTreinosAmanha(@RequestBody request: TreinoProfRequestDTO): List<TreinoProfResponseDTO> {
         val amanha = calculaAmanha(request.diaSemana)
         return treinoRepository
-            .findByProfessorIdSocioAndDiaSemanaOrderByHoraAsc(request.idProfessor, amanha)
+            .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.idProfessor, amanha)
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,

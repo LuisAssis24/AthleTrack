@@ -25,14 +25,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import estga.dadm.athletrack.api.LoginResponse
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.ui.theme.* // Importa cores personalizadas
 import kotlinx.coroutines.launch
 
 @Composable
 
-fun HomeScreenAtleta(user: LoginResponse) {
+fun HomeScreenAtleta(user: User) {
     val treinos = listOf(
         "Treino Cardio - 02/04",
         "Treino Força - 04/04",

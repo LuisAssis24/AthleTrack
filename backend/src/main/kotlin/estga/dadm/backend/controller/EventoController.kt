@@ -1,41 +1,41 @@
 package estga.dadm.backend.controller
 
+import estga.dadm.backend.dto.EventoRequestDTO
+import estga.dadm.backend.dto.EventoResponseDTO
 import estga.dadm.backend.model.Evento
-import estga.dadm.backend.repository.EventoRepository
-import org.springframework.http.ResponseEntity
+import estga.dadm.backend.repository.EventoModalidadeRepository
+import estga.dadm.backend.repository.SocioModalidadeRepository
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import kotlin.String
 
 @RestController
 @RequestMapping("/api/eventos")
-class EventoController(private val eventoRepository: EventoRepository) {
+class EventoController(
+    private val eventoModalidadeRepository: EventoModalidadeRepository,
+    private val socioModalidadeRepository: SocioModalidadeRepository
+) {
 
-    @GetMapping
-    fun listarTodos(): List<Evento> = eventoRepository.findAll()
+    @PostMapping("/listar")
+    fun listarPorIdSocio(@RequestBody request: EventoRequestDTO): List<EventoResponseDTO> {
+        val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
 
-    @PostMapping("/data")
-    fun listarPorDataPost(@RequestBody data: String): ResponseEntity<List<Evento>> {
-        val eventos = eventoRepository.findByData(LocalDate.parse(data))
-//        val eventos = listOf(
-//            Evento(idEvento = 1, localEvento = "Ginásio Central", data = LocalDate.parse(data), hora = LocalTime.of(10, 0)),
-//            Evento(idEvento = 2, localEvento = "Campo de Futebol", data = LocalDate.parse(data), hora = LocalTime.of(15, 30))
-//        )
-        return ResponseEntity.ok(eventos)
+        val modalidadesIds = socioModalidades.map { it.modalidade.id }
+
+        val eventos = eventoModalidadeRepository.findByModalidadeIdIn(modalidadesIds)
+            .map { relacao ->
+                val evento = relacao.evento
+                EventoResponseDTO(
+                    localEvento = evento.localEvento,
+                    data = evento.data,
+                    hora = evento.hora,
+                    descricao = evento.descricao
+                )
+            }
+            .filter { it.data.isAfter(LocalDate.now()) }
+
+        return eventos
     }
 
-    @PostMapping
-    fun criarEvento(@RequestBody evento: Evento): ResponseEntity<Evento> {
-        val novoEvento = eventoRepository.save(evento)
-        return ResponseEntity.ok(novoEvento)
-    }
 
-    @DeleteMapping("/{id}")
-    fun deletarEvento(@PathVariable id: Long): ResponseEntity<Void> {
-        return if (eventoRepository.existsById(id)) {
-            eventoRepository.deleteById(id)
-            ResponseEntity.noContent().build()
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import estga.dadm.athletrack.api.LoginRequest
-import estga.dadm.athletrack.api.LoginResponse
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.ui.theme.*
 
@@ -31,7 +31,7 @@ import retrofit2.Response
 @Composable
 @Preview // Permite visualizar esta UI na aba "Design" do Android Studio
 fun LoginScreen(
-    onLoginClick: (LoginResponse) -> Unit = {}, // Callback para o botão "Entrar"
+    onLoginClick: (User) -> Unit = {}, // Callback para o botão "Entrar"
     onForgotPasswordClick: () -> Unit = {} // Callback para o link "Esqueceste da palavra-passe?"
 ) {
     // Estados reativos que armazenam os valores dos campos de input
@@ -109,10 +109,10 @@ fun LoginScreen(
                 if (socio.isNotBlank() && password.isNotBlank()) {
                     val request = LoginRequest(socio.toInt(), password)
 
-                    RetrofitClient.loginService.login(request).enqueue(object : Callback<estga.dadm.athletrack.api.LoginResponse> {
+                    RetrofitClient.loginService.login(request).enqueue(object : Callback<estga.dadm.athletrack.api.User> {
                         override fun onResponse(
-                            call: Call<LoginResponse>,
-                            response: Response<LoginResponse>
+                            call: Call<User>,
+                            response: Response<User>
                         ) {
                             if (response.isSuccessful) {
                                 val user = response.body()
@@ -125,7 +125,7 @@ fun LoginScreen(
                             }
                         }
 
-                        override fun onFailure(call: Call<estga.dadm.athletrack.api.LoginResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<User>, t: Throwable) {
                             Toast.makeText(context, "Erro: ${t.message}", Toast.LENGTH_LONG).show()
                         }
                     })
