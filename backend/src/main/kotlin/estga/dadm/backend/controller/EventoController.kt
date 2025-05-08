@@ -2,12 +2,11 @@ package estga.dadm.backend.controller
 
 import estga.dadm.backend.dto.EventoRequestDTO
 import estga.dadm.backend.dto.EventoResponseDTO
-import estga.dadm.backend.model.Evento
 import estga.dadm.backend.repository.EventoModalidadeRepository
 import estga.dadm.backend.repository.SocioModalidadeRepository
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
-import kotlin.String
+
 
 @RestController
 @RequestMapping("/api/eventos")
@@ -32,10 +31,8 @@ class EventoController(
                     descricao = evento.descricao
                 )
             }
-            .filter { it.data.isAfter(LocalDate.now()) }
+            .filter { it.data.isEqual(LocalDate.now()) || it.data.isAfter(LocalDate.now()) }
 
         return eventos
     }
-
-
 }

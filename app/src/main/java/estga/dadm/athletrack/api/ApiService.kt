@@ -55,7 +55,8 @@ data class EventosRequest(
 data class Evento(
     val localEvento: String,
     val data: String,
-    val hora: String
+    val hora: String,
+    val descricao: String
 )
 
 interface EventosService {

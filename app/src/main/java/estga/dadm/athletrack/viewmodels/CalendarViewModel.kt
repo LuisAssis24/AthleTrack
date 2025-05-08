@@ -35,9 +35,7 @@ class CalendarViewModel : ViewModel() {
     fun carregarEventosParaMes(/* se necessário, userId ou filtros */) {
         viewModelScope.launch {
             // chamada à API ou geração local
-            _eventos.value = listOf(
-                Evento(idEvento = 1, localEvento = "Exemplo", data = "2025-05-07", hora = "10:00")
-            )
+
         }
     }
 }

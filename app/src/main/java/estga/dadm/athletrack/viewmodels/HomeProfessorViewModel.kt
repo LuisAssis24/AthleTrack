@@ -1,7 +1,5 @@
 package estga.dadm.athletrack.viewmodels
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import estga.dadm.athletrack.api.RetrofitClient
@@ -10,6 +8,7 @@ import estga.dadm.athletrack.api.TreinosRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 
 class HomeProfessorViewModel : ViewModel() {
@@ -39,6 +38,20 @@ class HomeProfessorViewModel : ViewModel() {
                 _treinosHoje.value = emptyList()
                 _treinosAmanha.value = emptyList()
             }
+        }
+    }
+
+    fun detetarDiaSemana(): String {
+        val diaAtual = LocalDate.now().dayOfWeek.value
+        return when (diaAtual) {
+            1 -> "SEG"
+            2 -> "TER"
+            3 -> "QUA"
+            4 -> "QUI"
+            5 -> "SEX"
+            6 -> "SAB"
+            7 -> "DOM"
+            else -> ""
         }
     }
 }

@@ -27,21 +27,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import estga.dadm.athletrack.components.QrCodeDialog
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-
-fun detetarDiaSemana(): String {
-    val diaAtual = LocalDate.now().dayOfWeek.value
-    return when (diaAtual) {
-        1 -> "SEG"
-        2 -> "TER"
-        3 -> "QUA"
-        4 -> "QUI"
-        5 -> "SEX"
-        6 -> "SAB"
-        7 -> "DOM"
-        else -> ""
-    }
-}
 
 @Composable
 fun HomeScreenProfessor(
@@ -64,7 +49,7 @@ fun HomeScreenProfessor(
     LaunchedEffect(Unit) {
         viewModel.carregarTreinos(
             user.idSocio,
-            diaSemana = detetarDiaSemana()
+            diaSemana = viewModel.detetarDiaSemana()
         )
     }
 
