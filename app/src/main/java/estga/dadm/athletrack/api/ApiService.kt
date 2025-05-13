@@ -27,7 +27,7 @@ interface LoginService {
 
 // Modelo da Request do treino
 data class TreinosRequest(
-    val idProfessor: Int,
+    val idSocio: Int,
     val diaSemana: String
 )
 
@@ -45,6 +45,9 @@ interface TreinosService {
 
     @POST("/api/treinos/amanha")
     suspend fun getTreinosAmanha(@Body request: TreinosRequest): List<Treino>
+
+    @POST("/api/treinos/aluno")
+    suspend fun getTreinosAluno(@Body request: TreinosRequest): List<Treino>
 }
 
 data class EventosRequest(

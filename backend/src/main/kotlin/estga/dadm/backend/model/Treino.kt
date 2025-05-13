@@ -15,6 +15,7 @@ data class Treino(
 
     val hora: LocalTime,
 
+    @Column(unique = true)
     val qrCode: String,
 
     @ManyToOne

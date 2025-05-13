@@ -1,6 +1,6 @@
 package estga.dadm.backend.dto
 
-data class TreinoProfRequestDTO(
-    val idProfessor: Int,
+data class TreinoRequestDTO(
+    val idSocio: Int,
     val diaSemana: String
 )

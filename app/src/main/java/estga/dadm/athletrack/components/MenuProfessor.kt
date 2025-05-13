@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import estga.dadm.athletrack.ui.theme.GrayNeutral
+import estga.dadm.athletrack.ui.theme.Gray
 import estga.dadm.athletrack.ui.theme.White
 
 @Composable
@@ -36,7 +36,7 @@ fun MenuProfessor(userName: String) {
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(GrayNeutral),
+                .background(Gray),
             contentAlignment = Alignment.Center
         ) {
             Icon(

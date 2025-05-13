@@ -25,12 +25,12 @@ class HomeProfessorViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val respostaHoje = api.getTreinosHoje(
-                    TreinosRequest(idProfessor = idProfessor, diaSemana = diaSemana)
+                    TreinosRequest(idSocio = idProfessor, diaSemana = diaSemana)
                 )
                 _treinosHoje.value = respostaHoje
 
                 val respostaAmanha = api.getTreinosAmanha(
-                    TreinosRequest(idProfessor = idProfessor, diaSemana = diaSemana)
+                    TreinosRequest(idSocio = idProfessor, diaSemana = diaSemana)
                 )
                 _treinosAmanha.value = respostaAmanha
 

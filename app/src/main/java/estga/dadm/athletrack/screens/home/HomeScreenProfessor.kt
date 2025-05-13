@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import estga.dadm.athletrack.components.QrCodeDialog
+import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -143,7 +145,13 @@ fun HomeScreenProfessor(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            thickness = 1.5.dp,
+                            color = Gray
+                        )
 
                         val aulasParaMostrar =
                             if (selected.value == "hoje") aulasHoje else aulasAmanha
@@ -172,9 +180,10 @@ fun HomeScreenProfessor(
                                         textAlign = TextAlign.Center
                                     )
                                     if (index < aulasParaMostrar.size - 1) {
-                                        Divider(
+                                        HorizontalDivider(
                                             modifier = Modifier.padding(vertical = 8.dp),
-                                            thickness = 1.dp
+                                            thickness = 1.dp,
+                                            color = White
                                         )
                                     }
                                 }

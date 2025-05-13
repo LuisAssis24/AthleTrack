@@ -15,6 +15,7 @@ import estga.dadm.athletrack.screens.LoginScreen
 import estga.dadm.athletrack.screens.calendar.CalendarScreen
 import estga.dadm.athletrack.screens.home.*
 import estga.dadm.athletrack.components.*
+import estga.dadm.athletrack.screens.*
 import java.net.*
 
 @Composable
@@ -42,8 +43,20 @@ fun AthleTrackNavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            HomeScreenAtleta(user = user)
+            HomeScreenAtleta(
+                user = user,
+                navController = navController,
+            )
         }
+
+        composable("qrscan/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            QrScanScreen(user = user, navController = navController)
+        }
+
 
         composable(
             "homeProfessor/{userJson}",

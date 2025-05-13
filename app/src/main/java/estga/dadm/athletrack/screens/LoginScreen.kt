@@ -68,7 +68,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(), // Ocupa toda a largura disponível
             colors = OutlinedTextFieldDefaults.colors( // Personalização visual
                 focusedBorderColor = BlueAccent,
-                unfocusedBorderColor = GrayNeutral,
+                unfocusedBorderColor = Gray,
                 focusedLabelColor = BlueAccent,
                 unfocusedLabelColor = White,
                 cursorColor = BlueAccent
@@ -91,7 +91,7 @@ fun LoginScreen(
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = BlueAccent,
-                unfocusedBorderColor = GrayNeutral,
+                unfocusedBorderColor = Gray,
                 focusedLabelColor = BlueAccent,
                 unfocusedLabelColor = White,
                 cursorColor = BlueAccent

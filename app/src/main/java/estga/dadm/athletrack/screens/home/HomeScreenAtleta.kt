@@ -1,52 +1,51 @@
 package estga.dadm.athletrack.screens.home
 
 // Importações necessárias para UI e comportamento
-import estga.dadm.athletrack.components.MenuAtleta
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import estga.dadm.athletrack.ui.theme.*
+import estga.dadm.athletrack.api.User
+import estga.dadm.athletrack.viewmodels.HomeAlunoViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.ui.text.style.TextAlign
-import estga.dadm.athletrack.api.User
-import estga.dadm.athletrack.ui.theme.* // Importa cores personalizadas
-import kotlinx.coroutines.launch
+import com.google.gson.Gson
+import estga.dadm.athletrack.components.MenuAtleta
 
 @Composable
 
-fun HomeScreenAtleta(user: User) {
-    val treinos = listOf(
-        "Treino Cardio - 02/04",
-        "Treino Força - 04/04",
-        "Treino Equipa - 06/04",
-        "Ginásio Livre - 08/04",
-        "Recuperação Ativa - 10/04",
-        "Treino Extra - 11/04",
-        "Treino Técnico - 12/04",
-        "Treino Livre - 13/04",
-        "Treino Tático - 14/04",
-        "Avaliação Física - 15/04"
-    ).take(10)
-
+fun HomeScreenAtleta(
+    user: User,
+    navController: NavHostController,
+    viewModel: HomeAlunoViewModel = viewModel()
+) {
+    val treinos by viewModel.treinos.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // Carregar a viewmodel assim que a composable for criada
+    LaunchedEffect(Unit) {
+        viewModel.carregarTreinos(
+            user.idSocio,
+            diaSemana = viewModel.detetarDiaSemana()
+        )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -99,48 +98,80 @@ fun HomeScreenAtleta(user: User) {
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Próximos Treinos", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = White)
+                Text(
+                    "Próximos Treinos",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = White
+                )
 
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
-                    thickness = 1.dp,
-                    color = GrayNeutral
+                    thickness = 1.5.dp,
+                    color = Gray
                 )
 
-                treinos.forEach {
-                    Text(
-                        it,
-                        fontSize = 16.sp,
-                        color = White,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    HorizontalDivider(thickness = 0.5.dp, color = GrayNeutral)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(480.dp)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (treinos.isEmpty()) {
+                            Text(
+                                text = "Não tem treinos agendados para hoje.",
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        } else {
+                            treinos.take(12).forEachIndexed { index, treino ->
+                                Text(
+                                    text = "${treino.nomeModalidade} - ${treino.diaSemana} - ${treino.hora}",
+                                    fontSize = 16.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                                HorizontalDivider(thickness = 1.dp, color = Gray)
+                            }
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
+                            .size(100.dp)
                             .clip(CircleShape)
-                            .background(Color.Gray),
+                            .background(White),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_menu_camera),
                             contentDescription = "Câmara",
-                            tint = White,
-                            modifier = Modifier.size(36.dp)
+                            tint = BluePrimary,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clickable {
+                                    val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                    navController.navigate("qrscan/$userJson")
+                                }
                         )
+
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Registar Presença", fontSize = 12.sp, color = White)
+                    Text(
+                        text = "Registar Presença",
+                        style = Typography.labelMedium,
+                        )
                 }
             }
         }
