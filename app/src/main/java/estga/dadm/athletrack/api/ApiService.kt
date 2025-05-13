@@ -67,3 +67,17 @@ interface EventosService {
     suspend fun getEventos(@Body request: EventosRequest): List<Evento>
 }
 
+data class PresencaRequest(
+    val idSocio: Int,
+    val qrCode: String
+)
+
+data class PresencaResponse(
+    val sucesso: Boolean,
+    val mensagem: String
+)
+
+interface PresencasService {
+    @POST("/api/presencas/registar")
+    suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
+}

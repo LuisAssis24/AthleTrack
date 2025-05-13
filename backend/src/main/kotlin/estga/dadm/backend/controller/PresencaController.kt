@@ -17,18 +17,21 @@ class PresencaController(
 ) {
 
     @PostMapping("/registar")
-    fun registarPresenca(@RequestBody request: PresencaRequestDTO): ResponseEntity<String> {
+    fun registarPresenca(@RequestBody request: PresencaRequestDTO): ResponseEntity<PresencaResponseDTO> {
         val treino = treinoRepository.findByQrCode(request.qrCode)
-            ?: return ResponseEntity.badRequest().body("QR Code inválido.")
+            ?: return ResponseEntity.badRequest()
+                .body(PresencaResponseDTO(sucesso = false, mensagem = "QR Code inválido."))
 
         val aluno = userRepository.findById(request.idSocio).orElse(null)
-            ?: return ResponseEntity.badRequest().body("Sócio não encontrado.")
+            ?: return ResponseEntity.badRequest()
+                .body(PresencaResponseDTO(sucesso = false, mensagem = "Sócio não encontrado."))
 
         val modalidadesDoAluno = socioModalidadeRepository.findBySocioId(request.idSocio)
             .map { it.modalidade.id }
 
         if (treino.modalidade.id !in modalidadesDoAluno) {
-            return ResponseEntity.status(403).body("Aluno não inscrito nesta modalidade.")
+            return ResponseEntity.status(403)
+                .body(PresencaResponseDTO(sucesso = false, mensagem = "Aluno não inscrito nesta modalidade."))
         }
 
         val presencaId = PresencaId(
@@ -37,7 +40,8 @@ class PresencaController(
         )
 
         if (presencaRepository.existsById(presencaId)) {
-            return ResponseEntity.status(208).body("Presença já confirmada anteriormente.")
+            return ResponseEntity.status(208)
+                .body(PresencaResponseDTO(sucesso = false, mensagem = "Presença já confirmada anteriormente."))
         }
 
         val novaPresenca = Presenca(
@@ -48,7 +52,7 @@ class PresencaController(
 
         presencaRepository.save(novaPresenca)
 
-        return ResponseEntity.ok("Presença registada com sucesso.")
+        return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
     }
 }
 
