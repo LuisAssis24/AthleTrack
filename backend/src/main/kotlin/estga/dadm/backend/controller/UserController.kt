@@ -36,7 +36,6 @@ class UserController(private val userRepository: UserRepository,
     }
 
     @PostMapping("/criar")
-    @Transactional
     fun criarUser(@RequestBody request: UserCreateRequestDTO): ResponseEntity<String> {
         return try {
             val encryptedPassword = PasswordUtil.encode(request.password)

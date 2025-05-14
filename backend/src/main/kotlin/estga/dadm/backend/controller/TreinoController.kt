@@ -53,7 +53,9 @@ class TreinoController(
         val todosTreinos = mutableListOf<Treino>()
 
         diasList.forEach { dia ->
-            val treinos = treinoRepository.findByModalidadeIdInAndDiaSemanaOrderByHoraAsc(modalidades, request.diaSemana)
+            val treinos = treinoRepository.findByModalidadeIdInAndDiaSemanaOrderByHoraAsc(
+                modalidades, dia
+            )
 
             if (treinos.isNotEmpty()) {
                 todosTreinos.addAll(treinos)
@@ -82,7 +84,6 @@ class TreinoController(
         }
 
         val treino = Treino(
-            id = 0, // Valor padrão para o ID autoincrement
             diaSemana = request.diaSemana,
             hora = LocalTime.parse(request.hora),
             qrCode = request.qrCode,

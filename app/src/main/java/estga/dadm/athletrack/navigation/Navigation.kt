@@ -27,7 +27,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             LoginScreen(
                 onLoginClick = { user ->
                     val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                    if (user.tipo == "atleta") {
+                    if (user.tipo.lowercase() == "atleta") {
                         navController.navigate("homeAtleta/$userJson")
                     } else {
                         navController.navigate("homeProfessor/$userJson")

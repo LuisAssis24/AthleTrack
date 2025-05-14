@@ -9,7 +9,7 @@ import java.time.LocalTime
 data class Treino(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int,
+    val id: Int = 0,
 
     val diaSemana: String,
 
