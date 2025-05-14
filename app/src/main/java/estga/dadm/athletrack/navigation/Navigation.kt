@@ -1,7 +1,5 @@
 package estga.dadm.athletrack.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,13 +7,13 @@ import androidx.navigation.compose.composable
 import com.google.gson.Gson
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.screens.LoginScreen
 import estga.dadm.athletrack.screens.calendar.CalendarScreen
-import estga.dadm.athletrack.screens.home.*
-import estga.dadm.athletrack.components.*
-import estga.dadm.athletrack.screens.*
+import estga.dadm.athletrack.screens.atleta.HomeScreenAtleta
+import estga.dadm.athletrack.screens.professor.GestaoTreinosScreen
+import estga.dadm.athletrack.screens.professor.HomeScreenProfessor
+import estga.dadm.athletrack.screens.professor.QrScanScreen
 import java.net.*
 
 @Composable
@@ -69,6 +67,16 @@ fun AthleTrackNavGraph(navController: NavHostController) {
                 navController = navController,
             )
         }
+
+        composable(
+            "gestaotreinos/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            GestaoTreinosScreen(user)
+        }
+
 
         composable(
             "calendar/{userJson}",

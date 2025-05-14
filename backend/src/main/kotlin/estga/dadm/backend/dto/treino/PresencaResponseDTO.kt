@@ -1,4 +1,4 @@
-package estga.dadm.backend.dto
+package estga.dadm.backend.dto.treino
 
 data class PresencaResponseDTO(
     val sucesso: Boolean,

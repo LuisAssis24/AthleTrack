@@ -3,6 +3,10 @@ package estga.dadm.athletrack.api
 import retrofit2.Call
 import retrofit2.http.*
 
+// Modelo de dados para quando é necessário enviar apenas o id do sócio
+data class idRequest(
+    val idSocio: Int
+)
 
 // Modelo de dados do pedido
 data class LoginRequest(
@@ -45,6 +49,10 @@ data class TreinoCreateRequest(
     val idProfessor: Int
 )
 
+data class TreinoDeleteRequest(
+    val qrCode: String
+)
+
 interface TreinosService {
     @POST("/api/treinos/hoje")
     suspend fun getTreinosHoje(@Body request: TreinosRequest): List<Treino>
@@ -54,6 +62,12 @@ interface TreinosService {
 
     @POST("/api/treinos/aluno")
     suspend fun getTreinosAluno(@Body request: TreinosRequest): List<Treino>
+
+    @POST("/api/treinos")
+    suspend fun listarTodosOsTreinos(@Body request: idRequest): List<Treino>
+
+    @POST("/api/treinos/apagar")
+    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): String
 
     @POST("/api/treinos/criar")
     suspend fun criarTreino(@Body request: TreinoCreateRequest): String

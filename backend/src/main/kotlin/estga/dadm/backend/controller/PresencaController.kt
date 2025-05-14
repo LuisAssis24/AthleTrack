@@ -1,6 +1,7 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.*
+import estga.dadm.backend.dto.treino.PresencaRequestDTO
+import estga.dadm.backend.dto.treino.PresencaResponseDTO
 import estga.dadm.backend.keys.PresencaId
 import estga.dadm.backend.model.Presenca
 import estga.dadm.backend.repository.*

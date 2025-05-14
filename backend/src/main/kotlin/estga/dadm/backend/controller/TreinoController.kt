@@ -1,6 +1,6 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.*
+import estga.dadm.backend.dto.treino.*
 import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.model.Treino
 import estga.dadm.backend.repository.*
@@ -15,6 +15,26 @@ class TreinoController(
     private val modalidadeRepository: ModalidadeRepository,
     private val userRepository: UserRepository
 ) {
+
+    @PostMapping()
+    fun listarTodosOsTreinos(): List<TreinoProfResponseDTO> {
+        val ordem = ordenarDias("SEG")
+
+        return ordem.flatMap { dia ->
+            treinoRepository
+                .findAll()
+                .filter { it.diaSemana == dia }
+                .sortedBy { it.hora }
+                .map { treino ->
+                    TreinoProfResponseDTO(
+                        nomeModalidade = treino.modalidade.nomeModalidade,
+                        diaSemana = treino.diaSemana,
+                        hora = treino.hora.toString(),
+                        qrCode = treino.qrCode
+                    )
+                }
+        }
+    }
 
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
@@ -56,17 +76,11 @@ class TreinoController(
         val margem = agora.minusMinutes(30)
 
         diasList.forEach { dia ->
-            val treinos = treinoRepository.findByModalidadeIdInAndDiaSemanaOrderByHoraAsc(
-                modalidades, dia
-            )
-
-            val treinosFiltrados = treinos.filter { treino ->
-                when (dia) {
-                    request.diaSemana -> treino.hora.isAfter(margem) || treino.hora == margem
-                    else -> true
+            val treinosFiltrados = treinoRepository
+                .findByModalidadeIdInAndDiaSemanaOrderByHoraAsc(modalidades, dia)
+                .filter { treino ->
+                    dia != request.diaSemana || treino.hora >= margem
                 }
-            }
-
             todosTreinos.addAll(treinosFiltrados)
         }
 
@@ -81,25 +95,35 @@ class TreinoController(
 
     @PostMapping("/criar")
     fun criarTreino(@RequestBody request: TreinoCriarRequestDTO): ResponseEntity<String> {
-
         val professor = userRepository.findById(request.idProfessor).orElseThrow()
-
         val modalidade = modalidadeRepository.findById(request.idModalidade).orElseThrow()
 
-        if (treinoRepository.findByQrCode(request.qrCode) != null) {
-            return ResponseEntity.badRequest().body("QR Code já existe. Por favor, utilize outro.")
+        val qrCode = "${request.diaSemana}-${request.hora}-P${request.idProfessor}-M${request.idModalidade}"
+
+        if (treinoRepository.findByQrCode(qrCode) != null) {
+            return ResponseEntity.badRequest().body("QR Code já existe.")
         }
 
         val treino = Treino(
             diaSemana = request.diaSemana,
             hora = LocalTime.parse(request.hora),
-            qrCode = request.qrCode,
+            qrCode = qrCode,
             modalidade = modalidade,
-            professor = professor,
+            professor = professor
         )
 
         treinoRepository.save(treino)
         return ResponseEntity.ok("Treino criado com sucesso.")
+    }
+
+    @PostMapping("/apagar")
+    fun apagarTreino(@RequestBody request: TreinoApagarRequest): ResponseEntity<String> {
+        val treino = treinoRepository.findByQrCode(request.qrCode)
+        if (treino != null) {
+            treinoRepository.delete(treino)
+            return ResponseEntity.ok("Treino apagado com sucesso.")
+        }
+        return ResponseEntity.badRequest().body("Treino não encontrado.")
     }
 
     fun calculaAmanha(dia: String): String? {

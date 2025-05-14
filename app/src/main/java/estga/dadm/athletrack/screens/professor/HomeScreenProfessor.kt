@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.screens.home
+package estga.dadm.athletrack.screens.professor
 
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
@@ -63,7 +63,8 @@ fun HomeScreenProfessor(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            MenuProfessor(user.nome)
+            MenuProfessor(user = user, navController = navController)
+
         }
     ) {
         Scaffold(

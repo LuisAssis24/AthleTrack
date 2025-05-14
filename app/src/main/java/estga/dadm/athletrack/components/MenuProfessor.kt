@@ -17,11 +17,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.google.gson.Gson
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.ui.theme.Gray
 import estga.dadm.athletrack.ui.theme.White
+import java.net.URLEncoder
 
 @Composable
-fun MenuProfessor(userName: String) {
+fun MenuProfessor(user: User, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxWidth(0.7f)
@@ -50,7 +54,7 @@ fun MenuProfessor(userName: String) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = userName,
+            text = user.nome,
             fontSize = 18.sp,
             color = White
         )
@@ -59,7 +63,11 @@ fun MenuProfessor(userName: String) {
 
         // Opções específicas do professor
         Button(onClick = {
+
             // Ação para Gestão de Treinos
+            val gson = Gson()
+            val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+            navController.navigate("gestaotreinos/$userJson")
 
         }, colors = ButtonDefaults.textButtonColors(
             contentColor = Color.White

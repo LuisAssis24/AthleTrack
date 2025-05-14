@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Treino
+import estga.dadm.athletrack.api.TreinoCreateRequest
+import estga.dadm.athletrack.api.TreinoDeleteRequest
 import estga.dadm.athletrack.api.TreinosRequest
+import estga.dadm.athletrack.api.idRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -54,4 +57,50 @@ class HomeProfessorViewModel : ViewModel() {
             else -> ""
         }
     }
+
+    private val _treinosTodos = MutableStateFlow<List<Treino>>(emptyList())
+    val treinosTodos: StateFlow<List<Treino>> = _treinosTodos
+
+    fun carregarTodosOsTreinos(idSocio: Int) {
+        viewModelScope.launch {
+            try {
+                val resposta = api.listarTodosOsTreinos(idRequest(idSocio))
+                _treinosTodos.value = resposta
+            } catch (e: Exception) {
+                _treinosTodos.value = emptyList()
+            }
+        }
+    }
+
+
+    fun criarTreino(
+        diaSemana: String,
+        hora: String,
+        idModalidade: Int,
+        idProfessor: Int,
+        callback: (Boolean, String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val resposta = api.criarTreino(
+                    TreinoCreateRequest(diaSemana, hora, "", idModalidade, idProfessor)
+                )
+                callback(true, resposta)
+            } catch (e: Exception) {
+                callback(false, "Erro ao criar treino")
+            }
+        }
+    }
+
+    fun apagarTreino(qrCode: String, onDone: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                api.apagarTreino(
+                    TreinoDeleteRequest(qrCode)
+                )
+            } catch (_: Exception) { }
+            onDone()
+        }
+    }
+
 }

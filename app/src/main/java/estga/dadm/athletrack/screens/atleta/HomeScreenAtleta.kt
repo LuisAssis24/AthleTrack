@@ -1,6 +1,7 @@
-package estga.dadm.athletrack.screens.home
+package estga.dadm.athletrack.screens.atleta
 
 // Importações necessárias para UI e comportamento
+import android.R
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -155,7 +156,7 @@ fun HomeScreenAtleta(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                            painter = painterResource(id = R.drawable.ic_menu_camera),
                             contentDescription = "Câmara",
                             tint = BluePrimary,
                             modifier = Modifier

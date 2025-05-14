@@ -1,4 +1,4 @@
-package estga.dadm.backend.dto
+package estga.dadm.backend.dto.user
 
 data class UserCreateRequestDTO(
     val password: String,

@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.screens
+package estga.dadm.athletrack.screens.professor
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -13,10 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.*
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Response
-import okhttp3.ResponseBody
-import javax.security.auth.callback.Callback
 
 @Composable
 fun QrScanScreen(user: User, navController: NavHostController) {

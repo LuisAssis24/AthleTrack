@@ -1,7 +1,7 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.EventoRequestDTO
-import estga.dadm.backend.dto.EventoResponseDTO
+import estga.dadm.backend.dto.evento.EventoRequestDTO
+import estga.dadm.backend.dto.evento.EventoResponseDTO
 import estga.dadm.backend.repository.EventoModalidadeRepository
 import estga.dadm.backend.repository.SocioModalidadeRepository
 import org.springframework.web.bind.annotation.*
