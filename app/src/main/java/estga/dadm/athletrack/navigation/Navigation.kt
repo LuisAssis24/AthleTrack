@@ -8,12 +8,10 @@ import com.google.gson.Gson
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import estga.dadm.athletrack.api.User
-import estga.dadm.athletrack.screens.LoginScreen
+import estga.dadm.athletrack.screens.*
 import estga.dadm.athletrack.screens.calendar.CalendarScreen
-import estga.dadm.athletrack.screens.atleta.HomeScreenAtleta
-import estga.dadm.athletrack.screens.professor.GestaoTreinosScreen
-import estga.dadm.athletrack.screens.professor.HomeScreenProfessor
-import estga.dadm.athletrack.screens.professor.QrScanScreen
+import estga.dadm.athletrack.screens.atleta.*
+import estga.dadm.athletrack.screens.professor.*
 import java.net.*
 
 @Composable
@@ -46,15 +44,6 @@ fun AthleTrackNavGraph(navController: NavHostController) {
                 navController = navController,
             )
         }
-
-        composable("qrscan/{userJson}",
-            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
-            val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            QrScanScreen(user = user, navController = navController)
-        }
-
 
         composable(
             "homeProfessor/{userJson}",
