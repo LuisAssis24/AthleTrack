@@ -52,22 +52,29 @@ class TreinoController(
         val diasList = ordenarDias(request.diaSemana)
         val todosTreinos = mutableListOf<Treino>()
 
+        val agora = LocalTime.now()
+        val margem = agora.minusMinutes(30)
+
         diasList.forEach { dia ->
             val treinos = treinoRepository.findByModalidadeIdInAndDiaSemanaOrderByHoraAsc(
                 modalidades, dia
             )
 
-            if (treinos.isNotEmpty()) {
-                todosTreinos.addAll(treinos)
+            val treinosFiltrados = treinos.filter { treino ->
+                when (dia) {
+                    request.diaSemana -> treino.hora.isAfter(margem) || treino.hora == margem
+                    else -> true
+                }
             }
+
+            todosTreinos.addAll(treinosFiltrados)
         }
 
-
-        return todosTreinos.map { treino: Treino ->
+        return todosTreinos.map { treino ->
             TreinoAlunoResponseDTO(
                 nomeModalidade = treino.modalidade.nomeModalidade,
                 diaSemana = treino.diaSemana,
-                hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
+                hora = treino.hora.toString()
             )
         }
     }

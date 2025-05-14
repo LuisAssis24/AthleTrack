@@ -58,12 +58,10 @@ fun MenuProfessor(userName: String) {
         Spacer(modifier = Modifier.height(24.dp))
 
         // Opções específicas do professor
-        Button(onClick = {}, colors = ButtonDefaults.textButtonColors(
-            contentColor = Color.White
-        )) {
-            Text("Avaliações")
-        }
-        Button(onClick = {}, colors = ButtonDefaults.textButtonColors(
+        Button(onClick = {
+            // Ação para Gestão de Treinos
+
+        }, colors = ButtonDefaults.textButtonColors(
             contentColor = Color.White
         )) {
             Text("Gestão de Treinos")
@@ -71,7 +69,7 @@ fun MenuProfessor(userName: String) {
         Button(onClick = {}, colors = ButtonDefaults.textButtonColors(
             contentColor = Color.White
         )) {
-            Text("Listar Atletas")
+            Text("Gestão de Atletas")
         }
     }
 }
