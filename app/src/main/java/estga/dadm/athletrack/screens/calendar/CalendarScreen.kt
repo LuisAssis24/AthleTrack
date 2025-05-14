@@ -25,14 +25,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 import estga.dadm.athletrack.api.RetrofitClient
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.CalendarViewModel
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 
 @Composable
-fun CalendarScreen(userName: String) {
+fun CalendarScreen(user: User) {
     val viewModel: CalendarViewModel = viewModel()
 
     val selectedDate by viewModel.selectedDate.collectAsState()
@@ -40,10 +42,13 @@ fun CalendarScreen(userName: String) {
     val currentMonth by viewModel.currentMonth.collectAsState()
 
     LaunchedEffect(currentMonth) {
-        viewModel.carregarEventosParaMes()
+        viewModel.carregarEventosParaMes(user.idSocio)
     }
 
-
+    val eventosFiltrados = eventos.filter { evento ->
+        val dataEvento = LocalDate.parse(evento.data)
+        dataEvento == selectedDate
+    }
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstDayOfWeek = currentMonth.atDay(1).dayOfWeek.value % 7
     val monthLabel = currentMonth.month.getDisplayName(TextStyle.FULL, Locale("pt", "BR"))
@@ -76,7 +81,7 @@ fun CalendarScreen(userName: String) {
                 )
             }
         },
-        containerColor = Color.White
+        containerColor = BluePrimary
     ) { padding ->
         Column(
             modifier = Modifier
@@ -90,9 +95,10 @@ fun CalendarScreen(userName: String) {
             Text(
                 "Próximos Eventos",
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = White
             )
-            Text("xxxxxxxxxxxxxxxxxxxx", fontSize = 14.sp, color = Color.Gray)
+            Text("xxxxxxxxxxxxxxxxxxxx", fontSize = 14.sp, color = Gray)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -100,7 +106,7 @@ fun CalendarScreen(userName: String) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(6.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = BlueAccent)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,20 +121,23 @@ fun CalendarScreen(userName: String) {
                         }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Mês anterior"
+                                contentDescription = "Mês anterior",
+                                tint = White
                             )
                         }
                         Text(
                             "$monthLabel ${currentMonth.year}",
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = White
                         )
                         IconButton(onClick = {
                             viewModel.irParaMesSeguinte()
                         }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = "Próximo mês"
+                                contentDescription = "Próximo mês",
+                                tint = White
                             )
                         }
                     }
@@ -140,7 +149,7 @@ fun CalendarScreen(userName: String) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         listOf("S", "M", "T", "W", "T", "F", "S").forEach {
-                            Text(it, fontSize = 12.sp, color = Color.Gray)
+                            Text(it, fontSize = 12.sp, color = Gray)
                         }
                     }
 
@@ -164,15 +173,17 @@ fun CalendarScreen(userName: String) {
                                             .size(36.dp)
                                             .clip(CircleShape)
                                             .background(
-                                                if (date == selectedDate) Color.Gray else Color.Transparent
+                                                if (date == selectedDate) Gray else Color.Transparent
                                             )
-                                            .clickable { viewModel.selecionarData(date) },
+                                            .clickable {
+                                                viewModel.selecionarData(date)
+                                            },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = "$day",
                                             fontSize = 14.sp,
-                                            color = if (date == selectedDate) Color.White else Color.Black
+                                            color = if (date == selectedDate) White else White
                                         )
                                     }
                                 } else {
@@ -186,42 +197,44 @@ fun CalendarScreen(userName: String) {
 
                     Button(
                         onClick = { /* Adicionar Evento */ },
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenSuccess)
                     ) {
-                        Text("Adicionar Evento")
+                        Text("Adicionar Evento", color = White)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            // Lista de eventos
+
             Column {
-                eventos.forEach { evento ->
+                eventosFiltrados.forEach { evento ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
-                            .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(12.dp))
+                            .background(Gray, shape = RoundedCornerShape(12.dp))
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold)
-                            Text(evento.hora, fontSize = 12.sp, color = Color.Gray)
+                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold, color = White)
+                            Text(evento.hora, fontSize = 12.sp, color = Gray)
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 "${selectedDate.dayOfMonth}",
                                 fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = White
                             )
                             Text(
                                 selectedDate.month.getDisplayName(
                                     TextStyle.SHORT,
                                     Locale("pt", "BR")
-                                ), fontSize = 12.sp
+                                ), fontSize = 12.sp, color = White
                             )
                         }
                     }
@@ -230,12 +243,11 @@ fun CalendarScreen(userName: String) {
         }
     }
 }
-
 // Composable de pré-visualização para desenvolvimento no Android Studio
-
-@Preview(showBackground = false)
-@Composable
-fun CalendarScreenPreview() {
-    CalendarScreen(userName = "João")
-}
+//
+//@Preview(showBackground = false)
+//@Composable
+//fun CalendarScreenPreview() {
+//    CalendarScreen(userName = "João")
+//}
 

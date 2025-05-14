@@ -70,8 +70,23 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             )
         }
 
-        composable("calendar") {
-            CalendarScreen(userName = "João Atleta")
+        composable(
+            "calendar/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val user = try {
+                gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            if (user != null) {
+                CalendarScreen(user = user)
+            } else {
+                // Trate o caso de erro, como redirecionar para outra tela ou exibir uma mensagem
+            }
         }
 
     }
