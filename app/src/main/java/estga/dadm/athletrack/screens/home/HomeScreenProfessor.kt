@@ -29,6 +29,8 @@ import androidx.navigation.compose.rememberNavController
 import estga.dadm.athletrack.components.QrCodeDialog
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import com.google.gson.Gson
 
 @Composable
 fun HomeScreenProfessor(
@@ -46,6 +48,9 @@ fun HomeScreenProfessor(
     val scope = rememberCoroutineScope()
 
     val selected = remember { mutableStateOf("hoje") }
+
+    val gson = Gson()
+    val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
 
     // Carregar as aulas assim que a composable for criada
     LaunchedEffect(Unit) {
@@ -94,10 +99,8 @@ fun HomeScreenProfessor(
                         modifier = Modifier
                             .size(36.dp)
                             .clickable {
-                                // Ação para abrir o calendário
-                                navController.navigate("calendar")
+                                navController.navigate("calendar/$userJson")
                             }
-
                     )
                 }
             }

@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import estga.dadm.athletrack.api.Evento
+import estga.dadm.athletrack.api.EventosRequest
+import estga.dadm.athletrack.api.RetrofitClient
 
 class CalendarViewModel : ViewModel() {
 
@@ -24,6 +26,7 @@ class CalendarViewModel : ViewModel() {
         _selectedDate.value = data
     }
 
+    
     fun irParaMesAnterior() {
         _currentMonth.value = _currentMonth.value.minusMonths(1)
     }
@@ -32,10 +35,14 @@ class CalendarViewModel : ViewModel() {
         _currentMonth.value = _currentMonth.value.plusMonths(1)
     }
 
-    fun carregarEventosParaMes(/* se necessário, userId ou filtros */) {
+    fun carregarEventosParaMes(idSocio: Int) {
         viewModelScope.launch {
-            // chamada à API ou geração local
-
+            try {
+                val response = RetrofitClient.eventosService.getEventos(EventosRequest(idSocio = idSocio))
+                _eventos.value = response
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
