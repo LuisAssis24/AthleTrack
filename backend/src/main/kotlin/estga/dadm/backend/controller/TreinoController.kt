@@ -1,18 +1,19 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.TreinoAlunoResponseDTO
-import estga.dadm.backend.repository.TreinoRepository
-import estga.dadm.backend.dto.TreinoRequestDTO
-import estga.dadm.backend.dto.TreinoProfResponseDTO
+import estga.dadm.backend.dto.*
 import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.model.Treino
-import estga.dadm.backend.repository.SocioModalidadeRepository
+import estga.dadm.backend.repository.*
+import org.springframework.http.ResponseEntity
+import java.time.LocalTime
 
 @RestController
 @RequestMapping("/api/treinos")
 class TreinoController(
     private val treinoRepository: TreinoRepository,
-    private val socioModalidadeRepository: SocioModalidadeRepository
+    private val socioModalidadeRepository: SocioModalidadeRepository,
+    private val modalidadeRepository: ModalidadeRepository,
+    private val userRepository: UserRepository
 ) {
 
     @PostMapping("/hoje")
@@ -69,6 +70,30 @@ class TreinoController(
         }
     }
 
+    @PostMapping("/criar")
+    fun criarTreino(@RequestBody request: TreinoCriarRequestDTO): ResponseEntity<String> {
+
+        val professor = userRepository.findById(request.idProfessor).orElseThrow()
+
+        val modalidade = modalidadeRepository.findById(request.idModalidade).orElseThrow()
+
+        if (treinoRepository.findByQrCode(request.qrCode) != null) {
+            return ResponseEntity.badRequest().body("QR Code já existe. Por favor, utilize outro.")
+        }
+
+        val treino = Treino(
+            id = 0, // Valor padrão para o ID autoincrement
+            diaSemana = request.diaSemana,
+            hora = LocalTime.parse(request.hora),
+            qrCode = request.qrCode,
+            modalidade = modalidade,
+            professor = professor,
+        )
+
+        treinoRepository.save(treino)
+        return ResponseEntity.ok("Treino criado com sucesso.")
+    }
+
     fun calculaAmanha(dia: String): String? {
         when (dia) {
             "SEG" -> return "TER"
@@ -76,7 +101,7 @@ class TreinoController(
             "QUA" -> return "QUI"
             "QUI" -> return "SEX"
             "SEX" -> return "SAB"
-            "SAB" -> return null
+            "SAB" -> return "DOM"
             "DOM" -> return "SEG"
         }
         return null

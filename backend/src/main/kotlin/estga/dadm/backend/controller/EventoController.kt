@@ -35,4 +35,8 @@ class EventoController(
 
         return eventos
     }
+
+    @PostMapping("/criar")
+    fun criarEvento(@RequestBody request: EventoRequestDTO) {
+    }
 }

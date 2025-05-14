@@ -1,9 +1,7 @@
 package estga.dadm.athletrack.api
 
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.http.*
 
 
 // Modelo de dados do pedido
@@ -39,6 +37,14 @@ data class Treino(
     val qrCode: String
 )
 
+data class TreinoCreateRequest(
+    val diaSemana: String,
+    val hora: String,
+    val qrCode: String,
+    val idModalidade: Int,
+    val idProfessor: Int
+)
+
 interface TreinosService {
     @POST("/api/treinos/hoje")
     suspend fun getTreinosHoje(@Body request: TreinosRequest): List<Treino>
@@ -48,6 +54,9 @@ interface TreinosService {
 
     @POST("/api/treinos/aluno")
     suspend fun getTreinosAluno(@Body request: TreinosRequest): List<Treino>
+
+    @POST("/api/treinos/criar")
+    suspend fun criarTreino(@Body request: TreinoCreateRequest): String
 }
 
 data class EventosRequest(

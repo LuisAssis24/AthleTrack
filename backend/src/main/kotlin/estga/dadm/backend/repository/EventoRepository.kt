@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
 @Repository
-interface EventoRepository : JpaRepository<Evento, Long> {
+interface EventoRepository : JpaRepository<Evento, Int> {
 
     fun findByData(data: LocalDate): List<Evento>
 }
