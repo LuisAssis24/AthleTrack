@@ -5,7 +5,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitClient {
-    private const val BASE_URL = "https://athletrack-backend.onrender.com"
+    private const val BASE_URL = "http://10.0.2.2:8080/api/" // Emulador Local
+    //private const val BASE_URL = "https://athletrack-backend.onrender.com" // Produção
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
