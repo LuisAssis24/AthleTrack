@@ -40,6 +40,9 @@ fun HomeScreenAtleta(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val gson = Gson()
+    val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+
     // Carregar a viewmodel assim que a composable for criada
     LaunchedEffect(Unit) {
         viewModel.carregarTreinos(
@@ -79,8 +82,11 @@ fun HomeScreenAtleta(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Calendário",
-                        tint = White,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clickable {
+                                navController.navigate("calendar/$userJson")
+                            }
                     )
                 }
             }

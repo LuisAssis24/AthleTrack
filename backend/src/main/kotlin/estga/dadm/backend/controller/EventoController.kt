@@ -12,7 +12,9 @@ import java.time.LocalDate
 @RequestMapping("/api/eventos")
 class EventoController(
     private val eventoModalidadeRepository: EventoModalidadeRepository,
-    private val socioModalidadeRepository: SocioModalidadeRepository
+    private val socioModalidadeRepository: SocioModalidadeRepository,
+    private val modalidadeRepository: ModalidadeRepository
+
 ) {
 
     @PostMapping("/listar")
@@ -36,7 +38,45 @@ class EventoController(
         return eventos
     }
 
-    @PostMapping("/criar")
-    fun criarEvento(@RequestBody request: EventoRequestDTO) {
+    @PostMapping("/modalidades")
+    fun listarModalidades(): List<Modalidade> {
+        //return modalidadeRepository.findAll()
+        // Simulação de dados para achar o problema
+        return listOf(
+            Modalidade(id = 1, nomeModalidade = "Futebol"),
+            Modalidade(id = 2, nomeModalidade = "Basquete"),
+            Modalidade(id = 3, nomeModalidade = "Vôlei")
+        )
     }
+
+
+    @PostMapping("/criar")
+    fun criarEvento(@RequestBody request: EventoCreateRequestDTO) {
+        try {
+            val evento = Evento(
+                id = 0,
+                localEvento = request.localEvento,
+                data = LocalDate.parse(request.data),
+                hora = LocalTime.parse(request.hora),
+                descricao = request.descricao
+            )
+            val eventoSalvo = eventoModalidadeRepository.saveEvento(evento)
+
+            request.modalidades.forEach { modalidadeId ->
+                val modalidade = modalidadeRepository.findById(modalidadeId)
+                    .orElseThrow { IllegalArgumentException("Modalidade $modalidadeId não encontrada.") }
+
+                val eventoModalidade = EventoModalidade(
+                    evento = eventoSalvo,
+                    modalidade = modalidade
+                )
+                eventoModalidadeRepository.save(eventoModalidade)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw RuntimeException("Erro ao criar evento: ${e.message}")
+        }
+    }
+
+
 }

@@ -22,19 +22,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.google.gson.Gson
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.CalendarViewModel
-import kotlinx.coroutines.coroutineScope
+import java.net.URLEncoder
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 
 @Composable
-fun CalendarScreen(user: User) {
+fun CalendarScreen(user: User, navController: NavHostController) {
     val viewModel: CalendarViewModel = viewModel()
 
     val selectedDate by viewModel.selectedDate.collectAsState()
@@ -195,12 +196,20 @@ fun CalendarScreen(user: User) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
-                        onClick = { /* Adicionar Evento */ },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenSuccess)
-                    ) {
-                        Text("Adicionar Evento", color = White)
+                    // Exibir botão apenas se o tipo for "Professor"
+                    if (user.tipo.lowercase() == "professor") {
+                        Button(
+                            onClick = {
+                                val gson = Gson()
+                                val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                                val selectedDateString = URLEncoder.encode(selectedDate.toString(), "UTF-8")
+                                navController.navigate("adicionarEvento/$userJson/$selectedDateString")
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = GreenSuccess)
+                        ) {
+                            Text("Adicionar Evento", color = White)
+                        }
                     }
                 }
             }

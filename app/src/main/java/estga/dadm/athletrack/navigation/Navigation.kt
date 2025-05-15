@@ -9,10 +9,11 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.screens.*
-import estga.dadm.athletrack.screens.calendar.CalendarScreen
+import estga.dadm.athletrack.screens.calendar.*
 import estga.dadm.athletrack.screens.atleta.*
 import estga.dadm.athletrack.screens.professor.*
 import java.net.*
+import java.time.LocalDate
 
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
@@ -80,9 +81,35 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             }
 
             if (user != null) {
-                CalendarScreen(user = user)
-            } else {
-                // Trate o caso de erro, como redirecionar para outra tela ou exibir uma mensagem
+                CalendarScreen(user = user, navController = navController)
+            }
+        }
+
+
+        composable(
+            "adicionarEvento/{userJson}/{selectedDate}",
+            arguments = listOf(
+                navArgument("userJson") { type = NavType.StringType },
+                navArgument("selectedDate") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val selectedDateString = backStackEntry.arguments?.getString("selectedDate") ?: ""
+            val user = try {
+                gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+            val selectedDate = try {
+                LocalDate.parse(selectedDateString)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                LocalDate.now()
+            }
+
+            if (user != null) {
+                AdicionarEventoScreen(user = user, navController = navController, selectedDate = selectedDate)
             }
         }
 
