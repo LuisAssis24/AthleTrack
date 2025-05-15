@@ -2,6 +2,7 @@ package estga.dadm.athletrack.screens.atleta
 
 // Importações necessárias para UI e comportamento
 import android.R
+import android.widget.Toast
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,26 +20,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
 import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
-import estga.dadm.athletrack.viewmodels.HomeAlunoViewModel
+import estga.dadm.athletrack.viewmodels.HomeAtletaViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
-import com.google.gson.Gson
+import androidx.compose.ui.platform.LocalContext
+import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.components.MenuAtleta
+import estga.dadm.athletrack.components.QrCameraScanner
 
 @Composable
 
 fun HomeScreenAtleta(
     user: User,
     navController: NavHostController,
-    viewModel: HomeAlunoViewModel = viewModel()
+    viewModel: HomeAtletaViewModel = viewModel()
 ) {
+    val api = viewModel.apiPresencas
+
     val treinos by viewModel.treinos.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    var showCameraDialog by remember { mutableStateOf(false) }
 
     // Carregar a viewmodel assim que a composable for criada
     LaunchedEffect(Unit) {
@@ -162,17 +168,52 @@ fun HomeScreenAtleta(
                             modifier = Modifier
                                 .size(64.dp)
                                 .clickable {
-                                    val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
-                                    navController.navigate("qrscan/$userJson")
+                                    showCameraDialog = true
                                 }
                         )
-
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Registar Presença",
                         style = Typography.labelMedium,
                         )
+                }
+
+                val context = LocalContext.current
+                val coroutineScope = rememberCoroutineScope()
+
+                if (showCameraDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showCameraDialog = false },
+                        confirmButton = {},
+                        title = { Text("Aponte a câmara para o código QR") },
+                        text = {
+                            QrCameraScanner { codigo ->
+                                coroutineScope.launch {
+                                    try {
+                                        val response = viewModel.apiPresencas.registarPresenca(
+                                            PresencaRequest(user.idSocio, codigo)
+                                        )
+
+                                        Toast.makeText(
+                                            context,
+                                            response.mensagem,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
+                                    } finally {
+                                        showCameraDialog = false
+                                    }
+                                }
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showCameraDialog = false }) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
                 }
             }
         }

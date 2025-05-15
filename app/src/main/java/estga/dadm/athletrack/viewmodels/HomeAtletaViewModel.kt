@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class HomeAlunoViewModel: ViewModel() {
-    private val api = RetrofitClient.treinosService
+class HomeAtletaViewModel: ViewModel() {
+    private val apiTreinos = RetrofitClient.treinosService
+    internal val apiPresencas = RetrofitClient.presencasService
 
     private val _treinos = MutableStateFlow<List<Treino>>(emptyList())
     val treinos: StateFlow<List<Treino>> = _treinos
@@ -18,7 +19,7 @@ class HomeAlunoViewModel: ViewModel() {
 
         viewModelScope.launch {
             try {
-                val resposta = api.getTreinosAluno(
+                val resposta = apiTreinos.getTreinosAluno(
                     TreinosRequest(idSocio = idSocio, diaSemana = diaSemana)
                 )
                 _treinos.value = resposta

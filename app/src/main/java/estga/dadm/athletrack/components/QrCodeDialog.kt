@@ -1,5 +1,8 @@
 package estga.dadm.athletrack.components
 
+import android.graphics.Bitmap
+import android.graphics.Color
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,11 +10,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import estga.dadm.athletrack.ui.theme.*
-import estga.dadm.athletrack.functions.QrCodeGenerator
 
 @Composable
 fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
@@ -38,6 +45,36 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
 
             }
         }
+    }
+}
+
+@Composable
+fun QrCodeGenerator(data: String, size: Int = 512) {
+    val bitmap = remember(data) {
+        generateQrCodeBitmap(data, size)
+    }
+
+    bitmap?.let {
+        Image(bitmap = it.asImageBitmap(), contentDescription = "QR Code")
+    }
+}
+
+fun generateQrCodeBitmap(data: String, size: Int): Bitmap? {
+    return try {
+        val bitMatrix = QRCodeWriter().encode(data, BarcodeFormat.QR_CODE, size, size)
+        val bmp = createBitmap(size, size, Bitmap.Config.RGB_565)
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                bmp[x, y] = if (bitMatrix.get(
+                        x,
+                        y
+                    )
+                ) Color.BLACK else Color.WHITE
+            }
+        }
+        bmp
+    } catch (e: Exception) {
+        null
     }
 }
 

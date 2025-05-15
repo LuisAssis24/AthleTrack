@@ -30,5 +30,4 @@ object RetrofitClient {
         retrofit.create(EventosService::class.java)
     }
 
-
 }
