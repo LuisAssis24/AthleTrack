@@ -2,7 +2,10 @@ package estga.dadm.athletrack.screens.atleta
 
 // Importações necessárias para UI e comportamento
 import android.R
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.components.MenuAtleta
 import estga.dadm.athletrack.components.QrCameraScanner
@@ -38,8 +42,6 @@ fun HomeScreenAtleta(
     navController: NavHostController,
     viewModel: HomeAtletaViewModel = viewModel()
 ) {
-    val api = viewModel.apiPresencas
-
     val treinos by viewModel.treinos.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -153,6 +155,22 @@ fun HomeScreenAtleta(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+
+                val context = LocalContext.current
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    if (isGranted) {
+                        showCameraDialog = true
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Permissão da câmara é necessária",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
@@ -168,52 +186,57 @@ fun HomeScreenAtleta(
                             modifier = Modifier
                                 .size(64.dp)
                                 .clickable {
-                                    showCameraDialog = true
+                                    when {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            android.Manifest.permission.CAMERA
+                                        ) == PackageManager.PERMISSION_GRANTED -> {
+                                            showCameraDialog = true
+                                        }
+
+                                        else -> {
+                                            launcher.launch(android.Manifest.permission.CAMERA)
+                                        }
+                                    }
                                 }
+
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Registar Presença",
                         style = Typography.labelMedium,
-                        )
-                }
-
-                val context = LocalContext.current
-                val coroutineScope = rememberCoroutineScope()
-
-                if (showCameraDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showCameraDialog = false },
-                        confirmButton = {},
-                        title = { Text("Aponte a câmara para o código QR") },
-                        text = {
-                            QrCameraScanner { codigo ->
-                                coroutineScope.launch {
-                                    try {
-                                        val response = viewModel.apiPresencas.registarPresenca(
-                                            PresencaRequest(user.idSocio, codigo)
-                                        )
-
-                                        Toast.makeText(
-                                            context,
-                                            response.mensagem,
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    } catch (e: Exception) {
-                                        Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
-                                    } finally {
-                                        showCameraDialog = false
-                                    }
-                                }
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showCameraDialog = false }) {
-                                Text("Cancelar")
-                            }
-                        }
                     )
+
+                    if (showCameraDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showCameraDialog = false },
+                            confirmButton = {},
+                            title = { Text("Ler QR Code") },
+                            text = {
+                                QrCameraScanner(onCodeScanned = { codigo ->
+                                    scope.launch {
+                                        try {
+                                            val response = viewModel.apiPresencas.registarPresenca(
+                                                PresencaRequest(user.idSocio, codigo)
+                                            )
+
+                                            Toast.makeText(
+                                                context,
+                                                response.mensagem,
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        } catch (e: Exception) {
+                                            Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
+                                        } finally {
+                                            showCameraDialog = false
+                                        }
+                                    }
+                                })
+                            }
+                        )
+                    }
+
                 }
             }
         }
