@@ -31,4 +31,7 @@ object RetrofitClient {
         retrofit.create(EventosService::class.java)
     }
 
+    val modalidadesService: ModalidadesService by lazy {
+        retrofit.create(ModalidadesService::class.java)
+    }
 }

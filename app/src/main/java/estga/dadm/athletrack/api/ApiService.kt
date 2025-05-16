@@ -77,10 +77,7 @@ data class EventosRequest(
     val idSocio: Int,
 )
 
-data class Modalidade(
-    val id: Int,
-    val nomeModalidade: String
-)
+
 
 // Modelo de Resposta dos Eventos
 data class Evento(
@@ -105,9 +102,9 @@ interface EventosService {
     @POST("/api/eventos/criar")
     suspend fun criarEvento(@Body request: EventoCriarRequestDTO)
 
-    @POST("/api/modalidades")
-    suspend fun listarModalidades(): List<Modalidade>
 }
+
+
 
 data class PresencaRequest(
     val idSocio: Int,
@@ -122,4 +119,14 @@ data class PresencaResponse(
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
+}
+
+data class Modalidade(
+    val id: Int,
+    val nomeModalidade: String
+)
+
+interface ModalidadesService {
+    @POST("/api/modalidade/listarTodas")
+    suspend fun listarTodasModalidades(): List<Modalidade>
 }

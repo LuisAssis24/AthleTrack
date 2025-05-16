@@ -24,6 +24,7 @@ import estga.dadm.athletrack.viewmodels.AdicionarEventoViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import android.app.DatePickerDialog
+import estga.dadm.athletrack.api.Modalidade
 
 import java.util.*
 
@@ -39,9 +40,11 @@ fun AdicionarEventoScreen(
     var local by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
     val modalidades by viewModel.modalidades.collectAsState()
-    val modalidadesSelecionadas = remember { mutableStateListOf<Int>() }
+    val modalidadesSelecionadas = remember { mutableStateListOf<Modalidade>() }
     var isLoading by remember { mutableStateOf(true) }
-
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -81,7 +84,8 @@ fun AdicionarEventoScreen(
                 )
             }
         },
-        containerColor = BluePrimary
+        containerColor = BluePrimary,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         if (isLoading) {
             Box(
@@ -171,34 +175,52 @@ fun AdicionarEventoScreen(
                     )
                 )
 
+                // MultiSelect para Modalidades
                 Text("Modalidades", fontWeight = FontWeight.Bold, color = White)
-                if (modalidades.isEmpty()) {
-                    Text("Nenhuma modalidade disponível", color = White)
-                } else {
-                    modalidades.forEach { modalidade ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    if (modalidade.id in modalidadesSelecionadas) {
-                                        modalidadesSelecionadas.remove(modalidade.id)
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = { isDropdownExpanded = !isDropdownExpanded },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+                    ) {
+                        Text(
+                            text = if (modalidadesSelecionadas.isEmpty()) "Selecionar Modalidades"
+                            else modalidadesSelecionadas.joinToString { it.nomeModalidade },
+                            color = White
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        modalidades.forEach { modalidade ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    if (modalidade in modalidadesSelecionadas) {
+                                        modalidadesSelecionadas.remove(modalidade)
                                     } else {
-                                        modalidadesSelecionadas.add(modalidade.id)
+                                        modalidadesSelecionadas.add(modalidade)
+                                    }
+                                },
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            checked = modalidade in modalidadesSelecionadas,
+                                            onCheckedChange = null,
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = BlueAccent,
+                                                uncheckedColor = Gray
+                                            )
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(modalidade.nomeModalidade, color = White)
                                     }
                                 }
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = modalidade.id in modalidadesSelecionadas,
-                                onCheckedChange = null,
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = BlueAccent,
-                                    uncheckedColor = Gray
-                                )
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(modalidade.nomeModalidade, color = White)
                         }
                     }
                 }
@@ -207,14 +229,25 @@ fun AdicionarEventoScreen(
 
                 Button(
                     onClick = {
-                        viewModel.adicionarEvento(
-                            data = data.toString(),
-                            hora = hora.toString(),
-                            local = local,
-                            descricao = descricao,
-                            modalidades = modalidadesSelecionadas.toList()
-                        ) {
-                            navController.popBackStack()
+                        coroutineScope.launch {
+                            try {
+                                viewModel.adicionarEvento(
+                                    data = data.toString(),
+                                    hora = hora.toString(),
+                                    local = local,
+                                    descricao = descricao,
+                                    modalidades = modalidadesSelecionadas.map { it.id }
+                                ) {
+                                    // Sucesso: Voltar para a página de calendário e atualizar eventos
+                                    navController.popBackStack("calendar/${user.idSocio}", inclusive = false)
+                                }
+                            } catch (e: Exception) {
+                                // Exibir mensagem de erro no Snackbar
+                                snackbarHostState.showSnackbar(
+                                    message = "Erro ao criar evento: ${e.message}",
+                                    actionLabel = "Fechar"
+                                )
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

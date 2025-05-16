@@ -1,5 +1,6 @@
 package estga.dadm.backend.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 
 @Entity
@@ -11,6 +12,7 @@ data class Modalidade(
 
     val nomeModalidade: String,
 
+    @JsonIgnore
     @OneToMany(mappedBy = "modalidade")
     val socios: List<SocioModalidade> = emptyList()
 )

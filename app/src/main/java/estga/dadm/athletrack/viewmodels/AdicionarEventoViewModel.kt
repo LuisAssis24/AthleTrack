@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.EventoCriarRequestDTO
+import estga.dadm.athletrack.api.idRequest
 
 
 class AdicionarEventoViewModel : ViewModel() {
@@ -17,13 +18,14 @@ class AdicionarEventoViewModel : ViewModel() {
     fun carregarModalidades() {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.eventosService.listarModalidades()
+                val response = RetrofitClient.modalidadesService.listarTodasModalidades()
                 _modalidades.value = response
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
+
 
     fun adicionarEvento(
         data: String,
@@ -49,4 +51,7 @@ class AdicionarEventoViewModel : ViewModel() {
             }
         }
     }
+
+
+
 }
