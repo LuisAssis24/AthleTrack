@@ -4,8 +4,15 @@ import estga.dadm.backend.dto.evento.EventoRequestDTO
 import estga.dadm.backend.dto.evento.EventoResponseDTO
 import estga.dadm.backend.repository.EventoModalidadeRepository
 import estga.dadm.backend.repository.SocioModalidadeRepository
+import estga.dadm.backend.repository.ModalidadeRepository
+import estga.dadm.backend.dto.evento.EventoCriarRequestDTO
+import estga.dadm.backend.model.Modalidade
+import estga.dadm.backend.model.Evento
+import estga.dadm.backend.model.EventoModalidade
+
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.time.LocalTime
 
 
 @RestController
@@ -51,7 +58,8 @@ class EventoController(
 
 
     @PostMapping("/criar")
-    fun criarEvento(@RequestBody request: EventoCreateRequestDTO) {
+    fun criarEvento(@RequestBody request: EventoCriarRequestDTO) {
+        /*
         try {
             val evento = Evento(
                 id = 0,
@@ -60,6 +68,9 @@ class EventoController(
                 hora = LocalTime.parse(request.hora),
                 descricao = request.descricao
             )
+
+
+
             val eventoSalvo = eventoModalidadeRepository.saveEvento(evento)
 
             request.modalidades.forEach { modalidadeId ->
@@ -76,7 +87,8 @@ class EventoController(
             e.printStackTrace()
             throw RuntimeException("Erro ao criar evento: ${e.message}")
         }
+        */
+
+        }
+
     }
-
-
-}
