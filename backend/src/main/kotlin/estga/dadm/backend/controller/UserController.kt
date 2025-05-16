@@ -3,6 +3,7 @@ package estga.dadm.backend.controller
 import estga.dadm.backend.dto.user.LoginRequestDTO
 import estga.dadm.backend.dto.user.LoginResponseDTO
 import estga.dadm.backend.dto.user.UserCreateRequestDTO
+import estga.dadm.backend.dto.user.UserDeleteRequestDTO
 import estga.dadm.backend.model.SocioModalidade
 import estga.dadm.backend.model.User
 import estga.dadm.backend.repository.ModalidadeRepository
@@ -66,4 +67,25 @@ class UserController(private val userRepository: UserRepository,
         }
     }
 
+    @PostMapping("/eliminar")
+    fun eliminarUser(@RequestBody request: UserDeleteRequestDTO): ResponseEntity<String> {
+        return try {
+            val user = userRepository.findById(request.idSocio).orElse(null)
+            val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
+
+            if (user != null) {
+                socioModalidades.forEach { socioModalidade ->
+                    socioModalidadeRepository.delete(socioModalidade)
+                }
+                // Eliminar o usuário
+                userRepository.delete(user)
+                ResponseEntity.ok("Usuário eliminado com sucesso.")
+            } else {
+                ResponseEntity.status(404).body("Usuário não encontrado.")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ResponseEntity.status(500).body("Erro ao eliminar utilizador: ${e.message}")
+        }
+    }
 }

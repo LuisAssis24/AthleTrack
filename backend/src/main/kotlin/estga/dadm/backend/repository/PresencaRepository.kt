@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PresencaRepository : JpaRepository<Presenca, PresencaId>{
-
+    fun findBySocioIdAndTreinoId(socioId: Int, treinoId: Int): Presenca?
 }
 

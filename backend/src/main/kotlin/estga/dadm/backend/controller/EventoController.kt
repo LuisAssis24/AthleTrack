@@ -1,9 +1,7 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.evento.EventoRequestDTO
-import estga.dadm.backend.dto.evento.EventoResponseDTO
-import estga.dadm.backend.repository.EventoModalidadeRepository
-import estga.dadm.backend.repository.SocioModalidadeRepository
+import estga.dadm.backend.dto.evento.*
+import estga.dadm.backend.repository.*
 import estga.dadm.backend.repository.ModalidadeRepository
 import estga.dadm.backend.dto.evento.EventoCriarRequestDTO
 import estga.dadm.backend.model.Modalidade

@@ -1,5 +1,7 @@
 package estga.dadm.backend.controller
 
+import estga.dadm.backend.dto.treino.PresencaListRequestDTO
+import estga.dadm.backend.dto.treino.PresencaListResponseDTO
 import estga.dadm.backend.dto.treino.PresencaRequestDTO
 import estga.dadm.backend.dto.treino.PresencaResponseDTO
 import estga.dadm.backend.keys.PresencaId
@@ -54,6 +56,36 @@ class PresencaController(
         presencaRepository.save(novaPresenca)
 
         return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
+    }
+
+    @PostMapping("/listar")
+    fun listarPresencas(@RequestBody request: PresencaListRequestDTO): List<PresencaListResponseDTO> {
+        val modalidade = treinoRepository.findById(request.idTreino).orElse(null).modalidade
+
+        val alunos = socioModalidadeRepository.findByModalidadeId(modalidade.id)
+            .map { it.socio }
+
+        val presencasSimuladas = alunos.map { socio ->
+            PresencaListResponseDTO(
+                id = socio.id,
+                nome = socio.nome,
+                estado = false,
+            )
+        }
+
+        presencasSimuladas.forEach { presenca ->
+            val presencaReal = presencaRepository.findBySocioIdAndTreinoId(
+                socioId = presenca.id,
+                treinoId = request.idTreino
+            )
+
+            if (presencaReal != null) {
+                presenca.estado = true
+            }
+
+        }
+
+        return presencasSimuladas
     }
 }
 

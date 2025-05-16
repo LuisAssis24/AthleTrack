@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface SocioModalidadeRepository : JpaRepository<SocioModalidade, SocioModalidadeId> {
     fun findBySocioId(socioId: Int): List<SocioModalidade>
+
+    fun findByModalidadeId(modalidadeId: Int): List<SocioModalidade>
 }
