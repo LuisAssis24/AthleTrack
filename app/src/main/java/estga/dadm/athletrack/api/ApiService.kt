@@ -21,10 +21,24 @@ data class User(
     val tipo: String
 )
 
-interface LoginService {
-    @Headers("Content-Type: application/json")
+data class UserCreate(
+    val password: String,
+    val nome: String,
+    val tipo: String,
+    val modalidades: List<Int>
+)
+
+data class UserDelete(
+    val idSocio: Int,
+)
+
+interface UserService {
     @POST("/api/login")
     fun login(@Body request: LoginRequest): Call<User>
+
+    fun criar(@Body request: LoginRequest): String
+
+    fun eliminar(@Body request: UserDelete): String
 }
 
 // Modelo da Request do treino
@@ -76,7 +90,6 @@ interface TreinosService {
 data class EventosRequest(
     val idSocio: Int,
 )
-
 
 
 // Modelo de Resposta dos Eventos

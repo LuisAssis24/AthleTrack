@@ -32,7 +32,6 @@ import retrofit2.Response
 @Preview // Permite visualizar esta UI na aba "Design" do Android Studio
 fun LoginScreen(
     onLoginClick: (User) -> Unit = {}, // Callback para o botão "Entrar"
-    onForgotPasswordClick: () -> Unit = {} // Callback para o link "Esqueceste da palavra-passe?"
 ) {
     // Estados reativos que armazenam os valores dos campos de input
     var socio by remember { mutableStateOf("") }
@@ -140,15 +139,5 @@ fun LoginScreen(
         ) {
             Text("Entrar", color = White)
         }
-
-
-        Spacer(modifier = Modifier.height(16.dp)) // Espaço antes do link
-
-        // Link "Esqueceste da palavra-passe?"
-        Text(
-            text = "Esqueceste da palavra-passe?",
-            color = White, // Cor da frase
-            modifier = Modifier.clickable { onForgotPasswordClick() } // Torna a frase clicável
-        )
     }
 }

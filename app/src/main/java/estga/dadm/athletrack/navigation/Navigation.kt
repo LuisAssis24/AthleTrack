@@ -30,7 +30,6 @@ fun AthleTrackNavGraph(navController: NavHostController) {
                         navController.navigate("homeProfessor/$userJson")
                     }
                 },
-                onForgotPasswordClick = {}
             )
         }
 
