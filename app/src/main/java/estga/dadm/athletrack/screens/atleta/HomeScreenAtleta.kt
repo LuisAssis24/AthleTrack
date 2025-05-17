@@ -1,6 +1,5 @@
 package estga.dadm.athletrack.screens.atleta
 
-// Importações necessárias para UI e comportamento
 import android.R
 import android.content.pm.PackageManager
 import android.widget.Toast
@@ -8,9 +7,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,217 +31,211 @@ import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeAtletaViewModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
-import estga.dadm.athletrack.components.MenuAtleta
 import estga.dadm.athletrack.components.QrCameraScanner
+import androidx.compose.ui.graphics.Color
 
 @Composable
-
 fun HomeScreenAtleta(
     user: User,
     navController: NavHostController,
     viewModel: HomeAtletaViewModel = viewModel()
 ) {
+    val BackgroundBlueDark = Color(0xFF0D1B2A)
+    val TopBarBlue = Color(0xFF1B263B)
     val treinos by viewModel.treinos.collectAsState()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
     var showCameraDialog by remember { mutableStateOf(false) }
 
-    // Carregar a viewmodel assim que a composable for criada
-    LaunchedEffect(Unit) {
-        viewModel.carregarTreinos(
-            user.idSocio,
-            diaSemana = viewModel.detetarDiaSemana()
-        )
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showCameraDialog = true
+        } else {
+            Toast.makeText(context, "Permissão da câmara é necessária", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuAtleta(userName = user.nome)
-        }
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
+    LaunchedEffect(Unit) {
+        viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
+    }
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundBlueDark),
+        containerColor = BackgroundBlueDark
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // TOP BAR COM BORDA ARREDONDADA
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {
-                        scope.launch { drawerState.open() }
-                    }) {
+                    // LADO ESQUERDO: PERFIL + NOME
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Perfil",
                             tint = White,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(32.dp)
                         )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column {
+                            Text(
+                                text = user.nome,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = White
+                            )
+                            Text(
+                                text = "Sócio nº ${user.idSocio}",
+                                fontSize = 14.sp,
+                                color = Color.LightGray
+                            )
+                        }
                     }
 
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = "Calendário",
-                        tint = White,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 24.dp)
-                    .wrapContentSize(Alignment.TopCenter),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text("Bem vindo", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = White)
-
-                Spacer(modifier = Modifier.height(40.dp))
-
-                Text(
-                    "Próximos Treinos",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = White
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    thickness = 1.5.dp,
-                    color = Gray
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(480.dp)
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        if (treinos.isEmpty()) {
-                            Text(
-                                text = "Não tem treinos agendados para hoje.",
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        } else {
-                            treinos.take(12).forEachIndexed { index, treino ->
-                                Text(
-                                    text = "${treino.nomeModalidade} - ${treino.diaSemana} - ${treino.hora}",
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 6.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                                HorizontalDivider(thickness = 1.dp, color = Gray)
+                    // LADO DIREITO: ÍCONES DE AÇÃO
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = {
+                            when {
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    android.Manifest.permission.CAMERA
+                                ) == PackageManager.PERMISSION_GRANTED -> {
+                                    showCameraDialog = true
+                                }
+                                else -> {
+                                    launcher.launch(android.Manifest.permission.CAMERA)
+                                }
                             }
+                        }) {
+                            Icon(
+                                painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                                contentDescription = "Câmara",
+                                tint = White,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        IconButton(onClick = {
+                            Toast.makeText(context, "Calendário clicado", Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = "Calendário",
+                                tint = White,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // TÍTULO CENTRALIZADO
+            Text(
+                text = "Próximos Treinos",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                val context = LocalContext.current
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission()
-                ) { isGranted ->
-                    if (isGranted) {
-                        showCameraDialog = true
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Permissão da câmara é necessária",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                thickness = 1.5.dp,
+                color = Color.LightGray
+            )
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(White),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_menu_camera),
-                            contentDescription = "Câmara",
-                            tint = BluePrimary,
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clickable {
-                                    when {
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            android.Manifest.permission.CAMERA
-                                        ) == PackageManager.PERMISSION_GRANTED -> {
-                                            showCameraDialog = true
-                                        }
-
-                                        else -> {
-                                            launcher.launch(android.Manifest.permission.CAMERA)
-                                        }
-                                    }
-                                }
-
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+            // ÁREA DE TREINOS COM SCROLL VERTICAL
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 24.dp)
+            ) {
+                if (treinos.isEmpty()) {
                     Text(
-                        text = "Registar Presença",
-                        style = Typography.labelMedium,
+                        text = "Não tem treinos agendados para hoje.",
+                        textAlign = TextAlign.Center,
+                        color = White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp)
                     )
-
-                    if (showCameraDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showCameraDialog = false },
-                            confirmButton = {},
-                            title = { Text("Ler QR Code") },
-                            text = {
-                                QrCameraScanner(onCodeScanned = { codigo ->
-                                    scope.launch {
-                                        try {
-                                            val response = viewModel.apiPresencas.registarPresenca(
-                                                PresencaRequest(user.idSocio, codigo)
-                                            )
-
-                                            Toast.makeText(
-                                                context,
-                                                response.mensagem,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        } catch (e: Exception) {
-                                            Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
-                                        } finally {
-                                            showCameraDialog = false
-                                        }
-                                    }
-                                })
-                            }
+                } else {
+                    treinos.forEach {
+                        Text(
+                            "${it.nomeModalidade} - ${it.diaSemana} - ${it.hora}",
+                            color = White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
                         )
+                        HorizontalDivider(color = Color.LightGray)
                     }
-
                 }
+            }
+
+            // CÂMERA QR DIALOG
+            if (showCameraDialog) {
+                AlertDialog(
+                    onDismissRequest = { showCameraDialog = false },
+                    confirmButton = {},
+                    title = { Text("Ler QR Code") },
+                    text = {
+                        QrCameraScanner(onCodeScanned = { codigo ->
+                            scope.launch {
+                                try {
+                                    val response = viewModel.apiPresencas.registarPresenca(
+                                        PresencaRequest(user.idSocio, codigo)
+                                    )
+                                    Toast.makeText(context, response.mensagem, Toast.LENGTH_LONG).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
+                                } finally {
+                                    showCameraDialog = false
+                                }
+                            }
+                        })
+                    }
+                )
             }
         }
     }
