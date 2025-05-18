@@ -1,5 +1,10 @@
 package estga.dadm.athletrack.screens.professor
 
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,13 +13,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +43,9 @@ import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import com.google.gson.Gson
+import estga.dadm.athletrack.api.PresencaRequest
+import estga.dadm.athletrack.components.QrCameraScanner
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun HomeScreenProfessor(
@@ -45,12 +60,27 @@ fun HomeScreenProfessor(
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     val selected = remember { mutableStateOf("hoje") }
 
     val gson = Gson()
     val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+
+    val BackgroundBlueDark = Color(0xFF0D1B2A)
+    val TopBarBlue = Color(0xFF1B263B)
+    val scope = rememberCoroutineScope()
+    var showCameraDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showCameraDialog = true
+        } else {
+            Toast.makeText(context, "Permissão da câmara é necessária", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Carregar as aulas assim que a composable for criada
     LaunchedEffect(Unit) {
@@ -60,175 +90,285 @@ fun HomeScreenProfessor(
         )
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuProfessor(user = user, navController = navController)
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundBlueDark),
+        containerColor = BackgroundBlueDark
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        }
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
+            // TOP BAR COM BORDA ARREDONDADA
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {
-                        scope.launch { drawerState.open() }
-                    }) {
+                    // LADO ESQUERDO: PERFIL + NOME
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            modifier = Modifier.size(36.dp)
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Perfil",
+                            tint = White,
+                            modifier = Modifier.size(32.dp)
                         )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column {
+                            Text(
+                                text = user.nome,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = White
+                            )
+                            Text(
+                                text = "Sócio nº ${user.idSocio}",
+                                fontSize = 14.sp,
+                                color = Color.LightGray
+                            )
+                        }
                     }
 
-                    Text(
-                        text = "9:41", // (Opcional: hora real futuramente)
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = "Calendário",
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clickable {
-                                navController.navigate("calendar/$userJson")
+                    // LADO DIREITO: ÍCONES DE AÇÃO
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        /*
+                        IconButton(onClick = {
+                            when {
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    android.Manifest.permission.CAMERA
+                                ) == PackageManager.PERMISSION_GRANTED -> {
+                                    showCameraDialog = true
+                                }
+                                else -> {
+                                    launcher.launch(android.Manifest.permission.CAMERA)
+                                }
                             }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.QrCode, // ÍCONE DE QR CODE
+                                contentDescription = "QR Code",
+                                tint = White,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }*/
+
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(24.dp)
+                                .padding(horizontal = 8.dp),
+                            color = Color.LightGray,
+                            thickness = 1.dp
+                        )
+
+                        IconButton(onClick = {
+                            Toast.makeText(context, "Calendário clicado", Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = "Calendário",
+                                tint = White,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = {
+                        val gson = Gson()
+                        val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                        navController.navigate("gestaotreinos/$userJson")
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                        .size(81.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
+                        contentDescription = "GestaoTreinos",
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Gestão de Treinos",
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Button(
+                    onClick = {
+                        val gson = Gson()
+                        val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                        navController.navigate("gestaoatletas/$userJson")
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                        .size(81.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "GestaoAtleta",
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Gestão de Atletas",
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-        ) { innerPadding ->
-            Column(
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .height(500.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                Text(
-                    text = "Bem vindo",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        thickness = 1.5.dp,
+                        color = Gray
+                    )
 
-                Text(
-                    text = user.nome,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                    val aulasParaMostrar =
+                        if (selected.value == "hoje") aulasHoje else aulasAmanha
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(500.dp)
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    if (aulasParaMostrar.isEmpty()) {
                         Text(
-                            text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
+                            text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            thickness = 1.5.dp,
-                            color = Gray
-                        )
-
-                        val aulasParaMostrar =
-                            if (selected.value == "hoje") aulasHoje else aulasAmanha
-
-                        if (aulasParaMostrar.isEmpty()) {
-                            Text(
-                                text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else {
-                            aulasParaMostrar.take(10).forEachIndexed { index, aula ->
-                                Column(
-                                    modifier = Modifier
-                                        .clickable {
-                                            qrCodeAtivo = aula.qrCode
-                                            showQrCode = true
-                                        }
-                                ) {
-                                    Text(
-                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
-                                        fontSize = 16.sp,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
-                                        textAlign = TextAlign.Center
-                                    )
-                                    if (index < aulasParaMostrar.size - 1) {
-                                        HorizontalDivider(
-                                            modifier = Modifier.padding(vertical = 8.dp),
-                                            thickness = 1.dp,
-                                            color = White
-                                        )
+                    } else {
+                        aulasParaMostrar.take(10).forEachIndexed { index, aula ->
+                            Column(
+                                modifier = Modifier
+                                    .clickable {
+                                        qrCodeAtivo = aula.qrCode
+                                        showQrCode = true
                                     }
+                            ) {
+                                Text(
+                                    text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
+                                    fontSize = 16.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                                if (index < aulasParaMostrar.size - 1) {
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(vertical = 8.dp),
+                                        thickness = 1.dp,
+                                        color = White
+                                    )
                                 }
-
                             }
-                        }
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    SingleChoiceSegmentedButtonRow {
-                        SegmentedButton(
-                            selected = selected.value == "hoje",
-                            onClick = { selected.value = "hoje" },
-                            shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp),
-                            icon = {}
-                        ) {
-                            Text("Hoje")
-                        }
-
-                        SegmentedButton(
-                            selected = selected.value == "amanha",
-                            onClick = { selected.value = "amanha" },
-                            shape = RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp),
-                            icon = {}
-                        ) {
-                            Text("Amanhã")
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                SingleChoiceSegmentedButtonRow {
+                    SegmentedButton(
+                        selected = selected.value == "hoje",
+                        onClick = { selected.value = "hoje" },
+                        shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp),
+                        icon = {}
+                    ) {
+                        Text("Hoje")
+                    }
+
+                    SegmentedButton(
+                        selected = selected.value == "amanha",
+                        onClick = { selected.value = "amanha" },
+                        shape = RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp),
+                        icon = {}
+                    ) {
+                        Text("Amanhã")
+                    }
+                }
+            }
+
+            // CÂMERA QR DIALOG
+            /*if (showCameraDialog) {
+                AlertDialog(
+                    onDismissRequest = { showCameraDialog = false },
+                    confirmButton = {},
+                    title = { Text("Ler QR Code") },
+                    text = {
+                        QrCameraScanner(onCodeScanned = { codigo ->
+                            scope.launch {
+                                try {
+                                    val response = viewModel.apiPresencas.registarPresenca(
+                                        PresencaRequest(user.idSocio, codigo)
+                                    )
+                                    Toast.makeText(context, response.mensagem, Toast.LENGTH_LONG).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
+                                } finally {
+                                    showCameraDialog = false
+                                }
+                            }
+                        })
+                    }
+                )
+            }*/
         }
     }
-    if (showQrCode) {
+
+if (showQrCode) {
         QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
     }
 
