@@ -10,7 +10,7 @@ import estga.dadm.backend.dto.modalidade.ModalidadeDTO
 class ModalidadeController(private val modalidadeRepository: ModalidadeRepository) {
 
 
-    @PostMapping("/listarTodas")
+    @PostMapping("/listar")
     fun listarTodasModalidades(): List<ModalidadeDTO> {
         val modalidades = modalidadeRepository.findAll()
         return modalidades.map { modalidade ->

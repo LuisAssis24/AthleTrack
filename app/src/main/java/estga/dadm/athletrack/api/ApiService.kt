@@ -33,10 +33,12 @@ data class UserDelete(
 )
 
 interface UserService {
-    @POST("/api/login")
+    @POST("/api/user/login")
     fun login(@Body request: LoginRequest): Call<User>
 
-    fun criar(@Body request: LoginRequest): String
+    fun listar(): List<User>
+
+    fun criar(@Body request: UserCreate): String
 
     fun eliminar(@Body request: UserDelete): String
 }
@@ -140,6 +142,6 @@ data class Modalidade(
 )
 
 interface ModalidadesService {
-    @POST("/api/modalidade/listarTodas")
+    @POST("/api/modalidade/listar")
     suspend fun listarTodasModalidades(): List<Modalidade>
 }

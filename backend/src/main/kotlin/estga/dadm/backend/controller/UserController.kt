@@ -1,7 +1,7 @@
 package estga.dadm.backend.controller
 
 import estga.dadm.backend.dto.user.LoginRequestDTO
-import estga.dadm.backend.dto.user.LoginResponseDTO
+import estga.dadm.backend.dto.user.UserResponseDTO
 import estga.dadm.backend.dto.user.UserCreateRequestDTO
 import estga.dadm.backend.dto.user.UserDeleteRequestDTO
 import estga.dadm.backend.model.SocioModalidade
@@ -14,17 +14,17 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 class UserController(private val userRepository: UserRepository,
                      private val modalidadeRepository: ModalidadeRepository,
                      private val socioModalidadeRepository: SocioModalidadeRepository)
 {
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequestDTO): ResponseEntity<LoginResponseDTO> {
+    fun login(@RequestBody request: LoginRequestDTO): ResponseEntity<UserResponseDTO> {
         val user = userRepository.findById(request.idSocio).orElse(null)
 
         if (user != null && PasswordUtil.matches(request.password, user.password)) {
-            val response = LoginResponseDTO(
+            val response = UserResponseDTO(
                 idSocio = user.id,
                 nome = user.nome,
                 tipo = user.tipo
@@ -34,6 +34,27 @@ class UserController(private val userRepository: UserRepository,
 
         return ResponseEntity.status(401).build()
     }
+
+   @PostMapping("/listar")
+   fun listarTodos(): List<UserResponseDTO> {
+       val users = userRepository.findAll()
+           .sortedBy { user ->
+               when (user.tipo.lowercase()) {
+                   "professor" -> 0
+                   "atleta" -> 1
+                   else -> 2
+               }
+           }
+           .map { user ->
+               UserResponseDTO(
+                   idSocio = user.id,
+                   nome = user.nome,
+                   tipo = user.tipo
+               )
+           }
+
+       return users
+   }
 
     @PostMapping("/criar")
     fun criarUser(@RequestBody request: UserCreateRequestDTO): ResponseEntity<String> {

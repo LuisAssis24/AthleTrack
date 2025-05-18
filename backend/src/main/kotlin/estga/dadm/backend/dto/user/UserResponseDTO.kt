@@ -1,6 +1,6 @@
 package estga.dadm.backend.dto.user
 
-data class LoginResponseDTO(
+data class UserResponseDTO(
     val idSocio: Int,
     val nome: String,
     val tipo: String
