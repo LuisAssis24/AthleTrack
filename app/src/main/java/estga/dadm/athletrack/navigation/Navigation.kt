@@ -63,7 +63,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            GestaoTreinosScreen(user)
+            GestaoTreinosScreen(user, navController) // <-- passar o navController aqui
         }
 
 
