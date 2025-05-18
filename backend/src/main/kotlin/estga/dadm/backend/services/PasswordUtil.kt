@@ -1,4 +1,4 @@
-package estga.dadm.backend.security
+package estga.dadm.backend.services
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 

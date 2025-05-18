@@ -9,7 +9,7 @@ import estga.dadm.backend.model.User
 import estga.dadm.backend.repository.ModalidadeRepository
 import estga.dadm.backend.repository.SocioModalidadeRepository
 import estga.dadm.backend.repository.UserRepository
-import estga.dadm.backend.security.PasswordUtil
+import estga.dadm.backend.services.PasswordUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
