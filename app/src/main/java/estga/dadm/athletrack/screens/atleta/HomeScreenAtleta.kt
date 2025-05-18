@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -138,14 +139,20 @@ fun HomeScreenAtleta(
                             }
                         }) {
                             Icon(
-                                painter = painterResource(id = android.R.drawable.ic_menu_camera),
-                                contentDescription = "Câmara",
+                                imageVector = Icons.Default.QrCode, // ÍCONE DE QR CODE
+                                contentDescription = "QR Code",
                                 tint = White,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(24.dp)
+                                .padding(horizontal = 8.dp),
+                            color = Color.LightGray,
+                            thickness = 1.dp
+                        )
 
                         IconButton(onClick = {
                             Toast.makeText(context, "Calendário clicado", Toast.LENGTH_SHORT).show()
