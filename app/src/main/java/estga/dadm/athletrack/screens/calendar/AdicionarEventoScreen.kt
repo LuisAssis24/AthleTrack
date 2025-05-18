@@ -24,6 +24,7 @@ import estga.dadm.athletrack.viewmodels.AdicionarEventoViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import android.app.DatePickerDialog
+import androidx.compose.material3.MaterialTheme.colorScheme
 import estga.dadm.athletrack.api.Modalidade
 
 import java.util.*
@@ -84,7 +85,7 @@ fun AdicionarEventoScreen(
                 )
             }
         },
-        containerColor = BluePrimary,
+        containerColor = colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         if (isLoading) {

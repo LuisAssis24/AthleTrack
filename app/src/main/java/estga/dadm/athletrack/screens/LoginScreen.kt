@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,63 +22,61 @@ import androidx.compose.ui.tooling.preview.Preview
 import estga.dadm.athletrack.api.LoginRequest
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.RetrofitClient
-import estga.dadm.athletrack.ui.theme.*
 
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 
-// Função composable que representa o ecrã de login
 @Composable
-@Preview // Permite visualizar esta UI na aba "Design" do Android Studio
+@Preview
 fun LoginScreen(
-    onLoginClick: (User) -> Unit = {}, // Callback para o botão "Entrar"
+    onLoginClick: (User) -> Unit = {},
 ) {
-    // Estados reativos que armazenam os valores dos campos de input
     var socio by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) } // Controla a visibilidade da password
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // Estrutura de layout principal em coluna, com alinhamento central
     Column(
         modifier = Modifier
-            .fillMaxSize() // Ocupa o ecran inteiro
-            .padding(32.dp), // Margens internas
-        verticalArrangement = Arrangement.Center, // Centraliza verticalmente
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
+            .fillMaxSize()
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        // Título da aplicação
         Text(
             text = "AthleTrack",
-            style = MaterialTheme.typography.displayLarge.copy(
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
+            style = typography.displayLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 48.sp
             ),
-            color = White // Cor branca definida na paleta de cores
+            color = colorScheme.onPrimary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Acompanhe o seu treino",
+            style = typography.titleLarge,
+            color = colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(40.dp)) // Espaço entre título e campos
+        Spacer(modifier = Modifier.height(40.dp))
 
-        // Campo de texto para o número de sócio
         OutlinedTextField(
             value = socio,
-            onValueChange = { socio = it }, // Atualiza o estado ao escrever
+            onValueChange = { socio = it },
             label = { Text("Número de Sócio") },
-            modifier = Modifier.fillMaxWidth(), // Ocupa toda a largura disponível
-            colors = OutlinedTextFieldDefaults.colors( // Personalização visual
-                focusedBorderColor = BlueAccent,
-                unfocusedBorderColor = Gray,
-                focusedLabelColor = BlueAccent,
-                unfocusedLabelColor = White,
-                cursorColor = BlueAccent
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorScheme.onPrimary, // Alterado para onPrimary
+                unfocusedBorderColor = colorScheme.secondary,
+                focusedLabelColor =colorScheme.onPrimary, // Alterado para onPrimary
+                unfocusedLabelColor = colorScheme.primary,
+                cursorColor = colorScheme.primary
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Espaço entre os campos
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de texto para a password (sem ícone de visibilidade neste caso)
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -89,26 +89,24 @@ fun LoginScreen(
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = BlueAccent,
-                unfocusedBorderColor = Gray,
-                focusedLabelColor = BlueAccent,
-                unfocusedLabelColor = White,
-                cursorColor = BlueAccent
+                focusedBorderColor =colorScheme.onPrimary, // Alterado para onPrimary
+                unfocusedBorderColor =colorScheme.secondary,
+                focusedLabelColor = colorScheme.onPrimary, // Alterado para onPrimary
+                unfocusedLabelColor = colorScheme.primary,
+                cursorColor = colorScheme.primary
             )
         )
 
-        Spacer(modifier = Modifier.height(24.dp)) // Espaço antes do botão
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Botão de login
-
-        val context = LocalContext.current // para mostrar Toast
+        val context = LocalContext.current
 
         Button(
             onClick = {
                 if (socio.isNotBlank() && password.isNotBlank()) {
                     val request = LoginRequest(socio.toInt(), password)
 
-                    RetrofitClient.loginService.login(request).enqueue(object : Callback<estga.dadm.athletrack.api.User> {
+                    RetrofitClient.loginService.login(request).enqueue(object : Callback<User> {
                         override fun onResponse(
                             call: Call<User>,
                             response: Response<User>
@@ -116,7 +114,6 @@ fun LoginScreen(
                             if (response.isSuccessful) {
                                 val user = response.body()
                                 if (user != null) {
-                                    // Aqui redirecionas com base no tipo
                                     onLoginClick(user)
                                 }
                             } else {
@@ -135,9 +132,13 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
         ) {
-            Text("Entrar", color = White)
+            Text(
+                text = "Entrar",
+                style = typography.labelMedium,
+                color = colorScheme.background
+            )
         }
     }
 }

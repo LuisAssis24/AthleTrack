@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
@@ -65,9 +66,6 @@ fun HomeScreenProfessor(
 
     val gson = Gson()
     val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-
-    val BackgroundBlueDark = Color(0xFF0D1B2A)
-    val TopBarBlue = Color(0xFF1B263B)
     val scope = rememberCoroutineScope()
     var showCameraDialog by remember { mutableStateOf(false) }
 
@@ -93,8 +91,8 @@ fun HomeScreenProfessor(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlueDark),
-        containerColor = BackgroundBlueDark
+            .background(colorScheme.surface),
+        containerColor = colorScheme.surface
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -109,7 +107,7 @@ fun HomeScreenProfessor(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                    .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -122,7 +120,7 @@ fun HomeScreenProfessor(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Perfil",
-                            tint = White,
+                            tint = colorScheme.primary,
                             modifier = Modifier.size(32.dp)
                         )
 
@@ -133,45 +131,23 @@ fun HomeScreenProfessor(
                                 text = user.nome,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                color = White
+                                color = colorScheme.primary
                             )
                             Text(
                                 text = "Sócio nº ${user.idSocio}",
                                 fontSize = 14.sp,
-                                color = Color.LightGray
+                                color = colorScheme.secondary
                             )
                         }
                     }
 
                     // LADO DIREITO: ÍCONES DE AÇÃO
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        /*
-                        IconButton(onClick = {
-                            when {
-                                ContextCompat.checkSelfPermission(
-                                    context,
-                                    android.Manifest.permission.CAMERA
-                                ) == PackageManager.PERMISSION_GRANTED -> {
-                                    showCameraDialog = true
-                                }
-                                else -> {
-                                    launcher.launch(android.Manifest.permission.CAMERA)
-                                }
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.QrCode, // ÍCONE DE QR CODE
-                                contentDescription = "QR Code",
-                                tint = White,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }*/
-
                         VerticalDivider(
                             modifier = Modifier
                                 .height(24.dp)
                                 .padding(horizontal = 8.dp),
-                            color = Color.LightGray,
+                            color = colorScheme.secondary,
                             thickness = 1.dp
                         )
 
@@ -181,7 +157,7 @@ fun HomeScreenProfessor(
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
                                 contentDescription = "Calendário",
-                                tint = White,
+                                tint = colorScheme.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -203,20 +179,22 @@ fun HomeScreenProfessor(
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                        .background(colorScheme.surface, shape = RoundedCornerShape(16.dp))
                         .size(81.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
                         contentDescription = "GestaoTreinos",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(40.dp),
+                        tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Treinos",
                         fontSize = 12.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = colorScheme.primary
                     )
                 }
 
@@ -230,20 +208,22 @@ fun HomeScreenProfessor(
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
                         .size(81.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "GestaoAtleta",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(40.dp),
+                        tint = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Atletas",
                         fontSize = 12.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = colorScheme.primary
                     )
                 }
             }
@@ -257,7 +237,7 @@ fun HomeScreenProfessor(
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Text(
-                        text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Próximas Aulas Amanhã",
+                        text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,

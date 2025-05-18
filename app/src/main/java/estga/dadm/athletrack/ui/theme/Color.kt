@@ -2,10 +2,23 @@ package estga.dadm.athletrack.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val BluePrimary = Color(0xFF0A2540)
-val BlueAccent = Color(0xFF1976D2)
-val Gray = Color(0xFFB0BEC5)
-val White = Color(0xFFFFFFFF)
-val GreenSuccess = Color(0xFF43A047)
-val RedError = Color(0xFFE53935)
-val BackgroundLight = Color(0xFFF5F7FA)
+val Gray = hexToColor("#B0BEC5")
+val White = hexToColor("#FFFFFF")
+
+val BackgroundBlueDark = hexToColor("#0D1B2A")
+val CardBlue = hexToColor("#1F4164")
+val BlueAccent = hexToColor("#346CA8")
+
+val GreenSuccess = hexToColor("#43A047")
+val RedError = hexToColor("#FF5B58")
+
+fun hexToColor(hex: String): Color {
+    require(hex.startsWith("#") && (hex.length == 7 || hex.length == 9)) {
+    }
+    val colorValue = hex.removePrefix("#").toLong(16)
+    return if (hex.length == 7) {
+        Color(0xFF000000 or colorValue) // Adiciona opacidade total (FF) se não estiver presente
+    } else {
+        Color(colorValue)
+    }
+}

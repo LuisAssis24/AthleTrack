@@ -6,16 +6,14 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val ColorScheme = darkColorScheme(
-    primary = BluePrimary,
-    secondary = BlueAccent,
-    background = BluePrimary,
-    surface = BluePrimary,
-    onPrimary = White,
-    onSecondary = White,
-    onBackground = White,
-    onSurface = White,
+    primary = White,
+    secondary = Gray,
+    onPrimary = BlueAccent,
+
+    primaryContainer = CardBlue,
+    surface = BackgroundBlueDark,
+
     error = RedError,
-    onError = White
 )
 
 @Composable
