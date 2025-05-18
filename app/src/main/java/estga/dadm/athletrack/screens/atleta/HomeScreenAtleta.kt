@@ -42,6 +42,8 @@ import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.components.QrCameraScanner
 import androidx.compose.ui.graphics.Color
+import com.google.gson.Gson
+import java.net.URLEncoder
 
 @Composable
 fun HomeScreenAtleta(
@@ -54,6 +56,7 @@ fun HomeScreenAtleta(
     val treinos by viewModel.treinos.collectAsState()
     val scope = rememberCoroutineScope()
     var showCameraDialog by remember { mutableStateOf(false) }
+    val gson = Gson()
 
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -84,7 +87,7 @@ fun HomeScreenAtleta(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // TOP BAR COM BORDA ARREDONDADA
+            // TOP BAR
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +100,6 @@ fun HomeScreenAtleta(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // LADO ESQUERDO: PERFIL + NOME
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Person,
@@ -123,8 +125,8 @@ fun HomeScreenAtleta(
                         }
                     }
 
-                    // LADO DIREITO: ÍCONES DE AÇÃO
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Botão QR Code
                         IconButton(onClick = {
                             when {
                                 ContextCompat.checkSelfPermission(
@@ -139,7 +141,7 @@ fun HomeScreenAtleta(
                             }
                         }) {
                             Icon(
-                                imageVector = Icons.Default.QrCode, // ÍCONE DE QR CODE
+                                imageVector = Icons.Default.QrCode,
                                 contentDescription = "QR Code",
                                 tint = White,
                                 modifier = Modifier.size(28.dp)
@@ -154,8 +156,10 @@ fun HomeScreenAtleta(
                             thickness = 1.dp
                         )
 
+                        // Botão Calendário - redireciona para a tela de calendário
                         IconButton(onClick = {
-                            Toast.makeText(context, "Calendário clicado", Toast.LENGTH_SHORT).show()
+                            val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                            navController.navigate("calendar/$userJson")
                         }) {
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
@@ -170,7 +174,6 @@ fun HomeScreenAtleta(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // TÍTULO CENTRALIZADO
             Text(
                 text = "Próximos Treinos",
                 fontSize = 18.sp,
@@ -188,7 +191,6 @@ fun HomeScreenAtleta(
                 color = Color.LightGray
             )
 
-            // ÁREA DE TREINOS COM SCROLL VERTICAL
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

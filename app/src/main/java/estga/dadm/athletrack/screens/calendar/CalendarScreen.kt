@@ -65,21 +65,16 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* Menu */ }) {
+                IconButton(onClick = {
+                    navController.popBackStack() // <- Volta para a tela anterior
+                }) {
                     Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
+                        imageVector = Icons.Default.ArrowBack, // <- Ícone de seta para esquerda
+                        contentDescription = "Voltar",
                         tint = White,
                         modifier = Modifier.size(36.dp)
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = "Calendário",
-                    tint = White,
-                    modifier = Modifier.size(36.dp)
-                )
             }
         },
         containerColor = BluePrimary
