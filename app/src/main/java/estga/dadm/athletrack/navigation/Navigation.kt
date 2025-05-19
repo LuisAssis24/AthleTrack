@@ -66,6 +66,15 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             GestaoTreinosScreen(user, navController) // <-- passar o navController aqui
         }
 
+        composable(
+            route = "gestaoatletas/{userJson}",
+            arguments = listOf(navArgument("userJson") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            GestaoAtletasScreen(user, navController)
+        }
+
 
         composable(
             "calendar/{userJson}",

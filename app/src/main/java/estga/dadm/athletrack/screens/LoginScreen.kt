@@ -3,7 +3,6 @@ package estga.dadm.athletrack.screens
 // Importações das bibliotecas Compose necessárias
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -19,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import estga.dadm.athletrack.api.LoginRequest
+import estga.dadm.athletrack.api.UserRequest
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.RetrofitClient
 
@@ -104,7 +103,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (socio.isNotBlank() && password.isNotBlank()) {
-                    val request = LoginRequest(socio.toInt(), password)
+                    val request = UserRequest(socio.toInt(), password)
 
                     RetrofitClient.loginService.login(request).enqueue(object : Callback<User> {
                         override fun onResponse(

@@ -9,7 +9,7 @@ data class idRequest(
 )
 
 // Modelo de dados do pedido
-data class LoginRequest(
+data class UserRequest(
     val idSocio: Int,
     val password: String
 )
@@ -34,13 +34,19 @@ data class UserDelete(
 
 interface UserService {
     @POST("/api/user/login")
-    fun login(@Body request: LoginRequest): Call<User>
+    fun login(@Body request: UserRequest): Call<User>
 
-    fun listar(): List<User>
+    @POST("/api/user/listar")
+    suspend fun listar(): List<User>
 
-    fun criar(@Body request: UserCreate): String
+    @POST("/api/user/criar")
+    suspend fun criar(@Body request: UserCreate): String
 
-    fun eliminar(@Body request: UserDelete): String
+    @POST("/api/user/eliminar/{idParaEliminar}")
+    suspend fun eliminar(
+        @Path("idParaEliminar") idParaEliminar: Int,
+        @Body request: UserRequest
+    ): String
 }
 
 // Modelo da Request do treino

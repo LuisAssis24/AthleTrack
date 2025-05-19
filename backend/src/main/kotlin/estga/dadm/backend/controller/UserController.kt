@@ -88,25 +88,28 @@ class UserController(private val userRepository: UserRepository,
         }
     }
 
-    @PostMapping("/eliminar")
-    fun eliminarUser(@RequestBody request: UserDeleteRequestDTO): ResponseEntity<String> {
-        return try {
-            val user = userRepository.findById(request.idSocio).orElse(null)
-            val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
+    @PostMapping("/eliminar/{idParaEliminar}")
+    fun eliminarUser(
+        @RequestBody loginRequest: LoginRequestDTO,
+        @PathVariable idParaEliminar: Int
+    ): ResponseEntity<String> {
+        val autenticado = userRepository.findById(loginRequest.idSocio).orElse(null)
 
-            if (user != null) {
-                socioModalidades.forEach { socioModalidade ->
-                    socioModalidadeRepository.delete(socioModalidade)
-                }
-                // Eliminar o usuário
-                userRepository.delete(user)
-                ResponseEntity.ok("Usuário eliminado com sucesso.")
-            } else {
-                ResponseEntity.status(404).body("Usuário não encontrado.")
+        if (autenticado == null || !PasswordUtil.matches(loginRequest.password, autenticado.password)) {
+            return ResponseEntity.status(401).body("Senha inválida.")
+        }
+
+        val user = userRepository.findById(idParaEliminar).orElse(null)
+        val socioModalidades = socioModalidadeRepository.findBySocioId(idParaEliminar)
+
+        return if (user != null) {
+            socioModalidades.forEach { socioModalidade ->
+                socioModalidadeRepository.delete(socioModalidade)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ResponseEntity.status(500).body("Erro ao eliminar utilizador: ${e.message}")
+            userRepository.delete(user)
+            ResponseEntity.ok("Usuário eliminado com sucesso.")
+        } else {
+            ResponseEntity.status(404).body("Usuário não encontrado.")
         }
     }
 }
