@@ -3,6 +3,8 @@ package estga.dadm.athletrack.screens.calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,6 +37,9 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
 
+/**
+ *
+ */
 @Composable
 fun CalendarScreen(user: User, navController: NavHostController) {
     val viewModel: CalendarViewModel = viewModel()
@@ -67,18 +72,18 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    navController.popBackStack() // <- Volta para a tela anterior
+                    navController.popBackStack()
                 }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack, // <- Ícone de seta para esquerda
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Voltar",
-                        tint = White,
+                        tint = colorScheme.primary,
                         modifier = Modifier.size(36.dp)
                     )
                 }
             }
         },
-        containerColor = colorScheme.background // <- Cor de fundo
+        containerColor = colorScheme.surface
     ) { padding ->
         Column(
             modifier = Modifier
@@ -93,9 +98,8 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                 "Próximos Eventos",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = White
+                color = colorScheme.primary
             )
-            Text("xxxxxxxxxxxxxxxxxxxx", fontSize = 14.sp, color = Gray)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -103,7 +107,7 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(6.dp),
-                colors = CardDefaults.cardColors(containerColor = BlueAccent)
+                colors = CardDefaults.cardColors(containerColor = colorScheme.primaryContainer)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,15 +200,21 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                     if (user.tipo.lowercase() == "professor") {
                         Button(
                             onClick = {
-                                val gson = Gson()
-                                val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                                val selectedDateString = URLEncoder.encode(selectedDate.toString(), "UTF-8")
-                                navController.navigate("adicionarEvento/$userJson/$selectedDateString")
+                                val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                navController.navigate("adicionarEvento/$userJson/${selectedDate.toString()}")
                             },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = GreenSuccess)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary,
+                                contentColor = colorScheme.background
+                            )
                         ) {
-                            Text("Adicionar Evento", color = White)
+                            Text(
+                                text = "Adicionar Evento",
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
                     }
                 }
@@ -212,20 +222,22 @@ fun CalendarScreen(user: User, navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Column {
-                eventosFiltrados.forEach { evento ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(eventosFiltrados) { evento ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
-                            .background(Gray, shape = RoundedCornerShape(12.dp))
+                            .background(colorScheme.primaryContainer, shape = RoundedCornerShape(12.dp))
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold, color = White)
-                            Text(evento.hora, fontSize = 12.sp, color = Gray)
+                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold, color = colorScheme.primary)
+                            Text(evento.hora, fontSize = 12.sp, color = colorScheme.secondary)
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -233,13 +245,13 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                                 "${selectedDate.dayOfMonth}",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = White
+                                color = colorScheme.primary
                             )
                             Text(
-                                selectedDate.month.getDisplayName(
-                                    TextStyle.SHORT,
-                                    Locale("pt", "BR")
-                                ), fontSize = 12.sp, color = White
+                                selectedDate.month.getDisplayName(TextStyle.SHORT, Locale("pt", "BR"))
+                                    .replaceFirstChar { it.uppercase() },
+                                fontSize = 12.sp,
+                                color = colorScheme.secondary
                             )
                         }
                     }

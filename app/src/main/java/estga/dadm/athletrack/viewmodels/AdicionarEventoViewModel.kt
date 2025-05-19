@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.EventoCriarRequestDTO
+import estga.dadm.athletrack.api.EventosRequest
 import estga.dadm.athletrack.api.idRequest
 
 
@@ -33,10 +34,28 @@ class AdicionarEventoViewModel : ViewModel() {
         local: String,
         descricao: String,
         modalidades: List<Int>,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             try {
+                // Verificar se o evento já existe
+                val eventosExistentes = RetrofitClient.eventosService.getEventos(
+                    EventosRequest(idSocio = 0) // Substitua por um ID válido, se necessário
+                )
+                val eventoDuplicado = eventosExistentes.any { evento ->
+                    evento.localEvento == local &&
+                            evento.data == data &&
+                            evento.hora == hora &&
+                            evento.descricao == descricao
+                }
+
+                if (eventoDuplicado) {
+                    onError("Evento já existe com os mesmos dados.")
+                    return@launch
+                }
+
+                // Criar o evento se não for duplicado
                 val request = EventoCriarRequestDTO(
                     data = data,
                     hora = hora,
@@ -48,6 +67,7 @@ class AdicionarEventoViewModel : ViewModel() {
                 onSuccess()
             } catch (e: Exception) {
                 e.printStackTrace()
+                onError("Erro ao criar evento: ${e.message}")
             }
         }
     }

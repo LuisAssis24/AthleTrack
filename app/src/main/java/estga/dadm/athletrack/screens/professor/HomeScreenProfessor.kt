@@ -151,13 +151,15 @@ fun HomeScreenProfessor(
                             thickness = 1.dp
                         )
 
+                        // Botão Calendário - redireciona para a tela de calendário
                         IconButton(onClick = {
-                            Toast.makeText(context, "Calendário clicado", Toast.LENGTH_SHORT).show()
+                            val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                            navController.navigate("calendar/$userJson")
                         }) {
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
                                 contentDescription = "Calendário",
-                                tint = colorScheme.primary,
+                                tint = White,
                                 modifier = Modifier.size(28.dp)
                             )
                         }

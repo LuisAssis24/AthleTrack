@@ -1,10 +1,8 @@
 package estga.dadm.athletrack.screens.calendar
 
 import android.app.TimePickerDialog
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,8 +22,13 @@ import estga.dadm.athletrack.viewmodels.AdicionarEventoViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import android.app.DatePickerDialog
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
+import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
+import java.net.URLEncoder
 
 import java.util.*
 
@@ -72,7 +75,7 @@ fun AdicionarEventoScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Voltar",
-                        tint = White,
+                        tint = colorScheme.primary,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -81,7 +84,7 @@ fun AdicionarEventoScreen(
                     text = "Adicionar Evento",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = White
+                    color = colorScheme.primary
                 )
             }
         },
@@ -95,7 +98,7 @@ fun AdicionarEventoScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = BlueAccent)
+                CircularProgressIndicator(color = colorScheme.primary)
             }
         } else {
             Column(
@@ -109,7 +112,7 @@ fun AdicionarEventoScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Botão para selecionar a data
-                Button(
+                OutlinedButton(
                     onClick = {
                         val datePicker = DatePickerDialog(
                             context,
@@ -123,13 +126,18 @@ fun AdicionarEventoScreen(
                         datePicker.show()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+                    border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                    shape = RoundedCornerShape(4.dp), // Menos arredondado
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = colorScheme.background,
+                        contentColor = colorScheme.secondary
+                    )
                 ) {
-                    Text("Data: ${data.toString()}", color = White)
+                    Text("Data: ${data.toString()}")
                 }
 
                 // Botão para selecionar a hora
-                Button(
+                OutlinedButton(
                     onClick = {
                         val timePicker = TimePickerDialog(
                             context,
@@ -143,9 +151,14 @@ fun AdicionarEventoScreen(
                         timePicker.show()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+                    border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                    shape = RoundedCornerShape(4.dp), // Menos arredondado
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = colorScheme.background,
+                        contentColor = colorScheme.secondary
+                    )
                 ) {
-                    Text("Hora: ${hora.toString()}", color = White)
+                    Text("Hora: ${hora.toString()}")
                 }
 
                 OutlinedTextField(
@@ -154,11 +167,11 @@ fun AdicionarEventoScreen(
                     label = { Text("Local") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BlueAccent,
-                        unfocusedBorderColor = Gray,
-                        focusedLabelColor = BlueAccent,
-                        unfocusedLabelColor = White,
-                        cursorColor = BlueAccent
+                        focusedBorderColor = colorScheme.primary,
+                        unfocusedBorderColor = colorScheme.secondary,
+                        focusedLabelColor = colorScheme.primary,
+                        unfocusedLabelColor = colorScheme.secondary,
+                        cursorColor = colorScheme.primary
                     )
                 )
 
@@ -168,26 +181,30 @@ fun AdicionarEventoScreen(
                     label = { Text("Descrição") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BlueAccent,
-                        unfocusedBorderColor = Gray,
-                        focusedLabelColor = BlueAccent,
-                        unfocusedLabelColor = White,
-                        cursorColor = BlueAccent
+                        focusedBorderColor = colorScheme.primary,
+                        unfocusedBorderColor = colorScheme.secondary,
+                        focusedLabelColor = colorScheme.primary,
+                        unfocusedLabelColor = colorScheme.secondary,
+                        cursorColor = colorScheme.primary
                     )
                 )
 
                 // MultiSelect para Modalidades
-                Text("Modalidades", fontWeight = FontWeight.Bold, color = White)
+                Text("Modalidades", fontWeight = FontWeight.Bold, color = colorScheme.primary)
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Button(
+                    OutlinedButton(
                         onClick = { isDropdownExpanded = !isDropdownExpanded },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                        shape = RoundedCornerShape(4.dp), // Menos arredondado
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = colorScheme.background,
+                            contentColor = colorScheme.secondary
+                        ),
                     ) {
                         Text(
                             text = if (modalidadesSelecionadas.isEmpty()) "Selecionar Modalidades"
-                            else modalidadesSelecionadas.joinToString { it.nomeModalidade },
-                            color = White
+                            else modalidadesSelecionadas.joinToString { it.nomeModalidade }
                         )
                     }
 
@@ -213,12 +230,12 @@ fun AdicionarEventoScreen(
                                             checked = modalidade in modalidadesSelecionadas,
                                             onCheckedChange = null,
                                             colors = CheckboxDefaults.colors(
-                                                checkedColor = BlueAccent,
-                                                uncheckedColor = Gray
+                                                checkedColor = colorScheme.primary,
+                                                uncheckedColor = colorScheme.secondary
                                             )
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(modalidade.nomeModalidade, color = White)
+                                        Text(modalidade.nomeModalidade, color = colorScheme.primary)
                                     }
                                 }
                             )
@@ -230,31 +247,47 @@ fun AdicionarEventoScreen(
 
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            try {
-                                viewModel.adicionarEvento(
-                                    data = data.toString(),
-                                    hora = hora.toString(),
-                                    local = local,
-                                    descricao = descricao,
-                                    modalidades = modalidadesSelecionadas.map { it.id }
-                                ) {
-                                    // Sucesso: Voltar para a página de calendário e atualizar eventos
-                                    navController.popBackStack("calendar/${user.idSocio}", inclusive = false)
+                        if (local.isBlank() || descricao.isBlank() || modalidadesSelecionadas.isEmpty()) {
+                            Toast.makeText(context, "Preencha todos os campos obrigatórios", Toast.LENGTH_SHORT).show()
+                        } else {
+                            coroutineScope.launch {
+                                try {
+                                    viewModel.adicionarEvento(
+                                        data = data.toString(),
+                                        hora = hora.toString(),
+                                        local = local,
+                                        descricao = descricao,
+                                        modalidades = modalidadesSelecionadas.map { it.id },
+                                        onSuccess = {
+                                            val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                            navController.navigate("calendar/$userJson") {
+                                                popUpTo("calendar/$userJson") { inclusive = true }
+                                            }
+                                        },
+                                        onError = { errorMessage ->
+                                            coroutineScope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    message = "Erro ao criar evento: $errorMessage",
+                                                    actionLabel = "Fechar"
+                                                )
+                                            }
+                                        }
+                                    )
+                                } catch (e: Exception) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Erro ao criar evento: ${e.message}",
+                                            actionLabel = "Fechar"
+                                        )
+                                    }
                                 }
-                            } catch (e: Exception) {
-                                // Exibir mensagem de erro no Snackbar
-                                snackbarHostState.showSnackbar(
-                                    message = "Erro ao criar evento: ${e.message}",
-                                    actionLabel = "Fechar"
-                                )
                             }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = BlueAccent)
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
-                    Text("Salvar", color = White)
+                    Text("Salvar", color = colorScheme.background)
                 }
             }
         }
