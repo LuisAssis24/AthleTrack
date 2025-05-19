@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -76,8 +77,8 @@ fun HomeScreenAtleta(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlueDark),
-        containerColor = BackgroundBlueDark
+            .background(colorScheme.surface),
+        containerColor = colorScheme.surface
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -92,7 +93,7 @@ fun HomeScreenAtleta(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .background(TopBarBlue, shape = RoundedCornerShape(16.dp))
+                    .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -104,7 +105,7 @@ fun HomeScreenAtleta(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Perfil",
-                            tint = White,
+                            tint = colorScheme.primary,
                             modifier = Modifier.size(32.dp)
                         )
 
@@ -115,12 +116,12 @@ fun HomeScreenAtleta(
                                 text = user.nome,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                color = White
+                                color = colorScheme.primary
                             )
                             Text(
                                 text = "Sócio nº ${user.idSocio}",
                                 fontSize = 14.sp,
-                                color = Color.LightGray
+                                color = colorScheme.secondary
                             )
                         }
                     }
@@ -152,7 +153,7 @@ fun HomeScreenAtleta(
                             modifier = Modifier
                                 .height(24.dp)
                                 .padding(horizontal = 8.dp),
-                            color = Color.LightGray,
+                            color = colorScheme.secondary,
                             thickness = 1.dp
                         )
 

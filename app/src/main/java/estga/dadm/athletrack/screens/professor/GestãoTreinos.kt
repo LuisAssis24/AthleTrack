@@ -1,5 +1,6 @@
 package estga.dadm.athletrack.screens.professor
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
+
 @Composable
 fun GestaoTreinosScreen(user: User, navController: NavHostController) {
     val viewModel: HomeProfessorViewModel = viewModel()
@@ -50,16 +53,21 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Voltar",
-                        tint = Color.White,
+                        tint = colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Criar Treino", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    "Criar Treino",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary
+                )
             }
         },
-        containerColor = Color(0xFF001F3F) // azul escuro
+        containerColor = colorScheme.surface
     ) { padding ->
         Column(
             modifier = Modifier
@@ -71,7 +79,12 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 value = dia,
                 onValueChange = { dia = it },
                 label = { Text("Dia da Semana") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorScheme.primary,
+                    unfocusedBorderColor = colorScheme.secondary,
+                    cursorColor = colorScheme.primary
+                )
             )
             Spacer(Modifier.height(8.dp))
 
@@ -79,7 +92,12 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 value = hora,
                 onValueChange = { hora = it },
                 label = { Text("Hora (HH:mm)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorScheme.primary,
+                    unfocusedBorderColor = colorScheme.secondary,
+                    cursorColor = colorScheme.primary
+                )
             )
             Spacer(Modifier.height(8.dp))
 
@@ -87,7 +105,12 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 value = modalidadeId,
                 onValueChange = { modalidadeId = it },
                 label = { Text("ID Modalidade") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorScheme.primary,
+                    unfocusedBorderColor = colorScheme.secondary,
+                    cursorColor = colorScheme.primary
+                )
             )
 
             Spacer(Modifier.height(12.dp))
@@ -98,7 +121,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         diaSemana = dia,
                         hora = hora,
                         idModalidade = modalidadeId.toInt(),
-                        idProfessor = user.idSocio
+                        idProfessor = user.idSocio,
                     ) { sucesso, resposta ->
                         mensagem = resposta
                         if (sucesso) viewModel.carregarTodosOsTreinos(user.idSocio)
@@ -108,25 +131,28 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)) // azul claro
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.background
+                )
             ) {
-                Text("Criar Treino", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("Criar Treino", color = colorScheme.background, fontWeight = FontWeight.Bold)
             }
 
             if (mensagem.isNotEmpty()) {
                 Text(
                     text = mensagem,
-                    color = Color.LightGray,
+                    color = if (mensagem.contains("Erro")) colorScheme.error else colorScheme.primary,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
 
             Spacer(Modifier.height(24.dp))
-            Divider(color = Color.Gray)
+            Divider(color = colorScheme.secondary)
             Text(
                 "Todos os Treinos",
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = colorScheme.primary,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -140,7 +166,13 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(vertical = 8.dp)
+                            .background(
+                                colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
@@ -151,7 +183,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                             Text(
                                 "QR: ${treino.qrCode}",
                                 fontSize = 12.sp,
-                                color = Color.LightGray
+                                color = colorScheme.primary,
                             )
                         }
                         IconButton(onClick = {
@@ -159,7 +191,11 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                 viewModel.carregarTodosOsTreinos(user.idSocio)
                             }
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Apagar", tint = Color.White)
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Apagar",
+                                tint = colorScheme.error
+                            )
                         }
                     }
                 }

@@ -12,7 +12,4 @@ import org.springframework.stereotype.Repository
 interface EventoModalidadeRepository : JpaRepository<EventoModalidade, EventoModalidadeId> {
     fun findByModalidadeIdIn(modalidadesIds: List<Int>): List<EventoModalidade>
 
-    @Modifying
-    @Query("INSERT INTO eventos (local_evento, data, hora, descricao) VALUES (:localEvento, :data, :hora, :descricao) RETURNING *", nativeQuery = true)
-    fun saveEvento(evento: Evento): Evento
 }

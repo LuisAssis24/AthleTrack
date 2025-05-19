@@ -30,8 +30,8 @@ class EventoController(
         val modalidadesIds = socioModalidades.map { it.modalidade.id }
 
         val eventos = eventoModalidadeRepository.findByModalidadeIdIn(modalidadesIds)
-            .map { relacao ->
-                val evento = relacao.evento
+            .map { it.evento } // Extraindo os eventos diretamente
+            .map { evento ->
                 EventoResponseDTO(
                     localEvento = evento.localEvento,
                     data = evento.data,
@@ -39,11 +39,9 @@ class EventoController(
                     descricao = evento.descricao
                 )
             }
-            .filter { it.data.isEqual(LocalDate.now()) || it.data.isAfter(LocalDate.now()) }
 
         return eventos
     }
-
 
 
 
@@ -52,7 +50,7 @@ class EventoController(
         try {
             // Verificar se já existe um evento igual
             val eventoExistente = eventoRepository.findByLocalEventoAndDataAndHoraAndDescricao(
-                request.localEvento, LocalDate.parse(request.data), LocalTime.parse(request.hora), request.descricao
+                request.localEvento, LocalDate.parse(request.data), LocalTime.parse(request.hora).withSecond(0), request.descricao
             )
             if (eventoExistente != null) {
                 throw IllegalArgumentException("Evento já existe com os mesmos dados.")
@@ -63,7 +61,7 @@ class EventoController(
                 id = 0,
                 localEvento = request.localEvento,
                 data = LocalDate.parse(request.data),
-                hora = LocalTime.parse(request.hora),
+                hora = LocalTime.parse(request.hora).withSecond(0), // Removendo os segundos
                 descricao = request.descricao
             )
             val eventoSalvo = eventoRepository.save(evento)

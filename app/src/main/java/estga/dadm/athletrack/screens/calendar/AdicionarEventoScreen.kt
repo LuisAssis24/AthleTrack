@@ -24,6 +24,7 @@ import java.time.LocalTime
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import com.google.gson.Gson
@@ -88,7 +89,7 @@ fun AdicionarEventoScreen(
                 )
             }
         },
-        containerColor = colorScheme.background,
+        containerColor = colorScheme.surface,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         if (isLoading) {
@@ -129,7 +130,7 @@ fun AdicionarEventoScreen(
                     border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
                     shape = RoundedCornerShape(4.dp), // Menos arredondado
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = colorScheme.background,
+                        containerColor = colorScheme.primaryContainer,
                         contentColor = colorScheme.secondary
                     )
                 ) {
@@ -154,7 +155,7 @@ fun AdicionarEventoScreen(
                     border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
                     shape = RoundedCornerShape(4.dp), // Menos arredondado
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = colorScheme.background,
+                        containerColor = colorScheme.primaryContainer,
                         contentColor = colorScheme.secondary
                     )
                 ) {
@@ -191,27 +192,31 @@ fun AdicionarEventoScreen(
 
                 // MultiSelect para Modalidades
                 Text("Modalidades", fontWeight = FontWeight.Bold, color = colorScheme.primary)
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     OutlinedButton(
                         onClick = { isDropdownExpanded = !isDropdownExpanded },
                         modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
-                        shape = RoundedCornerShape(4.dp), // Menos arredondado
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = colorScheme.background,
+                            containerColor = colorScheme.primaryContainer,
                             contentColor = colorScheme.secondary
                         ),
+                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = if (modalidadesSelecionadas.isEmpty()) "Selecionar Modalidades"
-                            else modalidadesSelecionadas.joinToString { it.nomeModalidade }
+                            text = if (modalidadesSelecionadas.isEmpty()) "Selecionar Modalidades" else modalidadesSelecionadas.joinToString { it.nomeModalidade },
+                            color = colorScheme.primary
                         )
                     }
 
                     DropdownMenu(
                         expanded = isDropdownExpanded,
                         onDismissRequest = { isDropdownExpanded = false },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+
+
                     ) {
                         modalidades.forEach { modalidade ->
                             DropdownMenuItem(
@@ -222,9 +227,13 @@ fun AdicionarEventoScreen(
                                         modalidadesSelecionadas.add(modalidade)
                                     }
                                 },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(colorScheme.primaryContainer),
                                 text = {
                                     Row(
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth() // Garante que o conteúdo ocupe toda a largura
                                     ) {
                                         Checkbox(
                                             checked = modalidade in modalidadesSelecionadas,
@@ -248,7 +257,11 @@ fun AdicionarEventoScreen(
                 Button(
                     onClick = {
                         if (local.isBlank() || descricao.isBlank() || modalidadesSelecionadas.isEmpty()) {
-                            Toast.makeText(context, "Preencha todos os campos obrigatórios", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Preencha todos os campos obrigatórios",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
                             coroutineScope.launch {
                                 try {
@@ -259,7 +272,8 @@ fun AdicionarEventoScreen(
                                         descricao = descricao,
                                         modalidades = modalidadesSelecionadas.map { it.id },
                                         onSuccess = {
-                                            val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                            val userJson =
+                                                URLEncoder.encode(Gson().toJson(user), "UTF-8")
                                             navController.navigate("calendar/$userJson") {
                                                 popUpTo("calendar/$userJson") { inclusive = true }
                                             }
