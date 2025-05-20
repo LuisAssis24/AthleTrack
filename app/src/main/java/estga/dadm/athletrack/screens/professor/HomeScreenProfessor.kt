@@ -177,7 +177,7 @@ fun HomeScreenProfessor(
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .background(colorScheme.surface, shape = RoundedCornerShape(16.dp))
+                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
                         .size(81.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
