@@ -15,88 +15,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import estga.dadm.athletrack.api.*
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import estga.dadm.athletrack.api.User
+import estga.dadm.athletrack.api.UserCreate
+import estga.dadm.athletrack.api.UserRequest
+import estga.dadm.athletrack.viewmodels.AtletasViewModel
 
 @Composable
 fun GestaoAtletasScreen(user: User, navController: NavHostController) {
+    val viewModel: AtletasViewModel = viewModel()
+    val atletas by viewModel.atletas.collectAsState()
+
     var nome by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var modalidades by remember { mutableStateOf("") } // "1,2"
+    var modalidades by remember { mutableStateOf("") }
     var mensagem by remember { mutableStateOf("") }
 
-    var atletas by remember { mutableStateOf<List<User>>(emptyList()) }
     var showPasswordDialog by remember { mutableStateOf(false) }
     var senhaParaApagar by remember { mutableStateOf("") }
     var atletaParaApagar by remember { mutableStateOf<User?>(null) }
 
-    val scope = rememberCoroutineScope()
-
-    fun carregarAtletas() {
-        scope.launch {
-            try {
-                val todos = RetrofitClient.loginService.listar()
-                atletas = todos.filter { it.tipo.lowercase() == "atleta" }
-            } catch (e: Exception) {
-                mensagem = "Erro ao carregar atletas"
-            }
-        }
-    }
-
-    fun criarAtleta() {
-        scope.launch {
-            try {
-                val ids = modalidades.split(",").mapNotNull { it.trim().toIntOrNull() }
-                val req = UserCreate(password, nome, "atleta", ids)
-                val resposta = RetrofitClient.loginService.criar(req)
-                mensagem = resposta
-                nome = ""
-                password = ""
-                modalidades = ""
-                carregarAtletas()
-            } catch (e: Exception) {
-                mensagem = "Erro ao criar atleta"
-            }
-        }
-    }
-
-    fun apagarAtletaComSenha() {
-        val atletaId = atletaParaApagar?.idSocio ?: run {
-            mensagem = "Erro: atleta a eliminar não definido"
-            return
-        }
-
-        scope.launch {
-            try {
-                val loginRequest = UserRequest(
-                    idSocio = user.idSocio,
-                    password = senhaParaApagar.trim()
-                )
-
-                val resposta = RetrofitClient.loginService.eliminar(
-                    idParaEliminar = atletaId,
-                    request = loginRequest
-                )
-
-                mensagem = resposta
-                carregarAtletas()
-
-            } catch (e: Exception) {
-                mensagem = "Erro ao apagar: ${e.message}"
-            } finally {
-                showPasswordDialog = false
-                senhaParaApagar = ""
-                atletaParaApagar = null
-            }
-        }
-    }
-
     LaunchedEffect(Unit) {
-        carregarAtletas()
+        viewModel.carregarAtletas()
     }
 
     Scaffold(
@@ -149,7 +90,19 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
             Spacer(Modifier.height(12.dp))
 
             Button(
-                onClick = { criarAtleta() },
+                onClick = {
+                    val ids = modalidades.split(",").mapNotNull { it.trim().toIntOrNull() }
+                    viewModel.criarAtleta(
+                        UserCreate(password, nome, "atleta", ids)
+                    ) { sucesso, resposta ->
+                        mensagem = resposta
+                        if (sucesso) {
+                            nome = ""
+                            password = ""
+                            modalidades = ""
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -200,7 +153,19 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 },
                 confirmButton = {
                     Button(
-                        onClick = { apagarAtletaComSenha() },
+                        onClick = {
+                            viewModel.apagarAtletaComSenha(
+                                idAtleta = atletaParaApagar!!.idSocio,
+                                idProfessor = user.idSocio,
+                                senha = senhaParaApagar
+                            ) { sucesso, resposta ->
+                                mensagem = resposta
+                                if (sucesso) viewModel.carregarAtletas()
+                            }
+                            showPasswordDialog = false
+                            senhaParaApagar = ""
+                            atletaParaApagar = null
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFe53935))
                     ) {
                         Text("Eliminar", color = Color.White)
@@ -218,17 +183,11 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     }
                 },
                 title = {
-                    Text(
-                        "Confirmar eliminação",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
+                    Text("Confirmar eliminação", color = Color.White, fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
-                        Text(
-                            text = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar!!.nome} (ID: ${atletaParaApagar!!.idSocio})?",
+                        Text("Tens a certeza que queres eliminar o atleta: ${atletaParaApagar!!.nome} (ID: ${atletaParaApagar!!.idSocio})?",
                             color = Color.White,
                             fontSize = 16.sp,
                             modifier = Modifier.padding(bottom = 12.dp)

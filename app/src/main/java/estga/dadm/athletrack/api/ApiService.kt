@@ -2,6 +2,7 @@ package estga.dadm.athletrack.api
 
 import retrofit2.Call
 import retrofit2.http.*
+import okhttp3.ResponseBody
 
 // Modelo de dados para quando é necessário enviar apenas o id do sócio
 data class idRequest(
@@ -46,7 +47,7 @@ interface UserService {
     suspend fun eliminar(
         @Path("idParaEliminar") idParaEliminar: Int,
         @Body request: UserRequest
-    ): String
+    ): ResponseBody
 }
 
 // Modelo da Request do treino
