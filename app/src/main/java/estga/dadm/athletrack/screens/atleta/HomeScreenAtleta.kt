@@ -136,6 +136,7 @@ fun HomeScreenAtleta(
                                 ) == PackageManager.PERMISSION_GRANTED -> {
                                     showCameraDialog = true
                                 }
+
                                 else -> {
                                     launcher.launch(android.Manifest.permission.CAMERA)
                                 }
@@ -224,29 +225,50 @@ fun HomeScreenAtleta(
             }
 
             // CÂMERA QR DIALOG
+            // Flag de leitura única
+            var leituraCompleta by remember { mutableStateOf(false) }
+
+            // CÂMERA QR DIALOG
             if (showCameraDialog) {
                 AlertDialog(
-                    onDismissRequest = { showCameraDialog = false },
+                    onDismissRequest = {
+                        showCameraDialog = false
+                        leituraCompleta = false // permite nova leitura no futuro
+                    },
                     confirmButton = {},
                     title = { Text("Ler QR Code") },
                     text = {
                         QrCameraScanner(onCodeScanned = { codigo ->
-                            scope.launch {
-                                try {
-                                    val response = viewModel.apiPresencas.registarPresenca(
-                                        PresencaRequest(user.idSocio, codigo)
-                                    )
-                                    Toast.makeText(context, response.mensagem, Toast.LENGTH_LONG).show()
-                                } catch (e: Exception) {
-                                    Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
-                                } finally {
-                                    showCameraDialog = false
+                            if (!leituraCompleta) {
+                                leituraCompleta = true // impede leituras duplicadas
+
+                                scope.launch {
+                                    try {
+                                        val response = viewModel.apiPresencas.registarPresenca(
+                                            PresencaRequest(user.idSocio, codigo)
+                                        )
+                                        Toast.makeText(
+                                            context,
+                                            response.mensagem,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            "Erro: ${e.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } finally {
+                                        showCameraDialog = false
+                                        leituraCompleta = false
+                                    }
                                 }
                             }
                         })
                     }
                 )
             }
+
         }
     }
 }

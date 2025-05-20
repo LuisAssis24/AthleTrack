@@ -38,8 +38,16 @@ class TreinoController(
 
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
+
+//Filtra os treinos do professor para o dia atual
+        val agora = LocalTime.now()
+        val margem = agora.minusMinutes(120)
+
         return treinoRepository
             .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.idSocio, request.diaSemana)
+            .filter {
+                it.hora >= margem
+            }
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
                     nomeModalidade = treino.modalidade.nomeModalidade,
@@ -73,7 +81,7 @@ class TreinoController(
         val todosTreinos = mutableListOf<Treino>()
 
         val agora = LocalTime.now()
-        val margem = agora.minusMinutes(30)
+        val margem = agora.minusMinutes(60)
 
         diasList.forEach { dia ->
             val treinosFiltrados = treinoRepository
