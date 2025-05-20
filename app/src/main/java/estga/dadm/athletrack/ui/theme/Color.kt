@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val Gray = hexToColor("#B0BEC5")
 val White = hexToColor("#FFFFFF")
+val Black = hexToColor("#000000")
 
 val BackgroundBlueDark = hexToColor("#0D1B2A")
 val CardBlue = hexToColor("#1F4164")

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -96,8 +97,7 @@ fun CalendarScreen(user: User, navController: NavHostController) {
 
             Text(
                 "Próximos Eventos",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                style = typography.displayLarge,
                 color = colorScheme.primary
             )
 

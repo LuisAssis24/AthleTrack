@@ -1,6 +1,5 @@
 package estga.dadm.athletrack.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import estga.dadm.athletrack.api.RetrofitClient
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-class AtletasViewModel : ViewModel() {
+class GestaoAtletaViewModel : ViewModel() {
     private val _atletas = MutableStateFlow<List<User>>(emptyList())
     val atletas: StateFlow<List<User>> = _atletas
 

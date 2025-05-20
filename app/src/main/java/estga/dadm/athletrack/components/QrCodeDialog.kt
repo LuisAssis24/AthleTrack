@@ -7,50 +7,83 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import estga.dadm.athletrack.ui.theme.*
+import java.net.URLEncoder
 
 @Composable
 fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background.copy(alpha = 0.5f)) // fundo semitransparente
-            .clickable(onClick = onDismiss) // fechar ao clicar fora
+            .background(colorScheme.background.copy(alpha = 0.5f))
+            .clickable(onClick = onDismiss)
     ) {
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(32.dp)
-                .background(White, shape = RoundedCornerShape(16.dp))
-                .clickable(enabled = false) {}, // evita fechar ao clicar no conteúdo
+                .padding(16.dp)
+                .width(360.dp)
+                .background(White, shape = RoundedCornerShape(16.dp)),
+                    //.clickable(enabled = false),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Código QR", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Spacer(Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 24.dp, horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                Text(
+                    text = "Código QR",
+                    style = typography.displayLarge,
+                    color = colorScheme.inversePrimary,
+                )
 
-                // qrCode
                 QrCodeGenerator(data = qrCode)
 
+                Button(
+                    onClick = {
+                        // lógica do botão aqui
+                    },
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = "Gerir Presenças",
+                        style = typography.labelMedium,
+                        textAlign = TextAlign.Center,
+                        color = colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun QrCodeGenerator(data: String, size: Int = 512) {
+fun QrCodeGenerator(data: String, size: Int = 768) {
     val bitmap = remember(data) {
         generateQrCodeBitmap(data, size)
     }

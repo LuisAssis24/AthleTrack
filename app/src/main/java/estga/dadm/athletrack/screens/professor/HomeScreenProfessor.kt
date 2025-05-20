@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.User
-import estga.dadm.athletrack.components.MenuProfessor
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -44,9 +43,6 @@ import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import com.google.gson.Gson
-import estga.dadm.athletrack.api.PresencaRequest
-import estga.dadm.athletrack.components.QrCameraScanner
-import androidx.compose.ui.res.painterResource
 
 @Composable
 fun HomeScreenProfessor(

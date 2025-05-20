@@ -141,6 +141,8 @@ data class PresencaResponse(
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
+
+
 }
 
 data class Modalidade(

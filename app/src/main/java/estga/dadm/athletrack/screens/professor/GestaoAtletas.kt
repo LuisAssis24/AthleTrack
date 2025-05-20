@@ -19,12 +19,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.UserCreate
-import estga.dadm.athletrack.api.UserRequest
-import estga.dadm.athletrack.viewmodels.AtletasViewModel
+import estga.dadm.athletrack.viewmodels.GestaoAtletaViewModel
 
 @Composable
 fun GestaoAtletasScreen(user: User, navController: NavHostController) {
-    val viewModel: AtletasViewModel = viewModel()
+    val viewModel: GestaoAtletaViewModel = viewModel()
     val atletas by viewModel.atletas.collectAsState()
 
     var nome by remember { mutableStateOf("") }

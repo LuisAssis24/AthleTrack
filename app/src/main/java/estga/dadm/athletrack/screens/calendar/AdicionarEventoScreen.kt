@@ -27,6 +27,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
 import java.net.URLEncoder
@@ -80,18 +81,12 @@ fun AdicionarEventoScreen(
                         modifier = Modifier.size(36.dp)
                     )
                 }
-
-                Text(
-                    text = "Adicionar Evento",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.primary
-                )
             }
         },
         containerColor = colorScheme.surface,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
+
         if (isLoading) {
             Box(
                 modifier = Modifier
@@ -110,6 +105,12 @@ fun AdicionarEventoScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    text = "Adicionar Evento",
+                    style = typography.displayLarge,
+                    color = colorScheme.primary
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Botão para selecionar a data
