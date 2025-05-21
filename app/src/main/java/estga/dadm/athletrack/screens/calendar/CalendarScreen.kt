@@ -42,9 +42,11 @@ import java.util.*
  *
  */
 @Composable
-fun CalendarScreen(user: User, navController: NavHostController) {
-    val viewModel: CalendarViewModel = viewModel()
-
+fun CalendarScreen(
+    user: User,
+    navController: NavHostController,
+    viewModel: CalendarViewModel = viewModel()
+) {
     val selectedDate by viewModel.selectedDate.collectAsState()
     val eventos by viewModel.eventos.collectAsState()
     val currentMonth by viewModel.currentMonth.collectAsState()
@@ -213,7 +215,7 @@ fun CalendarScreen(user: User, navController: NavHostController) {
                         ) {
                             Text(
                                 text = "Adicionar Evento",
-                                style = MaterialTheme.typography.labelMedium
+                                style = typography.labelMedium
                             )
                         }
                     }

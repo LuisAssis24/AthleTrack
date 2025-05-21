@@ -152,5 +152,5 @@ data class Modalidade(
 
 interface ModalidadesService {
     @POST("/api/modalidade/listar")
-    suspend fun listarTodasModalidades(): List<Modalidade>
+    suspend fun listarModalidades(): List<Modalidade>
 }

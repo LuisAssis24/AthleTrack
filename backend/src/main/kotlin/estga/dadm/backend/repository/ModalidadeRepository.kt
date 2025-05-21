@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ModalidadeRepository : JpaRepository<Modalidade, Int>{
-
     fun findByIdIn(ids: List<Int>): List<Modalidade>
-
 }

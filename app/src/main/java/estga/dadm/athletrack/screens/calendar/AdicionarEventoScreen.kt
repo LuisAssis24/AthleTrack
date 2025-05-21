@@ -215,9 +215,9 @@ fun AdicionarEventoScreen(
                     DropdownMenu(
                         expanded = isDropdownExpanded,
                         onDismissRequest = { isDropdownExpanded = false },
+                        tonalElevation = 0.dp, // remove sombra escura
                         modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
-
-
+                        .background(colorScheme.primaryContainer) // aplica ao menu inteiro
                     ) {
                         modalidades.forEach { modalidade ->
                             DropdownMenuItem(
@@ -229,8 +229,7 @@ fun AdicionarEventoScreen(
                                     }
                                 },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(colorScheme.primaryContainer),
+                                    .fillMaxSize(),
                                 text = {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -302,7 +301,7 @@ fun AdicionarEventoScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
-                    Text("Salvar", color = colorScheme.background)
+                    Text("Guardar", color = colorScheme.background)
                 }
             }
         }

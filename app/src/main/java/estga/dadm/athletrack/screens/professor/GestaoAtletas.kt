@@ -6,12 +6,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -19,17 +17,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.UserCreate
-import estga.dadm.athletrack.api.UserRequest
-import estga.dadm.athletrack.viewmodels.GestaoAtletaViewModel
+import estga.dadm.athletrack.viewmodels.GestaoAtletasViewModel
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.ui.Modifier
 
 @Composable
 fun GestaoAtletasScreen(user: User, navController: NavHostController) {
-    val viewModel: GestaoAtletaViewModel = viewModel()
+    val viewModel: GestaoAtletasViewModel = viewModel()
     val atletas by viewModel.atletas.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -43,14 +43,16 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
     var senhaParaApagar by remember { mutableStateOf("") }
     var atletaParaApagar by remember { mutableStateOf<User?>(null) }
 
-    val listaModalidades = listOf(
-        Modalidade(1, "Futebol"),
-        Modalidade(2, "Natação"),
-        Modalidade(3, "Basquetebol")
-    )
+    val listaModalidades by viewModel.modalidades.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.carregarAtletas()
+
+        try {
+            viewModel.carregarAtletas()
+            viewModel.carregarModalidades()
+        } catch (e: Exception) {
+            println("Erro ao carregar dados: ${e.message}")
+        }
     }
 
     Scaffold(
@@ -63,13 +65,13 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Voltar", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = colorScheme.primary)
                 }
                 Spacer(Modifier.width(8.dp))
-                Text("Gestão de Atletas", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text("Gestão de Atletas", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorScheme.primary)
             }
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = colorScheme.surface
     ) { padding ->
         Column(
             modifier = Modifier
@@ -83,9 +85,9 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 label = { Text("Nome do Atleta") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    focusedBorderColor = colorScheme.primary,
+                    unfocusedBorderColor = colorScheme.secondary,
+                    cursorColor = colorScheme.primary
                 )
             )
             Spacer(Modifier.height(8.dp))
@@ -96,9 +98,9 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    focusedBorderColor = colorScheme.primary,
+                    unfocusedBorderColor = colorScheme.secondary,
+                    cursorColor = colorScheme.primary
                 )
             )
             Spacer(Modifier.height(8.dp))
@@ -122,7 +124,10 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 DropdownMenu(
                     expanded = showModalidadesMenu,
                     onDismissRequest = { showModalidadesMenu = false },
-                    modifier = Modifier.fillMaxWidth()
+                    tonalElevation = 0.dp, // remove sombra escura
+                    modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+                    .background(colorScheme.primaryContainer) // aplica ao menu inteiro
+
                 ) {
                     listaModalidades.forEach { modalidade ->
                         DropdownMenuItem(
@@ -139,12 +144,12 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                         checked = modalidadesSelecionadas.contains(modalidade.id),
                                         onCheckedChange = null,
                                         colors = CheckboxDefaults.colors(
-                                            checkedColor = MaterialTheme.colorScheme.primary,
-                                            uncheckedColor = MaterialTheme.colorScheme.secondary
+                                            checkedColor = colorScheme.primary,
+                                            uncheckedColor = colorScheme.secondary
                                         )
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Text(modalidade.nomeModalidade, color = MaterialTheme.colorScheme.primary)
+                                    Text(modalidade.nomeModalidade, color = colorScheme.primary)
                                 }
                             }
                         )
@@ -185,7 +190,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
             }
 
             Spacer(Modifier.height(24.dp))
-            Divider(color = MaterialTheme.colorScheme.secondary)
+            HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
             Text("Todos os Atletas", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 8.dp))
 
             LazyColumn(modifier = Modifier.weight(1f).padding(bottom = 16.dp)) {
@@ -267,7 +272,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                         OutlinedTextField(
                             value = senhaParaApagar,
                             onValueChange = { senhaParaApagar = it },
-                            label = { Text("Insere a tua senha", color = MaterialTheme.colorScheme.secondary) },
+                            label = { Text("Insere a tua password", color = MaterialTheme.colorScheme.secondary) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )

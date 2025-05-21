@@ -2,6 +2,7 @@ package estga.dadm.athletrack.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.UserCreate
@@ -11,9 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-class GestaoAtletaViewModel : ViewModel() {
+class GestaoAtletasViewModel : ViewModel() {
     private val _atletas = MutableStateFlow<List<User>>(emptyList())
     val atletas: StateFlow<List<User>> = _atletas
+
+    private val _modalidades = MutableStateFlow<List<Modalidade>>(emptyList())
+    val modalidades: StateFlow<List<Modalidade>> = _modalidades
 
     fun carregarAtletas() {
         viewModelScope.launch {
@@ -60,6 +64,17 @@ class GestaoAtletaViewModel : ViewModel() {
                 callback(true, resposta.string())
             } catch (e: Exception) {
                 callback(false, "Erro ao apagar atleta: ${e.message}")
+            }
+        }
+    }
+
+    fun carregarModalidades() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.modalidadesService.listarModalidades()
+                _modalidades.value = response
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

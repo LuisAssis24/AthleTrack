@@ -1,6 +1,5 @@
 package estga.dadm.athletrack.screens.professor
 
-import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,16 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.QrCode
-import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
@@ -40,7 +34,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import estga.dadm.athletrack.components.QrCodeDialog
 import estga.dadm.athletrack.ui.theme.*
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import com.google.gson.Gson
 
