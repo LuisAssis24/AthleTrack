@@ -41,7 +41,7 @@ interface UserService {
     suspend fun listar(): List<User>
 
     @POST("/api/user/criar")
-    suspend fun criar(@Body request: UserCreate): String
+    suspend fun criar(@Body request: UserCreate):  ResponseBody
 
     @POST("/api/user/eliminar/{idParaEliminar}")
     suspend fun eliminar(
