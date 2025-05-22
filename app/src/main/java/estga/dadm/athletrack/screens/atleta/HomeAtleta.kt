@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import com.google.gson.Gson
 import estga.dadm.athletrack.other.UserPreferences
 import java.net.URLEncoder
+import estga.dadm.athletrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,13 +113,12 @@ fun HomeAtleta(
                         Column {
                             Text(
                                 text = user.nome,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
+                                style = Typography.titleMedium,
                                 color = colorScheme.primary
                             )
                             Text(
                                 text = "Sócio nº ${user.idSocio}",
-                                fontSize = 14.sp,
+                                style = Typography.labelMedium,
                                 color = colorScheme.secondary
                             )
                         }
@@ -143,7 +143,7 @@ fun HomeAtleta(
                             Icon(
                                 imageVector = Icons.Default.QrCode,
                                 contentDescription = "QR Code",
-                                tint = White,
+                                tint = colorScheme.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -164,7 +164,7 @@ fun HomeAtleta(
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
                                 contentDescription = "Calendário",
-                                tint = White,
+                                tint = colorScheme.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -176,9 +176,8 @@ fun HomeAtleta(
 
             Text(
                 text = "Próximos Treinos",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = White,
+                style = Typography.titleMedium,
+                color = colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -188,7 +187,7 @@ fun HomeAtleta(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 thickness = 1.5.dp,
-                color = Color.LightGray
+                color = colorScheme.secondary
             )
 
             Column(
@@ -202,7 +201,7 @@ fun HomeAtleta(
                     Text(
                         text = "Não tem treinos agendados para hoje.",
                         textAlign = TextAlign.Center,
-                        color = White,
+                        color = colorScheme.primary,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 24.dp)
@@ -217,7 +216,7 @@ fun HomeAtleta(
                                 .fillMaxWidth()
                                 .padding(vertical = 6.dp)
                         )
-                        HorizontalDivider(color = Color.LightGray)
+                        HorizontalDivider(color = colorScheme.secondary)
                     }
                 }
             }

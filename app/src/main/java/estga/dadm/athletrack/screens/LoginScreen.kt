@@ -27,6 +27,7 @@ import estga.dadm.athletrack.viewmodels.LoginViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import estga.dadm.athletrack.ui.theme.*
 
 
 @Composable
@@ -50,16 +51,13 @@ fun LoginScreen(
     ) {
         Text(
             text = "AthleTrack",
-            style = typography.displayLarge.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 48.sp
-            ),
-            color = colorScheme.onPrimary
+            style = typography.titleLarge,
+            color = colorScheme.onPrimary,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Acompanhe o seu treino",
-            style = typography.titleLarge,
+            style = typography.displayLarge,
             color = colorScheme.primary
         )
 

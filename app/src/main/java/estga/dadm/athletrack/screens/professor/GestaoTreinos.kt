@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
+import estga.dadm.athletrack.ui.theme.*
 
 @Composable
 fun GestaoTreinosScreen(user: User, navController: NavHostController) {
@@ -60,8 +61,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Criar Treino",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = Typography.displayLarge,
                     color = colorScheme.primary
                 )
             }
@@ -135,7 +135,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     contentColor = colorScheme.background
                 )
             ) {
-                Text("Criar Treino", color = colorScheme.background, fontWeight = FontWeight.Bold)
+                Text("Criar Treino", color = colorScheme.background)
             }
 
             if (mensagem.isNotEmpty()) {
@@ -150,7 +150,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
             Divider(color = colorScheme.secondary)
             Text(
                 "Todos os Treinos",
-                fontWeight = FontWeight.Bold,
                 color = colorScheme.primary,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -177,7 +176,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         Column {
                             Text(
                                 "${treino.nomeModalidade} - ${treino.diaSemana} ${treino.hora}",
-                                color = Color.White
+                                color = colorScheme.primary
                             )
                             Text(
                                 "QR: ${treino.qrCode}",

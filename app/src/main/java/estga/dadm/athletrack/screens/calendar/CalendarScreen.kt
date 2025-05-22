@@ -37,6 +37,7 @@ import java.net.URLEncoder
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
+import estga.dadm.athletrack.ui.theme.*
 
 /**
  *
@@ -125,14 +126,12 @@ fun CalendarScreen(
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Mês anterior",
-                                tint = White
+                                tint = colorScheme.primary
                             )
                         }
                         Text(
                             "$monthLabel ${currentMonth.year}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = White
+                            color = colorScheme.primary
                         )
                         IconButton(onClick = {
                             viewModel.irParaMesSeguinte()
@@ -140,7 +139,7 @@ fun CalendarScreen(
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = "Próximo mês",
-                                tint = White
+                                tint = colorScheme.primary
                             )
                         }
                     }
@@ -152,7 +151,7 @@ fun CalendarScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         listOf("S", "M", "T", "W", "T", "F", "S").forEach {
-                            Text(it, fontSize = 12.sp, color = Gray)
+                            Text(it, style = Typography.labelSmall, color = colorScheme.secondary)
                         }
                     }
 
@@ -176,7 +175,7 @@ fun CalendarScreen(
                                             .size(36.dp)
                                             .clip(CircleShape)
                                             .background(
-                                                if (date == selectedDate) Gray else Color.Transparent
+                                                if (date == selectedDate) colorScheme.secondary else colorScheme.tertiary
                                             )
                                             .clickable {
                                                 viewModel.selecionarData(date)
@@ -185,8 +184,8 @@ fun CalendarScreen(
                                     ) {
                                         Text(
                                             text = "$day",
-                                            fontSize = 14.sp,
-                                            color = if (date == selectedDate) White else White
+                                            style = Typography.labelMedium,
+                                            color = colorScheme.primary
                                         )
                                     }
                                 } else {
@@ -238,21 +237,20 @@ fun CalendarScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(evento.localEvento, fontWeight = FontWeight.SemiBold, color = colorScheme.primary)
-                            Text(evento.hora, fontSize = 12.sp, color = colorScheme.secondary)
+                            Text(evento.localEvento, color = colorScheme.primary)
+                            Text(evento.hora, style = Typography.labelSmall, color = colorScheme.secondary)
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 "${selectedDate.dayOfMonth}",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = Typography.titleMedium,
                                 color = colorScheme.primary
                             )
                             Text(
                                 selectedDate.month.getDisplayName(TextStyle.SHORT, Locale("pt", "BR"))
                                     .replaceFirstChar { it.uppercase() },
-                                fontSize = 12.sp,
+                                style = Typography.labelSmall,
                                 color = colorScheme.secondary
                             )
                         }

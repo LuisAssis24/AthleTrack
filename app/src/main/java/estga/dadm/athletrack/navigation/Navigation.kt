@@ -19,6 +19,7 @@ import estga.dadm.athletrack.screens.atleta.*
 import estga.dadm.athletrack.screens.professor.*
 import java.net.*
 import java.time.LocalDate
+import estga.dadm.athletrack.ui.theme.*
 
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {

@@ -1,5 +1,8 @@
 package estga.dadm.athletrack.screens.professor
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
@@ -37,6 +40,7 @@ import java.net.URLEncoder
 import com.google.gson.Gson
 import estga.dadm.athletrack.other.UserPreferences
 import kotlinx.coroutines.launch
+import estga.dadm.athletrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,9 +55,13 @@ fun HomeProfessor(
     val aulasHoje by viewModel.treinosHoje.collectAsState()
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
     val selected = remember { mutableStateOf("hoje") }
 
     val gson = Gson()
+    val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+    var showCameraDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
@@ -113,13 +121,12 @@ fun HomeProfessor(
                         Column {
                             Text(
                                 text = user.nome,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
+                                style = Typography.titleMedium,
                                 color = colorScheme.primary
                             )
                             Text(
                                 text = "Sócio nº ${user.idSocio}",
-                                fontSize = 14.sp,
+                                style = Typography.labelMedium,
                                 color = colorScheme.secondary
                             )
                         }
@@ -143,7 +150,7 @@ fun HomeProfessor(
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
                                 contentDescription = "Calendário",
-                                tint = White,
+                                tint = colorScheme.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -167,7 +174,7 @@ fun HomeProfessor(
                         .weight(1f)
                         .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
                         .size(81.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.tertiary)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
@@ -178,7 +185,7 @@ fun HomeProfessor(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Treinos",
-                        fontSize = 12.sp,
+                        style = Typography.labelSmall,
                         textAlign = TextAlign.Center,
                         color = colorScheme.primary
                     )
@@ -207,7 +214,7 @@ fun HomeProfessor(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Atletas",
-                        fontSize = 12.sp,
+                        style = Typography.labelSmall,
                         textAlign = TextAlign.Center,
                         color = colorScheme.primary
                     )
@@ -224,8 +231,7 @@ fun HomeProfessor(
                 Column(modifier = Modifier.fillMaxSize()) {
                     Text(
                         text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = Typography.titleMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -235,7 +241,7 @@ fun HomeProfessor(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         thickness = 1.5.dp,
-                        color = Gray
+                        color = colorScheme.secondary
                     )
 
                     val aulasParaMostrar =
@@ -258,7 +264,7 @@ fun HomeProfessor(
                             ) {
                                 Text(
                                     text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
-                                    fontSize = 16.sp,
+                                    style = Typography.bodyMedium,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = 8.dp),
@@ -268,7 +274,7 @@ fun HomeProfessor(
                                     HorizontalDivider(
                                         modifier = Modifier.padding(vertical = 8.dp),
                                         thickness = 1.dp,
-                                        color = White
+                                        color = colorScheme.primary
                                     )
                                 }
                             }

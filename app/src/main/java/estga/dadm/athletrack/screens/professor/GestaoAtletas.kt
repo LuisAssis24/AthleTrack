@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.Modifier
+import estga.dadm.athletrack.ui.theme.*
 
 @Composable
 fun GestaoAtletasScreen(user: User, navController: NavHostController) {
@@ -68,7 +69,11 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = colorScheme.primary)
                 }
                 Spacer(Modifier.width(8.dp))
-                Text("Gestão de Atletas", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorScheme.primary)
+                Text(
+                    "Gestão de Atletas",
+                    style = Typography.displayLarge,
+                    color = colorScheme.primary
+                )
             }
         },
         containerColor = colorScheme.surface
@@ -105,19 +110,22 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
             )
             Spacer(Modifier.height(8.dp))
 
-            Text("Modalidades", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                "Modalidades",
+                color = colorScheme.primary
+            )
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = { showModalidadesMenu = true },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    colors = ButtonDefaults.outlinedButtonColors(containerColor = colorScheme.primaryContainer)
                 ) {
                     Text(
                         text = if (modalidadesSelecionadas.isEmpty()) "Selecionar Modalidades" else modalidadesSelecionadas.joinToString { id ->
                             listaModalidades.find { it.id == id }?.nomeModalidade ?: "ID $id"
                         },
-                        color = MaterialTheme.colorScheme.primary
+                        color = colorScheme.primary
                     )
                 }
 
@@ -184,14 +192,14 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
             ) {
-                Text("Criar Atleta", color = MaterialTheme.colorScheme.background, fontWeight = FontWeight.Bold)
+                Text("Criar Atleta", color = colorScheme.background)
             }
 
             Spacer(Modifier.height(24.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
-            Text("Todos os Atletas", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(color = colorScheme.secondary)
+            Text("Todos os Atletas", color = colorScheme.primary, modifier = Modifier.padding(vertical = 8.dp))
 
             LazyColumn(modifier = Modifier.weight(1f).padding(bottom = 16.dp)) {
                 items(atletas) { atleta ->
@@ -199,20 +207,20 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp))
+                            .background(colorScheme.primaryContainer, RoundedCornerShape(12.dp))
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text(atleta.nome, color = Color.White)
-                            Text("ID: ${atleta.idSocio}", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                            Text(atleta.nome, color = colorScheme.primary)
+                            Text("ID: ${atleta.idSocio}", color = colorScheme.primary, style = Typography.labelSmall)
                         }
                         IconButton(onClick = {
                             atletaParaApagar = atleta
                             showPasswordDialog = true
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Apagar", tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Default.Delete, contentDescription = "Apagar", tint = colorScheme.error)
                         }
                     }
                 }
@@ -243,9 +251,9 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                             senhaParaApagar = ""
                             atletaParaApagar = null
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
                     ) {
-                        Text("Eliminar", color = MaterialTheme.colorScheme.background)
+                        Text("Eliminar", color = colorScheme.inversePrimary)
                     }
                 },
                 dismissButton = {
@@ -256,29 +264,28 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                             atletaParaApagar = null
                         }
                     ) {
-                        Text("Cancelar", color = MaterialTheme.colorScheme.primary)
+                        Text("Cancelar", color = colorScheme.primary)
                     }
                 },
                 title = {
-                    Text("Confirmar eliminação", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text("Confirmar eliminação", color = colorScheme.primary)
                 },
                 text = {
                     Column {
                         Text("Tens a certeza que queres eliminar o atleta: ${atletaParaApagar!!.nome} (ID: ${atletaParaApagar!!.idSocio})?",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 16.sp,
+                            color = colorScheme.primary,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
                         OutlinedTextField(
                             value = senhaParaApagar,
                             onValueChange = { senhaParaApagar = it },
-                            label = { Text("Insere a tua password", color = MaterialTheme.colorScheme.secondary) },
+                            label = { Text("Insere a tua password", color = colorScheme.secondary) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 },
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = colorScheme.surface
             )
         }
     }

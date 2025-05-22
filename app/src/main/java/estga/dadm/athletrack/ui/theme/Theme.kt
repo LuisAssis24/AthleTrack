@@ -10,10 +10,10 @@ private val ColorScheme = darkColorScheme(
     inversePrimary = Black,
     secondary = Gray,
     onPrimary = BlueAccent,
+    tertiary = Transparent,
 
     primaryContainer = CardBlue,
     surface = BackgroundBlueDark,
-
     error = RedError,
 )
 

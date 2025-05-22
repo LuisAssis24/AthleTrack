@@ -42,7 +42,7 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
                 .align(Alignment.Center)
                 .padding(16.dp)
                 .width(360.dp)
-                .background(White, shape = RoundedCornerShape(16.dp)),
+                .background(colorScheme.primary, shape = RoundedCornerShape(16.dp)),
             //.clickable(enabled = false),
             contentAlignment = Alignment.Center
         ) {

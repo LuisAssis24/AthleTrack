@@ -1,5 +1,7 @@
 package estga.dadm.athletrack.screens.professor
 
+import androidx.compose.runtime.Composable
+import estga.dadm.athletrack.ui.theme.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -58,8 +60,7 @@ fun GestaoPresencas(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Gestão de Presenças",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = Typography.displayLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -76,13 +77,12 @@ fun GestaoPresencas(
             treinoInfo?.let { treino ->
                 Text(
                     text = "${treino.nomeModalidade} - ${treino.diaSemana}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = Typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "Data: ${treino.hora}",
-                    fontSize = 14.sp,
+                    style = Typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -102,7 +102,7 @@ fun GestaoPresencas(
                         Text(
                             text = atleta.nome,
                             modifier = Modifier.weight(1f),
-                            fontSize = 16.sp,
+                            style = Typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Checkbox(

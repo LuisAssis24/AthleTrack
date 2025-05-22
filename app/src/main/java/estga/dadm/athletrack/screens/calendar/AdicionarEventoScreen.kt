@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
 import java.net.URLEncoder
+import estga.dadm.athletrack.ui.theme.*
 
 import java.util.*
 
@@ -192,7 +193,7 @@ fun AdicionarEventoScreen(
                 )
 
                 // MultiSelect para Modalidades
-                Text("Modalidades", fontWeight = FontWeight.Bold, color = colorScheme.primary)
+                Text("Modalidades", color = colorScheme.primary)
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {

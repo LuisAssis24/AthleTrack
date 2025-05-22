@@ -13,6 +13,8 @@ val BlueAccent = hexToColor("#346CA8")
 val GreenSuccess = hexToColor("#43A047")
 val RedError = hexToColor("#FF5B58")
 
+val Transparent = hexToColor("#00000000")
+
 fun hexToColor(hex: String): Color {
     require(hex.startsWith("#") && (hex.length == 7 || hex.length == 9)) {
     }
