@@ -30,12 +30,7 @@ import estga.dadm.athletrack.ui.theme.*
 import java.net.URLEncoder
 
 @Composable
-fun QrCodeDialog(
-    user: User,
-    qrCode: String,
-    onDismiss: () -> Unit,
-    navController: NavHostController
-) {
+fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,9 +62,7 @@ fun QrCodeDialog(
 
                 Button(
                     onClick = {
-                        val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
-                        val encodedQrCode = URLEncoder.encode(qrCode, "UTF-8")
-                        navController.navigate("gestaoPresencas/$userJson/$encodedQrCode")
+                        // lógica do botão aqui
                     },
                     modifier = Modifier
                         .width(240.dp)

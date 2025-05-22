@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,7 @@ import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeAtletaViewModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode
@@ -34,10 +36,12 @@ import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.components.QrCameraScanner
 import androidx.compose.ui.graphics.Color
 import com.google.gson.Gson
+import estga.dadm.athletrack.other.UserPreferences
 import java.net.URLEncoder
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenAtleta(
+fun HomeAtleta(
     user: User,
     navController: NavHostController,
     viewModel: HomeAtletaViewModel = viewModel()
@@ -48,6 +52,11 @@ fun HomeScreenAtleta(
     val gson = Gson()
 
     val context = LocalContext.current
+
+    val userPreferences = remember { UserPreferences(context) }
+    val bottomSheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -90,12 +99,13 @@ fun HomeScreenAtleta(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
+                        IconButton(onClick = { showBottomSheet = true }) {
+                            Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Perfil",
                             tint = colorScheme.primary,
                             modifier = Modifier.size(32.dp)
-                        )
+                        )}
 
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -257,6 +267,43 @@ fun HomeScreenAtleta(
                 )
             }
 
+        }
+    }
+
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = bottomSheetState,
+            containerColor = colorScheme.primaryContainer, // COR DO DRAWER
+            dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            userPreferences.clearLoginState()
+                            navController.navigate("login") {
+                                popUpTo(0)
+                            }
+                        }
+                    }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Logout",
+                    tint = colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    "Logout",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colorScheme.primary
+                )
+            }
         }
     }
 }
