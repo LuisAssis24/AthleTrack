@@ -15,7 +15,6 @@ class TreinoController(
     private val modalidadeRepository: ModalidadeRepository,
     private val userRepository: UserRepository
 ) {
-
     @PostMapping()
     fun listarTodosOsTreinos(): List<TreinoProfResponseDTO> {
         val ordem = ordenarDias("SEG")
@@ -27,6 +26,7 @@ class TreinoController(
                 .sortedBy { it.hora }
                 .map { treino ->
                     TreinoProfResponseDTO(
+                        idTreino = treino.id,
                         nomeModalidade = treino.modalidade.nomeModalidade,
                         diaSemana = treino.diaSemana,
                         hora = treino.hora.toString(),
@@ -50,6 +50,7 @@ class TreinoController(
             }
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
+                    idTreino = treino.id,
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
                     hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
@@ -65,6 +66,7 @@ class TreinoController(
             .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.idSocio, amanha)
             .map { treino: Treino ->
                 TreinoProfResponseDTO(
+                    idTreino = treino.id,
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
                     hora = treino.hora.toString(),  // irá mostrar no formato HH:MM

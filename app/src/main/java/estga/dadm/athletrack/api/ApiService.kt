@@ -58,6 +58,7 @@ data class TreinosRequest(
 
 // Modelo de Resposta do treino
 data class Treino(
+    val idTreino: Int,
     val nomeModalidade: String,
     val diaSemana: String,
     val hora: String,

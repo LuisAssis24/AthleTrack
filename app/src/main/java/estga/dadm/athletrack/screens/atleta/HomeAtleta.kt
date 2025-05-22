@@ -42,8 +42,6 @@ fun HomeScreenAtleta(
     navController: NavHostController,
     viewModel: HomeAtletaViewModel = viewModel()
 ) {
-    val BackgroundBlueDark = Color(0xFF0D1B2A)
-    val TopBarBlue = Color(0xFF1B263B)
     val treinos by viewModel.treinos.collectAsState()
     val scope = rememberCoroutineScope()
     var showCameraDialog by remember { mutableStateOf(false) }
