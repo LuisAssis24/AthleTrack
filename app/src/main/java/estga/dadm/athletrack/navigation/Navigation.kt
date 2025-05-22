@@ -121,5 +121,21 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             }
         }
 
+        composable(
+            "gestaoPresencas/{userJson}/{qrCode}",
+            arguments = listOf(
+                navArgument("userJson") { type = NavType.StringType },
+                navArgument("qrCode") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
+            val qrCode = backStackEntry.arguments?.getString("qrCode") ?: ""
+            val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
+            GestaoPresencas(user = user, qrCode = qrCode, navController = navController)
+        }
+
+
+
+
     }
 }

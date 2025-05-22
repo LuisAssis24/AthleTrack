@@ -339,8 +339,13 @@ fun HomeScreenProfessor(
         }
     }
 
-if (showQrCode) {
-        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+    if (showQrCode) {
+        QrCodeDialog(
+            user = user,
+            qrCode = qrCodeAtivo,
+            onDismiss = { showQrCode = false },
+            navController = navController
+        )
     }
 
 }

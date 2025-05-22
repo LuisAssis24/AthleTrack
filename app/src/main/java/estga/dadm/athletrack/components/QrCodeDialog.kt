@@ -21,14 +21,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import androidx.navigation.NavHostController
 import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.ui.theme.*
 import java.net.URLEncoder
 
 @Composable
-fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
+fun QrCodeDialog(
+    user: User,
+    qrCode: String,
+    onDismiss: () -> Unit,
+    navController: NavHostController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +48,7 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
                 .padding(16.dp)
                 .width(360.dp)
                 .background(White, shape = RoundedCornerShape(16.dp)),
-                    //.clickable(enabled = false),
+            //.clickable(enabled = false),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -60,7 +67,9 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit) {
 
                 Button(
                     onClick = {
-                        // lógica do botão aqui
+                        val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                        val encodedQrCode = URLEncoder.encode(qrCode, "UTF-8")
+                        navController.navigate("gestaoPresencas/$userJson/$encodedQrCode")
                     },
                     modifier = Modifier
                         .width(240.dp)

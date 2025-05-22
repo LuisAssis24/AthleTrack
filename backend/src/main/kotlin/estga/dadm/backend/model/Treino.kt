@@ -8,7 +8,8 @@ import java.time.LocalTime
 @Table(name = "treinos")
 data class Treino(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
     val diaSemana: String,
