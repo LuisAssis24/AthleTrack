@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -36,9 +38,12 @@ import estga.dadm.athletrack.components.QrCodeDialog
 import estga.dadm.athletrack.ui.theme.*
 import java.net.URLEncoder
 import com.google.gson.Gson
+import estga.dadm.athletrack.other.UserPreferences
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenProfessor(
+fun HomeProfessor(
     user: User,
     navController: NavHostController,
     viewModel: HomeProfessorViewModel = viewModel()
@@ -49,25 +54,15 @@ fun HomeScreenProfessor(
     val aulasHoje by viewModel.treinosHoje.collectAsState()
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-
     val selected = remember { mutableStateOf("hoje") }
 
     val gson = Gson()
-    val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-    val scope = rememberCoroutineScope()
-    var showCameraDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            showCameraDialog = true
-        } else {
-            Toast.makeText(context, "Permissão da câmara é necessária", Toast.LENGTH_SHORT).show()
-        }
-    }
+    val userPreferences = remember { UserPreferences(context) }
+    val bottomSheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
 
     // Carregar as aulas assim que a composable for criada
     LaunchedEffect(Unit) {
@@ -106,12 +101,15 @@ fun HomeScreenProfessor(
                 ) {
                     // LADO ESQUERDO: PERFIL + NOME
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                        IconButton(onClick = { showBottomSheet = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Perfil",
+                                tint = colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
 
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -224,7 +222,7 @@ fun HomeScreenProfessor(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
+                    .weight(0.7f)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Text(
@@ -311,52 +309,48 @@ fun HomeScreenProfessor(
                     }
                 }
             }
-
-            // CÂMERA QR DIALOG
-            /*if (showCameraDialog) {
-                AlertDialog(
-                    onDismissRequest = { showCameraDialog = false },
-                    confirmButton = {},
-                    title = { Text("Ler QR Code") },
-                    text = {
-                        QrCameraScanner(onCodeScanned = { codigo ->
-                            scope.launch {
-                                try {
-                                    val response = viewModel.apiPresencas.registarPresenca(
-                                        PresencaRequest(user.idSocio, codigo)
-                                    )
-                                    Toast.makeText(context, response.mensagem, Toast.LENGTH_LONG).show()
-                                } catch (e: Exception) {
-                                    Toast.makeText(context, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
-                                } finally {
-                                    showCameraDialog = false
-                                }
-                            }
-                        })
-                    }
-                )
-            }*/
         }
     }
 
-if (showQrCode) {
-        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+    val scope = rememberCoroutineScope() // Necessário para o launch
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = bottomSheetState,
+            containerColor = colorScheme.primaryContainer, // COR DO DRAWER
+            dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            userPreferences.clearLoginState()
+                            navController.navigate("login") {
+                                popUpTo(0)
+                            }
+                        }
+                    }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Logout",
+                    tint = colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    "Logout",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colorScheme.primary
+                )
+            }
+        }
     }
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewHomeScreenProfessor() {
-    val user = User(
-        idSocio = 1,
-        nome = "Professor Exemplo",
-        tipo = "Professor"
-    )
-    // Apenas para preview — passar um navController falso
-    HomeScreenProfessor(
-        user = user,
-        navController = rememberNavController()
-    )
-
+    if (showQrCode) {
+        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+    }
 }

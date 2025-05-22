@@ -29,10 +29,6 @@ data class UserCreate(
     val modalidades: List<Int>
 )
 
-data class UserDelete(
-    val idSocio: Int,
-)
-
 interface UserService {
     @POST("/api/user/login")
     fun login(@Body request: UserRequest): Call<User>
@@ -127,8 +123,6 @@ interface EventosService {
 
 }
 
-
-
 data class PresencaRequest(
     val idSocio: Int,
     val qrCode: String
@@ -142,8 +136,6 @@ data class PresencaResponse(
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
-
-
 }
 
 data class Modalidade(

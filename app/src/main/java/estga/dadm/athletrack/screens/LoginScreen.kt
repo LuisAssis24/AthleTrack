@@ -21,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import estga.dadm.athletrack.api.UserRequest
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.RetrofitClient
+import estga.dadm.athletrack.other.UserPreferences
+import estga.dadm.athletrack.viewmodels.LoginViewModel
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -28,10 +30,13 @@ import retrofit2.Response
 
 
 @Composable
-@Preview
 fun LoginScreen(
     onLoginClick: (User) -> Unit = {},
 ) {
+    val context = LocalContext.current
+    val userPreferences = remember { UserPreferences(context) }
+    val viewModel = remember { LoginViewModel(userPreferences) }
+
     var socio by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -101,32 +106,13 @@ fun LoginScreen(
         val context = LocalContext.current
 
         Button(
-            onClick = {
-                if (socio.isNotBlank() && password.isNotBlank()) {
-                    val request = UserRequest(socio.toInt(), password)
+            onClick = {viewModel.login(
+                socio = socio.toInt(),
+                password = password,
+                onSuccess = { user -> onLoginClick(user) },
+                onError = { msg -> Toast.makeText(context, msg, Toast.LENGTH_SHORT).show() }
+            )
 
-                    RetrofitClient.loginService.login(request).enqueue(object : Callback<User> {
-                        override fun onResponse(
-                            call: Call<User>,
-                            response: Response<User>
-                        ) {
-                            if (response.isSuccessful) {
-                                val user = response.body()
-                                if (user != null) {
-                                    onLoginClick(user)
-                                }
-                            } else {
-                                Toast.makeText(context, "Credenciais inválidas", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-
-                        override fun onFailure(call: Call<User>, t: Throwable) {
-                            Toast.makeText(context, "Erro: ${t.message}", Toast.LENGTH_LONG).show()
-                        }
-                    })
-                } else {
-                    Toast.makeText(context, "Preenche todos os campos", Toast.LENGTH_SHORT).show()
-                }
             },
             modifier = Modifier
                 .fillMaxWidth()

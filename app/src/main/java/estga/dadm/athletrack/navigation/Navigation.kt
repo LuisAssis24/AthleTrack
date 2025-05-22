@@ -1,6 +1,10 @@
 package estga.dadm.athletrack.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -8,6 +12,7 @@ import com.google.gson.Gson
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import estga.dadm.athletrack.api.User
+import estga.dadm.athletrack.other.UserPreferences
 import estga.dadm.athletrack.screens.*
 import estga.dadm.athletrack.screens.calendar.*
 import estga.dadm.athletrack.screens.atleta.*
@@ -18,6 +23,33 @@ import java.time.LocalDate
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
     val gson = Gson()
+
+    val context = LocalContext.current
+    val userPrefs = remember { UserPreferences(context) }
+    val isLoggedIn = userPrefs.isLoggedIn.collectAsState(initial = false).value
+    val userType = userPrefs.getUserType.collectAsState(initial = null).value
+    val userId = userPrefs.getUserId.collectAsState(initial = null).value
+    val userName = userPrefs.getUserName.collectAsState(initial = null).value.toString()
+
+    LaunchedEffect(isLoggedIn, userType, userId) {
+        if (isLoggedIn && userId != null && userType != null) {
+            val user = User(
+                idSocio = userId, tipo = userType,
+                nome = userName,
+            )
+            val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+            if (user.tipo == "professor") {
+                navController.navigate("homeProfessor/$userJson") {
+                    popUpTo("login") { inclusive = true }
+                }
+            } else {
+                navController.navigate("homeAtleta/$userJson") {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+        }
+    }
+
 
     NavHost(navController, startDestination = "login") {
         composable("login") {
@@ -51,7 +83,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user = gson.fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            HomeScreenProfessor(
+            HomeProfessor(
                 user = user,
                 navController = navController,
             )

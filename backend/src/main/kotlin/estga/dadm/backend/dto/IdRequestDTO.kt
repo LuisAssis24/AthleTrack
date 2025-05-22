@@ -1,5 +1,5 @@
 package estga.dadm.backend.dto
 
-data class idRequestDTO (
+data class IdRequestDTO (
    val id: Int
 )

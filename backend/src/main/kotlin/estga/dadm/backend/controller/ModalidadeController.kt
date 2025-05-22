@@ -1,10 +1,9 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.idRequestDTO
+import estga.dadm.backend.dto.IdRequestDTO
 import estga.dadm.backend.repository.*
 import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.dto.modalidade.ModalidadeDTO
-import estga.dadm.backend.model.SocioModalidade
 
 
 @RestController
@@ -25,7 +24,7 @@ class ModalidadeController(private val modalidadeRepository: ModalidadeRepositor
     }
 
     @PostMapping("/listarporid")
-    fun listarPorId(@RequestBody id: idRequestDTO): List<ModalidadeDTO> {
+    fun listarPorId(@RequestBody id: IdRequestDTO): List<ModalidadeDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(id.id)
 
         return socioModalidades.map { ligacao ->
