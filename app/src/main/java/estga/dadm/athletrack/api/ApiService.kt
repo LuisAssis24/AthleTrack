@@ -6,7 +6,7 @@ import okhttp3.ResponseBody
 
 // Modelo de dados para quando é necessário enviar apenas o id do sócio
 data class idRequest(
-    val idSocio: Int
+    val id: Int
 )
 
 // Modelo de dados do pedido
@@ -27,6 +27,10 @@ data class UserCreate(
     val nome: String,
     val tipo: String,
     val modalidades: List<Int>
+)
+
+data class UserDelete(
+    val idSocio: Int,
 )
 
 interface UserService {
@@ -123,6 +127,8 @@ interface EventosService {
 
 }
 
+
+
 data class PresencaRequest(
     val idSocio: Int,
     val qrCode: String
@@ -133,9 +139,20 @@ data class PresencaResponse(
     val mensagem: String
 )
 
+
+data class PresencaListResponseDTO(
+    val id : Int,
+    val nome: String,
+    var estado: Boolean,
+)
+
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
+
+    @POST("/api/presencas/listar")
+    suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponseDTO>
+
 }
 
 data class Modalidade(
