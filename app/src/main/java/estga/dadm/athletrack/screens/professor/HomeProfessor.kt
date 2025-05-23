@@ -354,6 +354,7 @@ fun HomeProfessor(
     }
 
     if (showQrCode) {
-        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false })
+        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
+            user = user, navController = navController)
     }
 }

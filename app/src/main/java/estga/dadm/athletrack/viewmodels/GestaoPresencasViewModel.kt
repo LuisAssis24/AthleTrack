@@ -32,15 +32,24 @@ class GestaoPresencasViewModel : ViewModel() {
                     _treinoInfo.value = treino
 
                     // Buscar todos os atletas inscritos na modalidade do treino
-                    val atletasInscritos = presencasService.listarPresencas(idRequest(treino.idTreino))
+                    //val atletasInscritos = presencasService.listarPresencas(idRequest(treino.idTreino))
+                    val atletasInscritos = listOf(
+                        PresencaListResponseDTO(id = 1, nome = "Atleta 1", estado = false),
+                        PresencaListResponseDTO(id = 2, nome = "Atleta 2", estado = true),
+                        PresencaListResponseDTO(id = 3, nome = "Atleta 3", estado = false)
+                    )
+
 
                     // Atualizar estado dos atletas com presença registrada
                     _alunos.value = atletasInscritos.map { atleta ->
                         atleta.copy(estado = atleta.estado)
                     }
                 } else {
-                    println("Treino não encontrado para o QR Code fornecido.")
-                }
+                    android.widget.Toast.makeText(
+                        android.app.Application().applicationContext,
+                        "Treino não encontrado para o QR Code fornecido.",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
