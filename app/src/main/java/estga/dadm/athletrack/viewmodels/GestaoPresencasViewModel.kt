@@ -32,13 +32,7 @@ class GestaoPresencasViewModel : ViewModel() {
                     _treinoInfo.value = treino
 
                     // Buscar todos os atletas inscritos na modalidade do treino
-                    //val atletasInscritos = presencasService.listarPresencas(idRequest(treino.idTreino))
-                    val atletasInscritos = listOf(
-                        PresencaListResponseDTO(id = 1, nome = "Atleta 1", estado = false),
-                        PresencaListResponseDTO(id = 2, nome = "Atleta 2", estado = true),
-                        PresencaListResponseDTO(id = 3, nome = "Atleta 3", estado = false)
-                    )
-
+                    val atletasInscritos = presencasService.listarPresencas(idRequest(treino.idTreino))
 
                     // Atualizar estado dos atletas com presença registrada
                     _alunos.value = atletasInscritos.map { atleta ->
