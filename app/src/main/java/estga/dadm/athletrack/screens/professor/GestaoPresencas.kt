@@ -13,17 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
-import java.time.format.TextStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import estga.dadm.athletrack.api.PresencaRequest
-import estga.dadm.athletrack.api.PresencaListResponseDTO
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.GestaoPresencasViewModel
 
@@ -73,7 +67,7 @@ fun GestaoPresencas(
                 )
             }
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = colorScheme.surface
     ) { padding ->
         Column(
             modifier = Modifier
@@ -87,13 +81,13 @@ fun GestaoPresencas(
                 Text(
                     text = "${treino.nomeModalidade} - ${treino.diaSemana}",
                     style = Typography.displayLarge,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorScheme.primary,
                     textAlign = TextAlign.Center
                 )
                 Text(
                     text = "Hora: ${treino.hora}",
                     style = Typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = colorScheme.secondary,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -109,7 +103,7 @@ fun GestaoPresencas(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .background(
-                                MaterialTheme.colorScheme.primaryContainer,
+                                colorScheme.primaryContainer,
                                 shape = RoundedCornerShape(12.dp)
                             )
                             .padding(16.dp),
@@ -120,18 +114,24 @@ fun GestaoPresencas(
                             Text(
                                 text = atleta.nome,
                                 style = Typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.primary
+                                color = colorScheme.primary
                             )
                             Text(
                                 text = "ID: ${atleta.id}",
                                 style = Typography.labelSmall,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = colorScheme.secondary
                             )
                         }
                         Checkbox(
                             checked = atleta.estado,
-                            onCheckedChange = { viewModel.atualizarPresenca(atleta.id, it) }
+                            onCheckedChange = {
+                                if (!atleta.qrCode) {
+                                    viewModel.atualizarPresenca(atleta.id, it)
+                                }
+                            },
+                            enabled = !atleta.qrCode // desativa se foi lida por QR
                         )
+
                     }
                 }
             }
@@ -139,17 +139,20 @@ fun GestaoPresencas(
             // Botão para salvar presenças
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { viewModel.salvarPresencas(qrCode) },
+                onClick = {
+                    viewModel.salvarPresencas(qrCode)
+                    navController.popBackStack() // Voltar para a página anterior
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = colorScheme.primary
                 )
             ) {
                 Text(
                     text = "Salvar Presenças",
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = colorScheme.onPrimary
                 )
             }
         }

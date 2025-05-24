@@ -15,7 +15,9 @@ data class Presenca(
     @Id
     @ManyToOne
     @JoinColumn(name = "id_treino")
-    val treino: Treino,
+    val treino: Treino?,
 
-    val estado: Boolean
+    var estado: Boolean,
+
+    val qrCode: Boolean
 )

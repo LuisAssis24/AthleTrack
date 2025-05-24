@@ -242,7 +242,7 @@ fun HomeAtleta(
                                 scope.launch {
                                     try {
                                         val response = viewModel.apiPresencas.registarPresenca(
-                                            PresencaRequest(user.idSocio, codigo)
+                                            PresencaRequest(user.idSocio, codigo, true)
                                         )
                                         Toast.makeText(
                                             context,

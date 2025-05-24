@@ -8,6 +8,7 @@ import estga.dadm.backend.keys.PresencaId
 import estga.dadm.backend.model.Presenca
 import estga.dadm.backend.repository.*
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,7 +21,7 @@ class PresencaController(
 ) {
 
     @PostMapping("/registar")
-    fun registarPresenca(@RequestBody request: PresencaRequestDTO): ResponseEntity<PresencaResponseDTO> {
+    fun registarPresencaQr(@RequestBody request: PresencaRequestDTO): ResponseEntity<PresencaResponseDTO> {
         val treino = treinoRepository.findByQrCode(request.qrCode)
             ?: return ResponseEntity.badRequest()
                 .body(PresencaResponseDTO(sucesso = false, mensagem = "QR Code inválido."))
@@ -50,13 +51,57 @@ class PresencaController(
         val novaPresenca = Presenca(
             socio = aluno,
             treino = treino,
-            estado = true
+            estado = true,
+            qrCode = true
         )
 
         presencaRepository.save(novaPresenca)
 
         return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
     }
+
+    @Transactional
+    @PostMapping("/registarmanual")
+    fun registarPresencaManual(@RequestBody request: PresencaRequestDTO): ResponseEntity<Boolean> {
+        if (request.qrCode.isBlank()) {
+            return ResponseEntity.badRequest().body(false)
+        }
+
+        val treino = treinoRepository.findByQrCode(request.qrCode)
+            ?: return ResponseEntity.badRequest().body(false)
+
+        val aluno = userRepository.findById(request.idSocio).orElse(null)
+            ?: return ResponseEntity.badRequest().body(false)
+
+        val presencaId = PresencaId(
+            socio = request.idSocio,
+            treino = treino.id
+        )
+
+        val presencaExistente = presencaRepository.findById(presencaId).orElse(null)
+
+        return try {
+            if (presencaExistente != null) {
+                presencaExistente.estado = request.estado
+                presencaRepository.save(presencaExistente)
+            } else {
+                val novaPresenca = Presenca(
+                    socio = aluno,
+                    treino = treino,
+                    estado = true,
+                    qrCode = false
+                )
+                presencaRepository.save(novaPresenca)
+
+            }
+            ResponseEntity.ok(true)
+        } catch (e: Exception) {
+            println("Erro ao guardar presença: ${e.message}")
+            ResponseEntity.internalServerError().body(false)
+        }
+    }
+
+
 
     @PostMapping("/listar")
     fun listarPresencas(@RequestBody request: IdRequestDTO): List<PresencaListResponseDTO> {
@@ -70,22 +115,34 @@ class PresencaController(
         val alunos = socioModalidadeRepository.findByModalidadeId(modalidade.id)
             .map { it.socio }
 
+
         val presencasSimuladas = alunos.map { socio ->
             PresencaListResponseDTO(
                 id = socio.id,
                 nome = socio.nome,
                 estado = false,
+                qrCode = false
             )
         }
 
         presencasSimuladas.forEach { presenca ->
+
             val presencaReal = presencaRepository.findBySocioIdAndTreinoId(
                 socioId = presenca.id,
                 treinoId = request.id
             )
 
-            if (presencaReal != null) {
-                presenca.estado = true
+            if (presencaReal?.estado == true) {
+                if (presencaReal.qrCode) {
+                    presenca.estado = true
+                    presenca.qrCode = true
+                } else if (!presencaReal.qrCode) {
+                    presenca.estado = true
+                    presenca.qrCode = false
+                }
+            } else {
+                presenca.estado = false
+                presenca.qrCode = false
             }
         }
 

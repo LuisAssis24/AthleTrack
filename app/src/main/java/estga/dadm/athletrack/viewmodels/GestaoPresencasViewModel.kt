@@ -2,7 +2,7 @@ package estga.dadm.athletrack.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import estga.dadm.athletrack.api.PresencaListResponseDTO
+import estga.dadm.athletrack.api.PresencaListResponse
 import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Treino
@@ -15,8 +15,8 @@ class GestaoPresencasViewModel : ViewModel() {
     private val _treinoInfo = MutableStateFlow<Treino?>(null)
     val treinoInfo: StateFlow<Treino?> = _treinoInfo
 
-    private val _alunos = MutableStateFlow<List<PresencaListResponseDTO>>(emptyList())
-    val alunos: StateFlow<List<PresencaListResponseDTO>> = _alunos
+    private val _alunos = MutableStateFlow<List<PresencaListResponse>>(emptyList())
+    val alunos: StateFlow<List<PresencaListResponse>> = _alunos
 
     private val treinosService = RetrofitClient.treinosService
     private val presencasService = RetrofitClient.presencasService
@@ -58,15 +58,18 @@ class GestaoPresencasViewModel : ViewModel() {
 
     fun salvarPresencas(qrCode: String) {
         viewModelScope.launch {
-            _alunos.value.filter { it.estado }.forEach { aluno ->
+            _alunos.value.forEach { aluno ->
                 try {
-                    presencasService.registarPresenca(
-                        PresencaRequest(idSocio = aluno.id, qrCode = qrCode)
-                    )
+                    if (!aluno.qrCode) {
+                        presencasService.registarPresencaManual(
+                            PresencaRequest(idSocio = aluno.id, qrCode = qrCode, estado = aluno.estado)
+                        )
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
         }
     }
+
 }

@@ -131,7 +131,8 @@ interface EventosService {
 
 data class PresencaRequest(
     val idSocio: Int,
-    val qrCode: String
+    val qrCode: String,
+    val estado: Boolean
 )
 
 data class PresencaResponse(
@@ -140,18 +141,22 @@ data class PresencaResponse(
 )
 
 
-data class PresencaListResponseDTO(
+data class PresencaListResponse(
     val id : Int,
     val nome: String,
     var estado: Boolean,
+    var qrCode: Boolean
 )
 
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
 
+    @POST("/api/presencas/registarmanual")
+    suspend fun registarPresencaManual(@Body request: PresencaRequest): PresencaResponse
+
     @POST("/api/presencas/listar")
-    suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponseDTO>
+    suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponse>
 
 }
 

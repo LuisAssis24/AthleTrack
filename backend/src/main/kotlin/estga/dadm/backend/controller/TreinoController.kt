@@ -41,7 +41,7 @@ class TreinoController(
 
 //Filtra os treinos do professor para o dia atual
         val agora = LocalTime.now()
-        val margem = agora.minusMinutes(120)
+        val margem = agora.minusMinutes(240)// margem de 4 horas
 
         return treinoRepository
             .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.idSocio, request.diaSemana)
