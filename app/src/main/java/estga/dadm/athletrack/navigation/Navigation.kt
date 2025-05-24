@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import estga.dadm.athletrack.api.User
+import estga.dadm.athletrack.other.SplashScreen
 import estga.dadm.athletrack.other.UserPreferences
 import estga.dadm.athletrack.screens.*
 import estga.dadm.athletrack.screens.calendar.*
@@ -52,7 +53,14 @@ fun AthleTrackNavGraph(navController: NavHostController) {
     }
 
 
-    NavHost(navController, startDestination = "login") {
+    NavHost(navController, startDestination = "splash") {
+        composable("splash") {
+            SplashScreen(
+                navController = navController,
+            )
+        }
+
+
         composable("login") {
             LoginScreen(
                 onLoginClick = { user ->

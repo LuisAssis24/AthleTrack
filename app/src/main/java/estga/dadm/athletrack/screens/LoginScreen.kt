@@ -15,20 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import estga.dadm.athletrack.api.UserRequest
 import estga.dadm.athletrack.api.User
-import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.other.UserPreferences
 import estga.dadm.athletrack.viewmodels.LoginViewModel
-
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import estga.dadm.athletrack.ui.theme.*
-
 
 @Composable
 fun LoginScreen(

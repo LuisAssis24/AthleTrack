@@ -41,6 +41,7 @@ import com.google.gson.Gson
 import estga.dadm.athletrack.other.UserPreferences
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.SentimentSatisfied
+import estga.dadm.athletrack.other.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,12 +68,17 @@ fun HomeProfessor(
 
 
     // Carregar as aulas assim que a composable for criada
-    LaunchedEffect(Unit) {
-        viewModel.carregarTreinos(
-            user.idSocio,
-            diaSemana = viewModel.detetarDiaSemana()
-        )
+    val isTimedOut = remember { mutableStateOf(false) }
+    val isLoading = remember {
+        derivedStateOf { aulasHoje.isEmpty() && !isTimedOut.value }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
+        kotlinx.coroutines.delay(500) // 5 segundos
+        isTimedOut.value = true
+    }
+
 
     Scaffold(
         modifier = Modifier
@@ -80,313 +86,323 @@ fun HomeProfessor(
             .background(colorScheme.surface),
         containerColor = colorScheme.surface
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            // TOP BAR COM BORDA ARREDONDADA
-            Box(
+        LoadingScreen(isLoading = isLoading.value) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // TOP BAR COM BORDA ARREDONDADA
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // LADO ESQUERDO: PERFIL + NOME
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { showBottomSheet = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Perfil",
+                                    tint = colorScheme.primary,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Column {
+                                Text(
+                                    text = user.nome,
+                                    style = Typography.titleMedium,
+                                    color = colorScheme.primary
+                                )
+                                Text(
+                                    text = "Sócio nº ${user.idSocio}",
+                                    style = Typography.labelMedium,
+                                    color = colorScheme.secondary
+                                )
+                            }
+                        }
+
+                        // LADO DIREITO: ÍCONES DE AÇÃO
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            VerticalDivider(
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .padding(horizontal = 8.dp),
+                                color = colorScheme.secondary,
+                                thickness = 1.dp
+                            )
+
+                            // Botão Calendário - redireciona para a tela de calendário
+                            IconButton(onClick = {
+                                val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                                navController.navigate("calendar/$userJson")
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = "Calendário",
+                                    tint = colorScheme.primary,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    // LADO ESQUERDO: PERFIL + NOME
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { showBottomSheet = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Perfil",
-                                tint = colorScheme.primary,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Column {
-                            Text(
-                                text = user.nome,
-                                style = Typography.titleMedium,
-                                color = colorScheme.primary
-                            )
-                            Text(
-                                text = "Sócio nº ${user.idSocio}",
-                                style = Typography.labelMedium,
-                                color = colorScheme.secondary
-                            )
-                        }
-                    }
-
-                    // LADO DIREITO: ÍCONES DE AÇÃO
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(24.dp)
-                                .padding(horizontal = 8.dp),
-                            color = colorScheme.secondary,
-                            thickness = 1.dp
-                        )
-
-                        // Botão Calendário - redireciona para a tela de calendário
-                        IconButton(onClick = {
+                    Button(
+                        onClick = {
+                            val gson = Gson()
                             val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                            navController.navigate("calendar/$userJson")
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = "Calendário",
-                                tint = colorScheme.primary,
-                                modifier = Modifier.size(28.dp)
+                            navController.navigate("gestaotreinos/$userJson")
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(
+                                colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(16.dp)
                             )
-                        }
+                            .size(81.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.tertiary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
+                            contentDescription = "GestaoTreinos",
+                            modifier = Modifier.size(40.dp),
+                            tint = colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Gestão de Treinos",
+                            style = Typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = {
+                            val gson = Gson()
+                            val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
+                            navController.navigate("gestaoatletas/$userJson")
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(
+                                colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .size(81.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "GestaoAtleta",
+                            modifier = Modifier.size(40.dp),
+                            tint = colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Gestão de Atletas",
+                            style = Typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = colorScheme.primary
+                        )
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = {
-                        val gson = Gson()
-                        val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                        navController.navigate("gestaotreinos/$userJson")
-                    },
+                Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
-                        .size(81.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.tertiary)
+                        .fillMaxWidth()
+                        .weight(0.7f)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
-                        contentDescription = "GestaoTreinos",
-                        modifier = Modifier.size(40.dp),
-                        tint = colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Gestão de Treinos",
-                        style = Typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = colorScheme.primary
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = {
-                        val gson = Gson()
-                        val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                        navController.navigate("gestaoatletas/$userJson")
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
-                        .size(81.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "GestaoAtleta",
-                        modifier = Modifier.size(40.dp),
-                        tint = colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Gestão de Atletas",
-                        style = Typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = colorScheme.primary
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
-                        style = Typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        thickness = 1.5.dp,
-                        color = colorScheme.secondary
-                    )
-
-                    val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
-
-                    if (aulasParaMostrar.isEmpty()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
+                            text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
+                            style = Typography.titleMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center, // Centraliza verticalmente
-                            modifier = Modifier.fillMaxHeight(0.6f) // Preenche 80% da altura
+                        HorizontalDivider(
+                            modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            thickness = 1.5.dp,
+                            color = colorScheme.secondary
+                        )
+
+                        val aulasParaMostrar =
+                            if (selected.value == "hoje") aulasHoje else aulasAmanha
+
+                        if (aulasParaMostrar.isEmpty()) {
+                            Text(
+                                text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center, // Centraliza verticalmente
+                                modifier = Modifier
+                                    .fillMaxHeight(0.6f) // Preenche 80% da altura
+                                    .fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.SentimentSatisfied,
+                                    contentDescription = "Sem aulas",
+                                    tint = colorScheme.primary,
+                                    modifier = Modifier.size(148.dp) // Tamanho do smile
+                                )
+                            }
+                        } else {
+                            aulasParaMostrar.take(10).forEachIndexed { index, aula ->
+                                Column(
+                                    modifier = Modifier
+                                        .clickable {
+                                            qrCodeAtivo = aula.qrCode
+                                            showQrCode = true
+                                        }
+                                ) {
+                                    Text(
+                                        text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
+                                        style = Typography.bodyMedium,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    if (index < aulasParaMostrar.size - 1) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            thickness = 1.dp,
+                                            color = colorScheme.primary
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SingleChoiceSegmentedButtonRow {
+                        SegmentedButton(
+                            selected = selected.value == "hoje",
+                            onClick = { selected.value = "hoje" },
+                            shape = RoundedCornerShape(
+                                topStart = 12.dp,
+                                bottomStart = 12.dp
+                            ), // Aumenta o arredondamento
+                            icon = {}
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.SentimentSatisfied,
-                                contentDescription = "Sem aulas",
-                                tint = colorScheme.primary,
-                                modifier = Modifier.size(148.dp) // Tamanho do smile
+                            Text(
+                                "Hoje",
+                                fontSize = 18.sp, // Aumenta o tamanho do texto
+                                modifier = Modifier.padding(
+                                    vertical = 5.dp,
+                                    horizontal = 10.dp
+                                ) // Aumenta o padding
                             )
                         }
-                    } else {
-                        aulasParaMostrar.take(10).forEachIndexed { index, aula ->
-                            Column(
-                                modifier = Modifier
-                                    .clickable {
-                                        qrCodeAtivo = aula.qrCode
-                                        showQrCode = true
-                                    }
-                            ) {
-                                Text(
-                                    text = "${aula.nomeModalidade} - ${aula.hora.take(5)}",
-                                    style = Typography.bodyMedium,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                                if (index < aulasParaMostrar.size - 1) {
-                                    HorizontalDivider(
-                                        modifier = Modifier.padding(vertical = 8.dp),
-                                        thickness = 1.dp,
-                                        color = colorScheme.primary
-                                    )
+
+                        SegmentedButton(
+                            selected = selected.value == "amanha",
+                            onClick = { selected.value = "amanha" },
+                            shape = RoundedCornerShape(
+                                topEnd = 12.dp,
+                                bottomEnd = 12.dp
+                            ), // Aumenta o arredondamento
+                            icon = {}
+                        ) {
+                            Text(
+                                "Amanhã",
+                                fontSize = 18.sp, // Aumenta o tamanho do texto
+                                modifier = Modifier.padding(
+                                    vertical = 5.dp,
+                                    horizontal = 10.dp
+                                ) // Aumenta o padding
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        val scope = rememberCoroutineScope() // Necessário para o launch
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = bottomSheetState,
+                containerColor = colorScheme.primaryContainer, // COR DO DRAWER
+                dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            scope.launch {
+                                userPreferences.clearLoginState()
+                                navController.navigate("login") {
+                                    popUpTo(0)
                                 }
                             }
-
                         }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                SingleChoiceSegmentedButtonRow {
-                    SegmentedButton(
-                        selected = selected.value == "hoje",
-                        onClick = { selected.value = "hoje" },
-                        shape = RoundedCornerShape(
-                            topStart = 12.dp,
-                            bottomStart = 12.dp
-                        ), // Aumenta o arredondamento
-                        icon = {}
-                    ) {
-                        Text(
-                            "Hoje",
-                            fontSize = 18.sp, // Aumenta o tamanho do texto
-                            modifier = Modifier.padding(
-                                vertical = 5.dp,
-                                horizontal = 10.dp
-                            ) // Aumenta o padding
-                        )
-                    }
-
-                    SegmentedButton(
-                        selected = selected.value == "amanha",
-                        onClick = { selected.value = "amanha" },
-                        shape = RoundedCornerShape(
-                            topEnd = 12.dp,
-                            bottomEnd = 12.dp
-                        ), // Aumenta o arredondamento
-                        icon = {}
-                    ) {
-                        Text(
-                            "Amanhã",
-                            fontSize = 18.sp, // Aumenta o tamanho do texto
-                            modifier = Modifier.padding(
-                                vertical = 5.dp,
-                                horizontal = 10.dp
-                            ) // Aumenta o padding
-                        )
-                    }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = "Logout",
+                        tint = colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        "Logout",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorScheme.primary
+                    )
                 }
             }
         }
-    }
 
-    val scope = rememberCoroutineScope() // Necessário para o launch
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            sheetState = bottomSheetState,
-            containerColor = colorScheme.primaryContainer, // COR DO DRAWER
-            dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        scope.launch {
-                            userPreferences.clearLoginState()
-                            navController.navigate("login") {
-                                popUpTo(0)
-                            }
-                        }
-                    }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    "Logout",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.primary
-                )
-            }
+        if (showQrCode) {
+            QrCodeDialog(
+                qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
+                user = user, navController = navController
+            )
         }
-    }
-
-    if (showQrCode) {
-        QrCodeDialog(
-            qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
-            user = user, navController = navController
-        )
     }
 }
+
