@@ -74,7 +74,9 @@ data class TreinoCreateRequest(
 )
 
 data class TreinoDeleteRequest(
-    val qrCode: String
+    val qrCode: String,
+    val idSocio: Int,
+    val password: String
 )
 
 interface TreinosService {
@@ -91,10 +93,10 @@ interface TreinosService {
     suspend fun listarTodosOsTreinos(@Body request: idRequest): List<Treino>
 
     @POST("/api/treinos/apagar")
-    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): String
+    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): retrofit2.Response<okhttp3.ResponseBody>
 
     @POST("/api/treinos/criar")
-    suspend fun criarTreino(@Body request: TreinoCreateRequest): String
+    suspend fun criarTreino(@Body request: TreinoCreateRequest): retrofit2.Response<okhttp3.ResponseBody>
 }
 
 data class EventosRequest(
@@ -168,4 +170,7 @@ data class Modalidade(
 interface ModalidadesService {
     @POST("/api/modalidade/listar")
     suspend fun listarModalidades(): List<Modalidade>
+
+    @POST("/api/modalidade/listarPorId")
+    suspend fun listarPorId(@Body request: idRequest): List<Modalidade>
 }

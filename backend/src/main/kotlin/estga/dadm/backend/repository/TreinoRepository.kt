@@ -12,4 +12,6 @@ interface TreinoRepository : JpaRepository<Treino, Int> {
 
     fun findByQrCode(qrCode: String): Treino?
 
+
+
 }

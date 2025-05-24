@@ -1,9 +1,11 @@
 package estga.dadm.backend.controller
 
+import estga.dadm.backend.dto.IdRequestDTO
 import estga.dadm.backend.dto.treino.*
 import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.model.Treino
 import estga.dadm.backend.repository.*
+import estga.dadm.backend.services.PasswordUtil
 import org.springframework.http.ResponseEntity
 import java.time.LocalTime
 
@@ -13,17 +15,23 @@ class TreinoController(
     private val treinoRepository: TreinoRepository,
     private val socioModalidadeRepository: SocioModalidadeRepository,
     private val modalidadeRepository: ModalidadeRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val presencaRepository: PresencaRepository
 ) {
-    @PostMapping()
-    fun listarTodosOsTreinos(): List<TreinoProfResponseDTO> {
-        val ordem = ordenarDias("SEG")
+    @PostMapping
+    fun listarTodosOsTreinos(@RequestBody request: IdRequestDTO): List<TreinoProfResponseDTO> {
+        println(">>> MÉTODO listarTodosOsTreinos INVOCADO com ID ${request.id}")
 
+        val ordem = ordenarDias("SEG") // ou usar dia atual
+
+        val treinos = treinoRepository.findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.id, "SEG")
+        println(">>> TREINOS FILTRADOS POR PROFESSOR 70 E DIA SEG:")
+        treinos.forEach {
+            println("Treino ${it.id} -> prof=${it.professor.id}, mod=${it.modalidade.id}, dia=${it.diaSemana}")
+        }
         return ordem.flatMap { dia ->
             treinoRepository
-                .findAll()
-                .filter { it.diaSemana == dia }
-                .sortedBy { it.hora }
+                .findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.id, dia)
                 .map { treino ->
                     TreinoProfResponseDTO(
                         idTreino = treino.id,
@@ -35,7 +43,6 @@ class TreinoController(
                 }
         }
     }
-
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
 
@@ -128,12 +135,28 @@ class TreinoController(
 
     @PostMapping("/apagar")
     fun apagarTreino(@RequestBody request: TreinoApagarRequest): ResponseEntity<String> {
-        val treino = treinoRepository.findByQrCode(request.qrCode)
-        if (treino != null) {
-            treinoRepository.delete(treino)
-            return ResponseEntity.ok("Treino apagado com sucesso.")
+        val professor = userRepository.findById(request.idSocio).orElse(null)
+            ?: return ResponseEntity.badRequest().body("Professor não encontrado.")
+
+        if (!PasswordUtil.matches(request.password, professor.password)) {
+            return ResponseEntity.status(401).body("Senha incorreta.")
         }
-        return ResponseEntity.badRequest().body("Treino não encontrado.")
+
+        val treino = treinoRepository.findByQrCode(request.qrCode)
+            ?: return ResponseEntity.badRequest().body("Treino não encontrado.")
+
+        if (treino.professor.id != professor.id) {
+            return ResponseEntity.status(403).body("Este treino não pertence a este professor.")
+        }
+
+        // 🔥 Apagar todas as presenças associadas a este treino
+        val presencas = presencaRepository.findByTreinoId(treino.id)
+        presencas.forEach { presenca ->
+            presencaRepository.delete(presenca)
+        }
+
+        treinoRepository.delete(treino)
+        return ResponseEntity.ok("Treino apagado com sucesso.")
     }
 
     fun calculaAmanha(dia: String): String? {
