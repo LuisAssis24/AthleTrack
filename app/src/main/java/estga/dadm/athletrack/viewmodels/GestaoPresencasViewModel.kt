@@ -58,18 +58,24 @@ class GestaoPresencasViewModel : ViewModel() {
 
     fun salvarPresencas(qrCode: String) {
         viewModelScope.launch {
-            _alunos.value.forEach { aluno ->
-                try {
-                    if (!aluno.qrCode) {
-                        presencasService.registarPresencaManual(
-                            PresencaRequest(idSocio = aluno.id, qrCode = qrCode, estado = aluno.estado)
+            try {
+                val listaManual = _alunos.value
+                    .filter { !it.qrCode } // só os manuais
+                    .map {
+                        PresencaRequest(
+                            idSocio = it.id,
+                            qrCode = qrCode,
+                            estado = it.estado
                         )
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+
+                if (listaManual.isNotEmpty()) {
+                    presencasService.registarPresencasManuais(listaManual)
                 }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
-
 }

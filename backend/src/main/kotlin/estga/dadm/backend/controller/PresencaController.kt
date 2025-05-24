@@ -60,48 +60,37 @@ class PresencaController(
         return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
     }
 
-    @Transactional
     @PostMapping("/registarmanual")
-    fun registarPresencaManual(@RequestBody request: PresencaRequestDTO): ResponseEntity<Boolean> {
-        if (request.qrCode.isBlank()) {
-            return ResponseEntity.badRequest().body(false)
-        }
-
-        val treino = treinoRepository.findByQrCode(request.qrCode)
-            ?: return ResponseEntity.badRequest().body(false)
-
-        val aluno = userRepository.findById(request.idSocio).orElse(null)
-            ?: return ResponseEntity.badRequest().body(false)
-
-        val presencaId = PresencaId(
-            socio = request.idSocio,
-            treino = treino.id
-        )
-
-        val presencaExistente = presencaRepository.findById(presencaId).orElse(null)
-
+    fun registarPresencasManuais(@RequestBody requests: List<PresencaRequestDTO>): ResponseEntity<Boolean> {
         return try {
-            if (presencaExistente != null) {
-                presencaExistente.estado = request.estado
-                presencaRepository.save(presencaExistente)
-            } else {
-                val novaPresenca = Presenca(
-                    socio = aluno,
-                    treino = treino,
-                    estado = true,
-                    qrCode = false
-                )
-                presencaRepository.save(novaPresenca)
+            requests.forEach { request ->
+                if (request.qrCode.isBlank()) return@forEach
 
+                val treino = treinoRepository.findByQrCode(request.qrCode) ?: return@forEach
+                val aluno = userRepository.findById(request.idSocio).orElse(null) ?: return@forEach
+                val presencaId = PresencaId(aluno.id, treino.id)
+                val presencaExistente = presencaRepository.findById(presencaId).orElse(null)
+
+                if (presencaExistente != null) {
+                    presencaExistente.estado = request.estado
+                    presencaRepository.save(presencaExistente)
+                } else {
+                    val nova = Presenca(
+                        socio = aluno,
+                        treino = treino,
+                        estado = request.estado,
+                        qrCode = false
+                    )
+                    presencaRepository.save(nova)
+                }
             }
+
             ResponseEntity.ok(true)
         } catch (e: Exception) {
-            println("Erro ao guardar presença: ${e.message}")
+            println("Erro ao guardar presenças manuais: ${e.message}")
             ResponseEntity.internalServerError().body(false)
         }
     }
-
-
 
     @PostMapping("/listar")
     fun listarPresencas(@RequestBody request: IdRequestDTO): List<PresencaListResponseDTO> {

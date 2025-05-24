@@ -153,7 +153,7 @@ interface PresencasService {
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
 
     @POST("/api/presencas/registarmanual")
-    suspend fun registarPresencaManual(@Body request: PresencaRequest): PresencaResponse
+    suspend fun registarPresencasManuais(@Body requests: List<PresencaRequest>): Boolean
 
     @POST("/api/presencas/listar")
     suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponse>
