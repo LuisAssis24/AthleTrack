@@ -40,7 +40,7 @@ import java.net.URLEncoder
 import com.google.gson.Gson
 import estga.dadm.athletrack.other.UserPreferences
 import kotlinx.coroutines.launch
-import estga.dadm.athletrack.ui.theme.*
+import androidx.compose.material.icons.filled.SentimentSatisfied
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,13 +55,10 @@ fun HomeProfessor(
     val aulasHoje by viewModel.treinosHoje.collectAsState()
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val selected = remember { mutableStateOf("hoje") }
 
     val gson = Gson()
-    val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-    var showCameraDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
@@ -185,7 +182,7 @@ fun HomeProfessor(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Treinos",
-                        style = Typography.labelSmall,
+                        style = Typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = colorScheme.primary
                     )
@@ -214,7 +211,7 @@ fun HomeProfessor(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Gestão de Atletas",
-                        style = Typography.labelSmall,
+                        style = Typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = colorScheme.primary
                     )
@@ -244,8 +241,7 @@ fun HomeProfessor(
                         color = colorScheme.secondary
                     )
 
-                    val aulasParaMostrar =
-                        if (selected.value == "hoje") aulasHoje else aulasAmanha
+                    val aulasParaMostrar = if (selected.value == "hoje") aulasHoje else aulasAmanha
 
                     if (aulasParaMostrar.isEmpty()) {
                         Text(
@@ -253,6 +249,20 @@ fun HomeProfessor(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center, // Centraliza verticalmente
+                            modifier = Modifier.fillMaxHeight(0.6f) // Preenche 80% da altura
+                                .fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.SentimentSatisfied,
+                                contentDescription = "Sem aulas",
+                                tint = colorScheme.primary,
+                                modifier = Modifier.size(148.dp) // Tamanho do smile
+                            )
+                        }
                     } else {
                         aulasParaMostrar.take(10).forEachIndexed { index, aula ->
                             Column(
@@ -296,19 +306,39 @@ fun HomeProfessor(
                     SegmentedButton(
                         selected = selected.value == "hoje",
                         onClick = { selected.value = "hoje" },
-                        shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 12.dp,
+                            bottomStart = 12.dp
+                        ), // Aumenta o arredondamento
                         icon = {}
                     ) {
-                        Text("Hoje")
+                        Text(
+                            "Hoje",
+                            fontSize = 18.sp, // Aumenta o tamanho do texto
+                            modifier = Modifier.padding(
+                                vertical = 5.dp,
+                                horizontal = 10.dp
+                            ) // Aumenta o padding
+                        )
                     }
 
                     SegmentedButton(
                         selected = selected.value == "amanha",
                         onClick = { selected.value = "amanha" },
-                        shape = RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp),
+                        shape = RoundedCornerShape(
+                            topEnd = 12.dp,
+                            bottomEnd = 12.dp
+                        ), // Aumenta o arredondamento
                         icon = {}
                     ) {
-                        Text("Amanhã")
+                        Text(
+                            "Amanhã",
+                            fontSize = 18.sp, // Aumenta o tamanho do texto
+                            modifier = Modifier.padding(
+                                vertical = 5.dp,
+                                horizontal = 10.dp
+                            ) // Aumenta o padding
+                        )
                     }
                 }
             }
@@ -354,7 +384,9 @@ fun HomeProfessor(
     }
 
     if (showQrCode) {
-        QrCodeDialog(qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
-            user = user, navController = navController)
+        QrCodeDialog(
+            qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
+            user = user, navController = navController
+        )
     }
 }
