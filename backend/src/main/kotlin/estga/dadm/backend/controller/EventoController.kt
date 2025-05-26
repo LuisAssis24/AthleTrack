@@ -7,11 +7,9 @@ import estga.dadm.backend.dto.evento.EventoCriarRequestDTO
 import estga.dadm.backend.model.Evento
 import estga.dadm.backend.model.EventoModalidade
 import estga.dadm.backend.repository.EventoRepository
-
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.LocalTime
-
 
 @RestController
 @RequestMapping("/api/eventos")
@@ -20,17 +18,16 @@ class EventoController(
     private val socioModalidadeRepository: SocioModalidadeRepository,
     private val modalidadeRepository: ModalidadeRepository,
     private val eventoRepository: EventoRepository
-
 ) {
 
+    // Lista eventos associados às modalidades do sócio informado
     @PostMapping("/listar")
     fun listarPorIdSocio(@RequestBody request: EventoRequestDTO): List<EventoResponseDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
-
         val modalidadesIds = socioModalidades.map { it.modalidade.id }
 
         val eventos = eventoModalidadeRepository.findByModalidadeIdIn(modalidadesIds)
-            .map { it.evento } // Extraindo os eventos diretamente
+            .map { it.evento }
             .map { evento ->
                 EventoResponseDTO(
                     localEvento = evento.localEvento,
@@ -43,12 +40,11 @@ class EventoController(
         return eventos
     }
 
-
-
+    // Cria um novo evento e associa às modalidades informadas
     @PostMapping("/criar")
     fun criarEvento(@RequestBody request: EventoCriarRequestDTO) {
         try {
-            // Verificar se já existe um evento igual
+            // Verifica se já existe um evento igual
             val eventoExistente = eventoRepository.findByLocalEventoAndDataAndHoraAndDescricao(
                 request.localEvento, LocalDate.parse(request.data), LocalTime.parse(request.hora).withSecond(0), request.descricao
             )
@@ -56,17 +52,17 @@ class EventoController(
                 throw IllegalArgumentException("Evento já existe com os mesmos dados.")
             }
 
-            // Criar o evento
+            // Cria o evento
             val evento = Evento(
                 id = 0,
                 localEvento = request.localEvento,
                 data = LocalDate.parse(request.data),
-                hora = LocalTime.parse(request.hora).withSecond(0), // Removendo os segundos
+                hora = LocalTime.parse(request.hora).withSecond(0),
                 descricao = request.descricao
             )
             val eventoSalvo = eventoRepository.save(evento)
 
-            // Associar as modalidades ao evento
+            // Associa as modalidades ao evento
             request.modalidades.forEach { modalidadeId ->
                 val modalidade = modalidadeRepository.findById(modalidadeId)
                     .orElseThrow { IllegalArgumentException("Modalidade $modalidadeId não encontrada.") }
@@ -82,5 +78,4 @@ class EventoController(
             throw RuntimeException("Erro ao criar evento: ${e.message}")
         }
     }
-
-    }
+}

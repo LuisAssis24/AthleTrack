@@ -4,24 +4,27 @@ import retrofit2.Call
 import retrofit2.http.*
 import okhttp3.ResponseBody
 
-// Modelo de dados para quando é necessário enviar apenas o id do sócio
+// Define os modelos de dados e serviços para comunicação com a API.
+
+// Modelo de dados para quando é necessário enviar apenas o id do sócio.
 data class idRequest(
     val id: Int
 )
 
-// Modelo de dados do pedido
+// Modelo de dados do pedido de login.
 data class UserRequest(
     val idSocio: Int,
     val password: String
 )
 
-// Modelo de dados da resposta
+// Modelo de dados da resposta do usuário.
 data class User(
     val idSocio: Int,
     val nome: String,
     val tipo: String
 )
 
+// Modelo de dados para criação de usuário.
 data class UserCreate(
     val password: String,
     val nome: String,
@@ -29,10 +32,12 @@ data class UserCreate(
     val modalidades: List<Int>
 )
 
+// Modelo de dados para exclusão de usuário.
 data class UserDelete(
     val idSocio: Int,
 )
 
+// Interface para serviços relacionados ao usuário.
 interface UserService {
     @POST("/api/user/login")
     fun login(@Body request: UserRequest): Call<User>
@@ -41,7 +46,7 @@ interface UserService {
     suspend fun listar(): List<User>
 
     @POST("/api/user/criar")
-    suspend fun criar(@Body request: UserCreate):  ResponseBody
+    suspend fun criar(@Body request: UserCreate): ResponseBody
 
     @POST("/api/user/eliminar/{idParaEliminar}")
     suspend fun eliminar(
@@ -50,13 +55,13 @@ interface UserService {
     ): ResponseBody
 }
 
-// Modelo da Request do treino
+// Modelo da Request do treino.
 data class TreinosRequest(
     val idSocio: Int,
     val diaSemana: String
 )
 
-// Modelo de Resposta do treino
+// Modelo de Resposta do treino.
 data class Treino(
     val idTreino: Int,
     val nomeModalidade: String,
@@ -65,6 +70,7 @@ data class Treino(
     val qrCode: String
 )
 
+// Modelo de dados para criação de treino.
 data class TreinoCreateRequest(
     val diaSemana: String,
     val hora: String,
@@ -73,12 +79,14 @@ data class TreinoCreateRequest(
     val idProfessor: Int
 )
 
+// Modelo de dados para exclusão de treino.
 data class TreinoDeleteRequest(
     val qrCode: String,
     val idSocio: Int,
     val password: String
 )
 
+// Interface para serviços relacionados a treinos.
 interface TreinosService {
     @POST("/api/treinos/hoje")
     suspend fun getTreinosHoje(@Body request: TreinosRequest): List<Treino>
@@ -99,12 +107,12 @@ interface TreinosService {
     suspend fun criarTreino(@Body request: TreinoCreateRequest): retrofit2.Response<okhttp3.ResponseBody>
 }
 
+// Modelo da Request dos eventos.
 data class EventosRequest(
     val idSocio: Int,
 )
 
-
-// Modelo de Resposta dos Eventos
+// Modelo de Resposta dos Eventos.
 data class Evento(
     val localEvento: String,
     val data: String,
@@ -112,6 +120,7 @@ data class Evento(
     val descricao: String
 )
 
+// Modelo de dados para criação de evento.
 data class EventoCriarRequestDTO(
     val data: String,
     val hora: String,
@@ -120,36 +129,37 @@ data class EventoCriarRequestDTO(
     val modalidades: List<Int>
 )
 
+// Interface para serviços relacionados a eventos.
 interface EventosService {
     @POST("/api/eventos/listar")
     suspend fun getEventos(@Body request: EventosRequest): List<Evento>
 
     @POST("/api/eventos/criar")
     suspend fun criarEvento(@Body request: EventoCriarRequestDTO)
-
 }
 
-
-
+// Modelo da Request de presença.
 data class PresencaRequest(
     val idSocio: Int,
     val qrCode: String,
     val estado: Boolean
 )
 
+// Modelo de Resposta de presença.
 data class PresencaResponse(
     val sucesso: Boolean,
     val mensagem: String
 )
 
-
+// Modelo de lista de presenças.
 data class PresencaListResponse(
-    val id : Int,
+    val id: Int,
     val nome: String,
     var estado: Boolean,
     var qrCode: Boolean
 )
 
+// Interface para serviços relacionados a presenças.
 interface PresencasService {
     @POST("/api/presencas/registar")
     suspend fun registarPresenca(@Body request: PresencaRequest): PresencaResponse
@@ -159,14 +169,15 @@ interface PresencasService {
 
     @POST("/api/presencas/listar")
     suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponse>
-
 }
 
+// Modelo de dados para modalidades.
 data class Modalidade(
     val id: Int,
     val nomeModalidade: String
 )
 
+// Interface para serviços relacionados a modalidades.
 interface ModalidadesService {
     @POST("/api/modalidade/listar")
     suspend fun listarModalidades(): List<Modalidade>

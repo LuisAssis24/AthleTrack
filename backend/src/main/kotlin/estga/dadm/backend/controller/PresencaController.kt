@@ -8,7 +8,6 @@ import estga.dadm.backend.keys.PresencaId
 import estga.dadm.backend.model.Presenca
 import estga.dadm.backend.repository.*
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,6 +19,7 @@ class PresencaController(
     private val socioModalidadeRepository: SocioModalidadeRepository
 ) {
 
+    // Registra presença via QR Code
     @PostMapping("/registar")
     fun registarPresencaQr(@RequestBody request: PresencaRequestDTO): ResponseEntity<PresencaResponseDTO> {
         val treino = treinoRepository.findByQrCode(request.qrCode)
@@ -60,6 +60,7 @@ class PresencaController(
         return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
     }
 
+    // Registra presenças manualmente (lista de presenças)
     @PostMapping("/registarmanual")
     fun registarPresencasManuais(@RequestBody requests: List<PresencaRequestDTO>): ResponseEntity<Boolean> {
         return try {
@@ -92,6 +93,7 @@ class PresencaController(
         }
     }
 
+    // Lista presenças de um treino específico
     @PostMapping("/listar")
     fun listarPresencas(@RequestBody request: IdRequestDTO): List<PresencaListResponseDTO> {
         val treino = treinoRepository.findById(request.id).orElse(null)
@@ -104,7 +106,6 @@ class PresencaController(
         val alunos = socioModalidadeRepository.findByModalidadeId(modalidade.id)
             .map { it.socio }
 
-
         val presencasSimuladas = alunos.map { socio ->
             PresencaListResponseDTO(
                 id = socio.id,
@@ -115,7 +116,6 @@ class PresencaController(
         }
 
         presencasSimuladas.forEach { presenca ->
-
             val presencaReal = presencaRepository.findBySocioIdAndTreinoId(
                 socioId = presenca.id,
                 treinoId = request.id
@@ -138,5 +138,3 @@ class PresencaController(
         return presencasSimuladas
     }
 }
-
-

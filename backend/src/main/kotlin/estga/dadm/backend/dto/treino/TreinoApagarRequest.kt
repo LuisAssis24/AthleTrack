@@ -1,7 +1,11 @@
 package estga.dadm.backend.dto.treino
 
+/**
+ * DTO para requisição de exclusão de treino.
+ * Contém informações necessárias para validar e apagar um treino.
+ */
 data class TreinoApagarRequest (
-    val qrCode: String,
-    val idSocio: Int,
-    val password: String
+    val qrCode: String,     // QR Code do treino a ser apagado
+    val idSocio: Int,       // ID do professor solicitante
+    val password: String    // Senha do professor para validação
 )

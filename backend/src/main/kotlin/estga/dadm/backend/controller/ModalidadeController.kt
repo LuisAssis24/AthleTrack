@@ -5,13 +5,14 @@ import estga.dadm.backend.repository.*
 import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.dto.modalidade.ModalidadeDTO
 
-
 @RestController
 @RequestMapping("/api/modalidade")
-class ModalidadeController(private val modalidadeRepository: ModalidadeRepository,
-                           private val socioModalidadeRepository: SocioModalidadeRepository) {
+class ModalidadeController(
+    private val modalidadeRepository: ModalidadeRepository,
+    private val socioModalidadeRepository: SocioModalidadeRepository
+) {
 
-
+    // Lista todas as modalidades disponíveis
     @PostMapping("/listar")
     fun listarTodasModalidades(): List<ModalidadeDTO> {
         val modalidades = modalidadeRepository.findAll()
@@ -23,6 +24,7 @@ class ModalidadeController(private val modalidadeRepository: ModalidadeRepositor
         }
     }
 
+    // Lista modalidades associadas a um sócio específico
     @PostMapping("/listarporid")
     fun listarPorId(@RequestBody id: IdRequestDTO): List<ModalidadeDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(id.id)

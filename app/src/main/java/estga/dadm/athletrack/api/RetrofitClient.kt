@@ -3,11 +3,12 @@ package estga.dadm.athletrack.api
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
+// Configura o cliente Retrofit para comunicação com a API.
 object RetrofitClient {
     private const val BASE_URL = "http://10.0.2.2:8080/api/" // Emulador Local
     //private const val BASE_URL = "https://athletrack-backend.onrender.com" // Produção
 
+    // Instância do Retrofit configurada com a URL base e o conversor Gson.
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -15,6 +16,7 @@ object RetrofitClient {
             .build()
     }
 
+    // Serviços disponíveis no cliente Retrofit.
     val loginService: UserService by lazy {
         retrofit.create(UserService::class.java)
     }

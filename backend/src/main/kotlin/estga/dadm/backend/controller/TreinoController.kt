@@ -18,6 +18,7 @@ class TreinoController(
     private val userRepository: UserRepository,
     private val presencaRepository: PresencaRepository
 ) {
+    // Lista todos os treinos de um professor, ordenados por dia da semana
     @PostMapping
     fun listarTodosOsTreinos(@RequestBody request: IdRequestDTO): List<TreinoProfResponseDTO> {
         println(">>> MÉTODO listarTodosOsTreinos INVOCADO com ID ${request.id}")
@@ -43,10 +44,10 @@ class TreinoController(
                 }
         }
     }
+
+    // Lista treinos do professor para o dia atual
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
-
-//Filtra os treinos do professor para o dia atual
         val agora = LocalTime.now()
         val margem = agora.minusMinutes(240)// margem de 4 horas
 
@@ -60,12 +61,13 @@ class TreinoController(
                     idTreino = treino.id,
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
+                    hora = treino.hora.toString(),
                     qrCode = treino.qrCode
                 )
             }
     }
 
+    // Lista treinos do professor para o dia seguinte
     @PostMapping("/amanha")
     fun getTreinosAmanha(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
         val amanha = calculaAmanha(request.diaSemana)
@@ -76,12 +78,13 @@ class TreinoController(
                     idTreino = treino.id,
                     nomeModalidade = treino.modalidade.nomeModalidade,
                     diaSemana = treino.diaSemana,
-                    hora = treino.hora.toString(),  // irá mostrar no formato HH:MM
+                    hora = treino.hora.toString(),
                     qrCode = treino.qrCode
                 )
             }
     }
 
+    // Lista treinos disponíveis para um aluno, considerando suas modalidades
     @PostMapping("/aluno")
     fun getTreinosAluno(@RequestBody request: TreinoRequestDTO): List<TreinoAlunoResponseDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
@@ -110,6 +113,7 @@ class TreinoController(
         }
     }
 
+    // Cria um novo treino
     @PostMapping("/criar")
     fun criarTreino(@RequestBody request: TreinoCriarRequestDTO): ResponseEntity<String> {
         val professor = userRepository.findById(request.idProfessor).orElseThrow()
@@ -133,6 +137,7 @@ class TreinoController(
         return ResponseEntity.ok("Treino criado com sucesso.")
     }
 
+    // Apaga um treino, validando o professor e senha
     @PostMapping("/apagar")
     fun apagarTreino(@RequestBody request: TreinoApagarRequest): ResponseEntity<String> {
         val professor = userRepository.findById(request.idSocio).orElse(null)
@@ -149,7 +154,7 @@ class TreinoController(
             return ResponseEntity.status(403).body("Este treino não pertence a este professor.")
         }
 
-        // 🔥 Apagar todas as presenças associadas a este treino
+        // Apaga todas as presenças associadas a este treino
         val presencas = presencaRepository.findByTreinoId(treino.id)
         presencas.forEach { presenca ->
             presencaRepository.delete(presenca)
@@ -159,6 +164,7 @@ class TreinoController(
         return ResponseEntity.ok("Treino apagado com sucesso.")
     }
 
+    // Calcula o próximo dia da semana
     fun calculaAmanha(dia: String): String? {
         when (dia) {
             "SEG" -> return "TER"
@@ -172,6 +178,7 @@ class TreinoController(
         return null
     }
 
+    // Retorna a ordem dos dias da semana a partir de um dia específico
     fun ordenarDias(dia: String): List<String?> {
         when (dia) {
             "SEG" -> return listOf("SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM")

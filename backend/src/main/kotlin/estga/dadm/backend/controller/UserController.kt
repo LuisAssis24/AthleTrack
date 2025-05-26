@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/user")
-class UserController(private val userRepository: UserRepository,
-                     private val modalidadeRepository: ModalidadeRepository,
-                     private val socioModalidadeRepository: SocioModalidadeRepository)
-{
+class UserController(
+    private val userRepository: UserRepository,
+    private val modalidadeRepository: ModalidadeRepository,
+    private val socioModalidadeRepository: SocioModalidadeRepository
+) {
+    // Realiza login do usuário
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequestDTO): ResponseEntity<UserResponseDTO> {
         val user = userRepository.findById(request.idSocio).orElse(null)
@@ -35,27 +37,29 @@ class UserController(private val userRepository: UserRepository,
         return ResponseEntity.status(401).build()
     }
 
-   @PostMapping("/listar")
-   fun listarTodos(): List<UserResponseDTO> {
-       val users = userRepository.findAll()
-           .sortedBy { user ->
-               when (user.tipo.lowercase()) {
-                   "professor" -> 0
-                   "atleta" -> 1
-                   else -> 2
-               }
-           }
-           .map { user ->
-               UserResponseDTO(
-                   idSocio = user.id,
-                   nome = user.nome,
-                   tipo = user.tipo
-               )
-           }
+    // Lista todos os usuários, ordenando por tipo
+    @PostMapping("/listar")
+    fun listarTodos(): List<UserResponseDTO> {
+        val users = userRepository.findAll()
+            .sortedBy { user ->
+                when (user.tipo.lowercase()) {
+                    "professor" -> 0
+                    "atleta" -> 1
+                    else -> 2
+                }
+            }
+            .map { user ->
+                UserResponseDTO(
+                    idSocio = user.id,
+                    nome = user.nome,
+                    tipo = user.tipo
+                )
+            }
 
-       return users
-   }
+        return users
+    }
 
+    // Cria um novo usuário e associa às modalidades informadas
     @PostMapping("/criar")
     fun criarUser(@RequestBody request: UserCreateRequestDTO): ResponseEntity<String> {
         return try {
@@ -66,7 +70,6 @@ class UserController(private val userRepository: UserRepository,
                 password = encryptedPassword,
                 tipo = request.tipo,
             )
-
 
             val savedUser = userRepository.save(user)
 
@@ -88,6 +91,7 @@ class UserController(private val userRepository: UserRepository,
         }
     }
 
+    // Elimina um usuário, validando a senha do solicitante
     @PostMapping("/eliminar/{idParaEliminar}")
     fun eliminarUser(
         @RequestBody loginRequest: LoginRequestDTO,
