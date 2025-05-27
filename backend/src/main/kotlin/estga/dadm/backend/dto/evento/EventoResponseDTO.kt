@@ -8,6 +8,7 @@ import java.time.LocalTime
  * Contém as informações principais de um evento.
  */
 data class EventoResponseDTO (
+    val id: Int,              // ID do evento
     val localEvento: String,     // Local onde o evento será realizado
     val data: LocalDate,         // Data do evento
     val hora: LocalTime,         // Hora do evento

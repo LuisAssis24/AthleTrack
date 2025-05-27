@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -365,9 +366,39 @@ fun HomeProfessor(
             ModalBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = bottomSheetState,
-                containerColor = colorScheme.primaryContainer, // COR DO DRAWER
-                dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
+                containerColor = colorScheme.primaryContainer,
+                dragHandle = null
             ) {
+                // Botão de Refresh
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            // Ação de refresh: aqui chamas a função de carregamento
+                            scope.launch {
+                                // Exemplo de chamada fictícia
+                                viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
+                                showBottomSheet = false // Fecha o drawer
+                            }
+                        }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Atualizar Treinos",
+                        tint = colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        "Atualizar Treinos",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorScheme.primary
+                    )
+                }
+
+                // Botão de Logout (mantido como estava)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

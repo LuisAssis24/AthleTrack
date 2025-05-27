@@ -101,10 +101,10 @@ interface TreinosService {
     suspend fun listarTodosOsTreinos(@Body request: idRequest): List<Treino>
 
     @POST("/api/treinos/apagar")
-    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): retrofit2.Response<okhttp3.ResponseBody>
+    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): retrofit2.Response<ResponseBody>
 
     @POST("/api/treinos/criar")
-    suspend fun criarTreino(@Body request: TreinoCreateRequest): retrofit2.Response<okhttp3.ResponseBody>
+    suspend fun criarTreino(@Body request: TreinoCreateRequest): retrofit2.Response<ResponseBody>
 }
 
 // Modelo da Request dos eventos.
@@ -114,6 +114,7 @@ data class EventosRequest(
 
 // Modelo de Resposta dos Eventos.
 data class Evento(
+    val id: Int,              // ID do evento
     val localEvento: String,
     val data: String,
     val hora: String,
@@ -136,6 +137,9 @@ interface EventosService {
 
     @POST("/api/eventos/criar")
     suspend fun criarEvento(@Body request: EventoCriarRequestDTO)
+
+    @POST("/api/eventos/apagar")
+    suspend fun apagarEvento(@Body request: idRequest): retrofit2.Response<ResponseBody>
 }
 
 // Modelo da Request de presença.
@@ -181,7 +185,4 @@ data class Modalidade(
 interface ModalidadesService {
     @POST("/api/modalidade/listar")
     suspend fun listarModalidades(): List<Modalidade>
-
-    @POST("/api/modalidade/listarPorId")
-    suspend fun listarPorId(@Body request: idRequest): List<Modalidade>
 }

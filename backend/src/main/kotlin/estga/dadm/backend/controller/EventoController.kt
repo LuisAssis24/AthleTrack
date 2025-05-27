@@ -1,10 +1,13 @@
 package estga.dadm.backend.controller
 
+import estga.dadm.backend.dto.IdRequestDTO
 import estga.dadm.backend.dto.evento.*
 import estga.dadm.backend.repository.*
 import estga.dadm.backend.dto.evento.EventoCriarRequestDTO
 import estga.dadm.backend.model.*
 import estga.dadm.backend.repository.EventoRepository
+import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,6 +42,7 @@ class EventoController(
             .map { it.evento }
             .map { evento ->
                 EventoResponseDTO(
+                    id = evento.id,
                     localEvento = evento.localEvento,
                     data = evento.data,
                     hora = evento.hora,
@@ -93,6 +97,33 @@ class EventoController(
         } catch (e: Exception) {
             e.printStackTrace()
             throw RuntimeException("Erro ao criar evento: ${e.message}")
+        }
+    }
+
+    /**
+     * Remove um evento e todas as suas associações com modalidades.
+     *
+     * Este endpoint recebe um ID de evento, remove todas as ligações do evento com modalidades
+     * e, em seguida, exclui o próprio evento do repositório.
+     *
+     * @param request Objeto IdRequestDTO contendo o ID do evento a ser removido.
+     * @throws RuntimeException se ocorrer algum erro durante a exclusão.
+     */
+    @PostMapping("/apagar")
+    @Transactional
+    fun apagarEvento(@RequestBody request: IdRequestDTO): ResponseEntity<String> {
+        return try {
+            val evento = eventoRepository.findById(request.id)
+                .orElseThrow { IllegalArgumentException("Evento não encontrado.") }
+
+            eventoModalidadeRepository.deleteByEventoId(evento.id)
+            eventoRepository.delete(evento)
+            ResponseEntity.ok("Evento apagado com sucesso.")
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(404).body(e.message)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ResponseEntity.status(500).body("Erro ao apagar evento: ${e.message}")
         }
     }
 }

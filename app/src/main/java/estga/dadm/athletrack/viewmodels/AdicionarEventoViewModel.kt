@@ -52,6 +52,7 @@ class AdicionarEventoViewModel : ViewModel() {
      * @param onError Callback a ser executado em caso de erro, recebendo uma mensagem de erro.
      */
     fun adicionarEvento(
+        idSocio: Int, // ID do sócio que está criando o evento.
         data: String,
         hora: String,
         local: String,
@@ -64,7 +65,7 @@ class AdicionarEventoViewModel : ViewModel() {
             try {
                 // Verifica se já existe um evento com os mesmos dados.
                 val eventosExistentes = RetrofitClient.eventosService.getEventos(
-                    EventosRequest(idSocio = 0) // Substitua por um ID válido, se necessário.
+                    EventosRequest(idSocio = idSocio) // Substitua por um ID válido, se necessário.
                 )
                 val eventoDuplicado = eventosExistentes.any { evento ->
                     evento.localEvento == local &&

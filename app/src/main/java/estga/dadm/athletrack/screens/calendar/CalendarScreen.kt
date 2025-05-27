@@ -9,7 +9,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -32,7 +35,11 @@ import java.util.*
 import estga.dadm.athletrack.ui.theme.*
 
 /**
+ * Tela de calendário que exibe eventos e permite interação com as datas.
  *
+ * @param user O usuário logado.
+ * @param navController Controlador de navegação para gerenciar rotas.
+ * @param viewModel ViewModel responsável por gerenciar o estado da tela.
  */
 @Composable
 fun CalendarScreen(
@@ -40,28 +47,38 @@ fun CalendarScreen(
     navController: NavHostController,
     viewModel: CalendarViewModel = viewModel()
 ) {
+    // Estado da data selecionada
     val selectedDate by viewModel.selectedDate.collectAsState()
+    // Lista de eventos carregados
     val eventos by viewModel.eventos.collectAsState()
+    // Mês atual exibido no calendário
     val currentMonth by viewModel.currentMonth.collectAsState()
 
+    // Verifica se os eventos estão sendo carregados
     val isLoading = eventos.isEmpty()
 
+    // Carrega eventos para o mês atual ao inicializar ou mudar o mês
     LaunchedEffect(currentMonth) {
         viewModel.carregarEventosParaMes(user.idSocio)
     }
 
+    // Filtra eventos para a data selecionada
     val eventosFiltrados = eventos.filter { evento ->
         val dataEvento = LocalDate.parse(evento.data)
         dataEvento == selectedDate
     }
+
+    // Calcula os dias no mês e o primeiro dia da semana
     val daysInMonth = currentMonth.lengthOfMonth()
     val firstDayOfWeek = currentMonth.atDay(1).dayOfWeek.value % 7
     val monthLabel = currentMonth.month.getDisplayName(TextStyle.FULL, Locale("pt", "BR"))
         .replaceFirstChar { it.uppercase() }
 
+    // Tela de carregamento enquanto os eventos são carregados
     LoadingScreen(isLoading = isLoading) {
         Scaffold(
             topBar = {
+                // Barra superior com botão de voltar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -93,6 +110,7 @@ fun CalendarScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Título da tela
                 Text(
                     "Próximos Eventos",
                     style = typography.displayLarge,
@@ -101,6 +119,7 @@ fun CalendarScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Cartão do calendário
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -111,6 +130,7 @@ fun CalendarScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(16.dp)
                     ) {
+                        // Navegação entre meses
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -141,6 +161,7 @@ fun CalendarScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
+                        // Cabeçalho dos dias da semana
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
                             modifier = Modifier.fillMaxWidth()
@@ -156,6 +177,8 @@ fun CalendarScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
+                        // Geração do calendário
+
                         val totalSlots = firstDayOfWeek + daysInMonth
                         val weeks = (totalSlots + 6) / 7
                         for (week in 0 until weeks) {
@@ -169,6 +192,10 @@ fun CalendarScreen(
 
                                     if (day in 1..daysInMonth) {
                                         val date = currentMonth.atDay(day)
+                                        val hasEventos = eventos.any { evento ->
+                                            LocalDate.parse(evento.data) == date
+                                        }
+
                                         Box(
                                             modifier = Modifier
                                                 .size(36.dp)
@@ -181,11 +208,24 @@ fun CalendarScreen(
                                                 },
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Text(
-                                                text = "$day",
-                                                style = Typography.labelMedium,
-                                                color = colorScheme.primary
-                                            )
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Text(
+                                                    text = "$day",
+                                                    style = Typography.labelMedium,
+                                                    color = colorScheme.primary
+                                                )
+                                                if (hasEventos) {
+                                                    Spacer(modifier = Modifier.height(2.dp))
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(4.dp)
+                                                            .clip(CircleShape)
+                                                            .background(colorScheme.secondary)
+                                                    )
+                                                } else {
+                                                    Spacer(modifier = Modifier.size(6.dp))
+                                                }
+                                            }
                                         }
                                     } else {
                                         Spacer(modifier = Modifier.size(36.dp))
@@ -196,7 +236,7 @@ fun CalendarScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Exibir botão apenas se o tipo for "Professor"
+                        // Botão para adicionar evento (apenas para professores)
                         if (user.tipo.lowercase() == "professor") {
                             Button(
                                 onClick = {
@@ -222,6 +262,7 @@ fun CalendarScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Lista de eventos filtrados
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -238,43 +279,68 @@ fun CalendarScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(evento.localEvento, color = colorScheme.primary)
-                                Text(
-                                    evento.hora,
-                                    style = Typography.labelSmall,
-                                    color = colorScheme.secondary
-                                )
+                            // Seção principal com data, local e hora
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                // Data ao lado esquerdo
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        "${selectedDate.dayOfMonth}",
+                                        style = Typography.titleMedium,
+                                        color = colorScheme.primary
+                                    )
+                                    Text(
+                                        selectedDate.month.getDisplayName(
+                                            TextStyle.SHORT,
+                                            Locale("pt", "PT")
+                                        ).replaceFirstChar { it.uppercase() },
+                                        style = Typography.labelSmall,
+                                        color = colorScheme.secondary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                // Nome e Hora
+                                Column {
+                                    Text(evento.localEvento, color = colorScheme.primary)
+                                    Text(
+                                        evento.hora.take(5), // Apenas "hh:mm"
+                                        style = Typography.labelSmall,
+                                        color = colorScheme.secondary
+                                    )
+                                }
                             }
 
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    "${selectedDate.dayOfMonth}",
-                                    style = Typography.titleMedium,
-                                    color = colorScheme.primary
+                            // Ícones: Detalhes e Eliminar
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddCircle,
+                                    contentDescription = "Detalhes",
+                                    tint = colorScheme.primary,
+                                    modifier = Modifier.clickable {
+                                        // TODO: abrir detalhes do evento
+                                    }
                                 )
-                                Text(
-                                    selectedDate.month.getDisplayName(
-                                        TextStyle.SHORT,
-                                        Locale("pt", "BR")
-                                    )
-                                        .replaceFirstChar { it.uppercase() },
-                                    style = Typography.labelSmall,
-                                    color = colorScheme.secondary
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar",
+                                    tint = colorScheme.error,
+                                    modifier = Modifier.clickable {
+
+                                    }
                                 )
                             }
                         }
+
                     }
                 }
             }
         }
     }
 }
-// Composable de pré-visualização para desenvolvimento no Android Studio
-//
-//@Preview(showBackground = false)
-//@Composable
-//fun CalendarScreenPreview() {
-//    CalendarScreen(userName = "João")
-//}
-

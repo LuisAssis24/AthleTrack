@@ -2,6 +2,7 @@ package estga.dadm.backend.repository
 
 import estga.dadm.backend.model.EventoModalidade
 import estga.dadm.backend.keys.EventoModalidadeId
+import estga.dadm.backend.model.Evento
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface EventoModalidadeRepository : JpaRepository<EventoModalidade, EventoModalidadeId> {
     /**
-     * Busca associações de evento-modalidade por uma lista de IDs de modalidades.
+     * Busca associações de evento-modalidade por uma lista de ‘IDs’ de modalidades.
      */
     fun findByModalidadeIdIn(modalidadesIds: List<Int>): List<EventoModalidade>
+
+    fun deleteByEventoId(id: Int)
 }

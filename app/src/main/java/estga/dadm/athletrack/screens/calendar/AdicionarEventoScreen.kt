@@ -267,6 +267,7 @@ fun AdicionarEventoScreen(
                             coroutineScope.launch {
                                 try {
                                     viewModel.adicionarEvento(
+                                        idSocio = user.idSocio,
                                         data = data.toString(),
                                         hora = hora.toString(),
                                         local = local,

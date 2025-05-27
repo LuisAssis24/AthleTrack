@@ -110,7 +110,7 @@ class PresencaController(
     /**
      * Lista as presenças de um treino específico, indicando o estado de presença de cada sócio.
      *
-     * @param request Objeto contendo o ID do treino.
+     * @param request Objeto contendo o ‘ID’ do treino.
      * @return Lista de presenças dos sócios para o treino especificado.
      */
     @PostMapping("/listar")
@@ -122,8 +122,10 @@ class PresencaController(
 
         val modalidade = treino.modalidade
 
+        // Obtém todos os sócios da modalidade, excluindo os do tipo "professor"
         val alunos = socioModalidadeRepository.findByModalidadeId(modalidade.id)
             .map { it.socio }
+            .filter { it.tipo.lowercase() != "professor" }
 
         val presencasSimuladas = alunos.map { socio ->
             PresencaListResponseDTO(
