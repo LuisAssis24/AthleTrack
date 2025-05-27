@@ -10,23 +10,47 @@ import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.EventoCriarRequestDTO
 import estga.dadm.athletrack.api.EventosRequest
 
-
+/**
+ * ViewModel responsável por gerenciar a lógica de negócios para adicionar eventos e carregar modalidades.
+ */
 class AdicionarEventoViewModel : ViewModel() {
+
+    // Estado interno que armazena a lista de modalidades disponíveis.
     private val _modalidades = MutableStateFlow<List<Modalidade>>(emptyList())
+
+    /**
+     * Estado público que expõe a lista de modalidades para observação.
+     */
     val modalidades: StateFlow<List<Modalidade>> = _modalidades
 
+    /**
+     * Carrega a lista de modalidades disponíveis a partir do serviço remoto.
+     * Atualiza o estado interno `_modalidades` com os dados recebidos.
+     */
     fun carregarModalidades() {
         viewModelScope.launch {
             try {
+                // Faz a chamada ao serviço remoto para listar modalidades.
                 val response = RetrofitClient.modalidadesService.listarModalidades()
                 _modalidades.value = response
             } catch (e: Exception) {
+                // Imprime o erro no log em caso de falha.
                 e.printStackTrace()
             }
         }
     }
 
-
+    /**
+     * Adiciona um novo evento ao sistema.
+     *
+     * @param data A data do evento no formato "yyyy-MM-dd".
+     * @param hora A hora do evento no formato "HH:mm".
+     * @param local O local onde o evento será realizado.
+     * @param descricao Uma descrição detalhada do evento.
+     * @param modalidades Uma lista de IDs das modalidades associadas ao evento.
+     * @param onSuccess Callback a ser executado em caso de sucesso.
+     * @param onError Callback a ser executado em caso de erro, recebendo uma mensagem de erro.
+     */
     fun adicionarEvento(
         data: String,
         hora: String,
@@ -38,9 +62,9 @@ class AdicionarEventoViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                // Verificar se o evento já existe
+                // Verifica se já existe um evento com os mesmos dados.
                 val eventosExistentes = RetrofitClient.eventosService.getEventos(
-                    EventosRequest(idSocio = 0) // Substitua por um ID válido, se necessário
+                    EventosRequest(idSocio = 0) // Substitua por um ID válido, se necessário.
                 )
                 val eventoDuplicado = eventosExistentes.any { evento ->
                     evento.localEvento == local &&
@@ -50,11 +74,12 @@ class AdicionarEventoViewModel : ViewModel() {
                 }
 
                 if (eventoDuplicado) {
+                    // Retorna um erro se o evento já existir.
                     onError("Evento já existe com os mesmos dados.")
                     return@launch
                 }
 
-                // Criar o evento se não for duplicado
+                // Cria o evento se não for duplicado.
                 val request = EventoCriarRequestDTO(
                     data = data,
                     hora = hora,
@@ -63,14 +88,13 @@ class AdicionarEventoViewModel : ViewModel() {
                     modalidades = modalidades,
                 )
                 RetrofitClient.eventosService.criarEvento(request)
+                // Executa o callback de sucesso.
                 onSuccess()
             } catch (e: Exception) {
+                // Imprime o erro no log e executa o callback de erro.
                 e.printStackTrace()
                 onError("Erro ao criar evento: ${e.message}")
             }
         }
     }
-
-
-
 }

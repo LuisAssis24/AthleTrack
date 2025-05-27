@@ -1,46 +1,76 @@
 package estga.dadm.athletrack.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.YearMonth
-import estga.dadm.athletrack.api.Evento
-import estga.dadm.athletrack.api.EventosRequest
-import estga.dadm.athletrack.api.RetrofitClient
+import java.time.*
+import estga.dadm.athletrack.api.*
 
+/**
+ * ViewModel responsável por gerenciar o estado e a lógica de negócios do calendário.
+ */
 class CalendarViewModel : ViewModel() {
 
+    // Estado interno que armazena a data selecionada no calendário.
     private val _selectedDate = MutableStateFlow(LocalDate.now())
+
+    /**
+     * Estado público que expõe a data selecionada para observação.
+     */
     val selectedDate: StateFlow<LocalDate> = _selectedDate
 
+    // Estado interno que armazena o mês atual exibido no calendário.
     private val _currentMonth = MutableStateFlow(YearMonth.now())
+
+    /**
+     * Estado público que expõe o mês atual para observação.
+     */
     val currentMonth: StateFlow<YearMonth> = _currentMonth
 
+    // Estado interno que armazena a lista de eventos carregados.
     private val _eventos = MutableStateFlow<List<Evento>>(emptyList())
+
+    /**
+     * Estado público que expõe a lista de eventos para observação.
+     */
     val eventos: StateFlow<List<Evento>> = _eventos
 
+    /**
+     * Atualiza a data selecionada no calendário.
+     *
+     * @param data A nova data a ser selecionada.
+     */
     fun selecionarData(data: LocalDate) {
         _selectedDate.value = data
     }
 
-    
+    /**
+     * Move o calendário para o mês anterior.
+     */
     fun irParaMesAnterior() {
         _currentMonth.value = _currentMonth.value.minusMonths(1)
     }
 
+    /**
+     * Move o calendário para o mês seguinte.
+     */
     fun irParaMesSeguinte() {
         _currentMonth.value = _currentMonth.value.plusMonths(1)
     }
 
+    /**
+     * Carrega os eventos do mês atual para o usuário especificado.
+     *
+     * @param idSocio O ID do sócio cujos eventos devem ser carregados.
+     */
     fun carregarEventosParaMes(idSocio: Int) {
         viewModelScope.launch {
             try {
+                // Faz a chamada ao serviço remoto para obter os eventos.
                 val response = RetrofitClient.eventosService.getEventos(EventosRequest(idSocio = idSocio))
                 _eventos.value = response
             } catch (e: Exception) {
+                // Imprime o erro no log em caso de falha.
                 e.printStackTrace()
             }
         }

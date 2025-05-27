@@ -21,12 +21,11 @@ class TreinoController(
     // Lista todos os treinos de um professor, ordenados por dia da semana
     @PostMapping
     fun listarTodosOsTreinos(@RequestBody request: IdRequestDTO): List<TreinoProfResponseDTO> {
-        println(">>> MÉTODO listarTodosOsTreinos INVOCADO com ID ${request.id}")
 
         val ordem = ordenarDias("SEG") // ou usar dia atual
 
         val treinos = treinoRepository.findByProfessorIdAndDiaSemanaOrderByHoraAsc(request.id, "SEG")
-        println(">>> TREINOS FILTRADOS POR PROFESSOR 70 E DIA SEG:")
+
         treinos.forEach {
             println("Treino ${it.id} -> prof=${it.professor.id}, mod=${it.modalidade.id}, dia=${it.diaSemana}")
         }
@@ -84,7 +83,7 @@ class TreinoController(
             }
     }
 
-    // Lista treinos disponíveis para um aluno, considerando suas modalidades
+    // Lista treinos disponíveis para um aluno, considerando a suas modalidades
     @PostMapping("/aluno")
     fun getTreinosAluno(@RequestBody request: TreinoRequestDTO): List<TreinoAlunoResponseDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
@@ -113,7 +112,7 @@ class TreinoController(
         }
     }
 
-    // Cria um novo treino
+    // Cria um treino
     @PostMapping("/criar")
     fun criarTreino(@RequestBody request: TreinoCriarRequestDTO): ResponseEntity<String> {
         val professor = userRepository.findById(request.idProfessor).orElseThrow()

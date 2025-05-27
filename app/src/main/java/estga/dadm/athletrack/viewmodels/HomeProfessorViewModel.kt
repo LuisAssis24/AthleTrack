@@ -3,37 +3,58 @@ package estga.dadm.athletrack.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import estga.dadm.athletrack.api.Modalidade
-import estga.dadm.athletrack.api.RetrofitClient
-import estga.dadm.athletrack.api.Treino
-import estga.dadm.athletrack.api.TreinoCreateRequest
-import estga.dadm.athletrack.api.TreinoDeleteRequest
-import estga.dadm.athletrack.api.TreinosRequest
-import estga.dadm.athletrack.api.idRequest
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import estga.dadm.athletrack.api.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-
+/**
+ * ViewModel responsável por gerenciar os treinos e modalidades do professor.
+ */
 class HomeProfessorViewModel : ViewModel() {
+
+    // Serviço para operações relacionadas a treinos.
     private val api = RetrofitClient.treinosService
 
+    // Estado interno que armazena os treinos de hoje.
     private val _treinosHoje = MutableStateFlow<List<Treino>>(emptyList())
+
+    /**
+     * Estado público que expõe os treinos de hoje para observação.
+     */
     val treinosHoje: StateFlow<List<Treino>> = _treinosHoje
 
+    // Estado interno que armazena os treinos de amanhã.
     private val _treinosAmanha = MutableStateFlow<List<Treino>>(emptyList())
+
+    /**
+     * Estado público que expõe os treinos de amanhã para observação.
+     */
     val treinosAmanha: StateFlow<List<Treino>> = _treinosAmanha
 
+    // Estado interno que armazena a lista de modalidades.
     private val _modalidades = MutableStateFlow<List<Modalidade>>(emptyList())
+
+    /**
+     * Estado público que expõe a lista de modalidades para observação.
+     */
     val modalidades: StateFlow<List<Modalidade>> = _modalidades
 
+    // Estado interno que armazena os dias da semana.
     private val _diasSemana = MutableStateFlow<List<String>>(emptyList())
+
+    /**
+     * Estado público que expõe os dias da semana para observação.
+     */
     val diasSemana: StateFlow<List<String>> = _diasSemana
 
-
+    /**
+     * Carrega os treinos do professor para hoje e amanhã com base no dia da semana.
+     *
+     * @param idProfessor O ID do professor cujos treinos devem ser carregados.
+     * @param diaSemana O dia da semana para o qual os treinos devem ser carregados.
+     */
     fun carregarTreinos(idProfessor: Int, diaSemana: String) {
-
         viewModelScope.launch {
             try {
                 val respostaHoje = api.getTreinosHoje(
@@ -45,7 +66,6 @@ class HomeProfessorViewModel : ViewModel() {
                     TreinosRequest(idSocio = idProfessor, diaSemana = diaSemana)
                 )
                 _treinosAmanha.value = respostaAmanha
-
             } catch (e: Exception) {
                 _treinosHoje.value = emptyList()
                 _treinosAmanha.value = emptyList()
@@ -53,6 +73,9 @@ class HomeProfessorViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Carrega a lista de modalidades disponíveis.
+     */
     fun carregarModalidades() {
         viewModelScope.launch {
             try {
@@ -62,22 +85,18 @@ class HomeProfessorViewModel : ViewModel() {
         }
     }
 
-    suspend fun carregarModalidadesDoSocio(idSocio: Int) {
-        try {
-            val resultado = RetrofitClient.modalidadesService
-                .listarPorId(idRequest(idSocio))
-            Log.d("DEBUG_MODALIDADES", "Recebido: ${resultado.map { it.nomeModalidade }}")
-            _modalidades.value = resultado
-        } catch (e: Exception) {
-            Log.e("DEBUG_MODALIDADES", "Erro: ${e.message}")
-            _modalidades.value = emptyList()
-        }
-    }
-
+    /**
+     * Carrega os dias da semana.
+     */
     fun carregarDiasSemana() {
         _diasSemana.value = listOf("SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM")
     }
 
+    /**
+     * Detecta o dia da semana atual.
+     *
+     * @return Uma string representando o dia da semana atual (e.g., "SEG", "TER").
+     */
     fun detetarDiaSemana(): String {
         val diaAtual = LocalDate.now().dayOfWeek.value
         return when (diaAtual) {
@@ -92,9 +111,19 @@ class HomeProfessorViewModel : ViewModel() {
         }
     }
 
+    // Estado interno que armazena todos os treinos.
     private val _treinosTodos = MutableStateFlow<List<Treino>>(emptyList())
+
+    /**
+     * Estado público que expõe todos os treinos para observação.
+     */
     val treinosTodos: StateFlow<List<Treino>> = _treinosTodos
 
+    /**
+     * Carrega todos os treinos do professor.
+     *
+     * @param idSocio O ID do sócio (professor) cujos treinos devem ser carregados.
+     */
     fun carregarTodosOsTreinos(idSocio: Int) {
         viewModelScope.launch {
             try {
@@ -108,7 +137,15 @@ class HomeProfessorViewModel : ViewModel() {
         }
     }
 
-
+    /**
+     * Cria um novo treino.
+     *
+     * @param diaSemana O dia da semana do treino.
+     * @param hora A hora do treino.
+     * @param idModalidade O ID da modalidade associada ao treino.
+     * @param idProfessor O ID do professor responsável pelo treino.
+     * @param callback Callback a ser executado após a criação, indicando sucesso ou erro.
+     */
     fun criarTreino(
         diaSemana: String,
         hora: String,
@@ -136,7 +173,20 @@ class HomeProfessorViewModel : ViewModel() {
         }
     }
 
-    fun apagarTreino(idSocio: Int, password: String, qrCode: String, onDone: (Boolean, String) -> Unit) {
+    /**
+     * Apaga um treino.
+     *
+     * @param idSocio O ID do sócio (professor) que está apagando o treino.
+     * @param password A senha do professor para autenticação.
+     * @param qrCode O QR Code do treino a ser apagado.
+     * @param onDone Callback a ser executado após a exclusão, indicando sucesso ou erro.
+     */
+    fun apagarTreino(
+        idSocio: Int,
+        password: String,
+        qrCode: String,
+        onDone: (Boolean, String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val response = api.apagarTreino(
@@ -154,5 +204,4 @@ class HomeProfessorViewModel : ViewModel() {
             }
         }
     }
-
 }

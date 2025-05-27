@@ -267,7 +267,7 @@ fun HomeProfessor(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center, // Centraliza verticalmente
                                 modifier = Modifier
-                                    .fillMaxHeight(0.6f) // Preenche 80% da altura
+                                    .fillMaxHeight(0.6f) // Preenche 60% da altura
                                     .fillMaxWidth()
                             ) {
                                 Icon(
