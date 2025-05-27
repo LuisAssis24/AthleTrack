@@ -23,10 +23,15 @@ import estga.dadm.athletrack.viewmodels.GestaoAtletasViewModel
 import kotlinx.coroutines.launch
 import android.widget.Toast
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.other.LoadingScreen
+import estga.dadm.athletrack.other.SuccessPopupToast
 import estga.dadm.athletrack.ui.theme.*
 
 @Composable
@@ -48,6 +53,13 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
     val listaModalidades by viewModel.modalidades.collectAsState()
 
     val isLoading = atletas.isEmpty()
+    var toastMessage by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    var isToastSuccess by remember { mutableStateOf(true) }
+    var popupMessage by remember { mutableStateOf("") }
+    var showPopup by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("") }
+    var showSuccessPopup by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
 
@@ -86,6 +98,41 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
             },
             containerColor = colorScheme.surface
         ) { padding ->
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                if (showToast && toastMessage.isNotEmpty()) {
+                    FloatingPopupToast(
+                        message = toastMessage,
+                        icon = if (isToastSuccess) Icons.Default.Check else Icons.Default.Warning,
+                        color = if (isToastSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error
+                    ) {
+                        showToast = false
+                    }
+                }
+            }
+
+            if (showPopup) {
+                FloatingPopupToast(
+                    message = popupMessage,
+                    icon = Icons.Default.Warning,
+                    color = MaterialTheme.colorScheme.error
+                ) {
+                    showPopup = false
+                }
+            }
+            if (showSuccessPopup) {
+                SuccessPopupToast(
+                    message = successMessage
+                ) {
+                    showSuccessPopup = false
+                }
+            }
+
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -177,25 +224,34 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
 
                 Button(
                     onClick = {
-                        if (nome.isBlank() || password.isBlank() || modalidadesSelecionadas.isEmpty()) {
-                            coroutineScope.launch {
-                                Toast.makeText(
-                                    context,
-                                    "Preencha nome, senha e selecione pelo menos uma modalidade.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                        when {
+                            nome.isBlank() -> {
+                                popupMessage = "Preencha o nome."
+                                showPopup = true
                             }
-                        } else {
-                            viewModel.criarAtleta(
-                                UserCreate(password, nome, "atleta", modalidadesSelecionadas)
-                            ) { sucesso, resposta ->
-                                coroutineScope.launch {
-                                    Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
-                                }
-                                if (sucesso) {
-                                    nome = ""
-                                    password = ""
-                                    modalidadesSelecionadas.clear()
+                            password.isBlank() -> {
+                                popupMessage = "Preencha a senha."
+                                showPopup = true
+                            }
+                            modalidadesSelecionadas.isEmpty() -> {
+                                popupMessage = "Selecione pelo menos uma modalidade."
+                                showPopup = true
+                            }
+                            else -> {
+                                viewModel.criarAtleta(
+                                    UserCreate(password, nome, "atleta", modalidadesSelecionadas)
+                                ) { sucesso, resposta ->
+                                    if (sucesso) {
+                                        successMessage = resposta
+                                        showSuccessPopup = true
+
+                                        nome = ""
+                                        password = ""
+                                        modalidadesSelecionadas.clear()
+                                    } else {
+                                        popupMessage = resposta
+                                        showPopup = true
+                                    }
                                 }
                             }
                         }
@@ -266,10 +322,19 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                     idProfessor = user.idSocio,
                                     senha = senhaParaApagar
                                 ) { sucesso, resposta ->
-                                    coroutineScope.launch {
-                                        Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
+                                    val mensagemFinal = if (!sucesso && resposta.contains("Senha incorreta", ignoreCase = true)) {
+                                        "Password inválida"
+                                    } else {
+                                        resposta
                                     }
-                                    if (sucesso) viewModel.carregarAtletas()
+
+                                    toastMessage = mensagemFinal
+                                    isToastSuccess = sucesso
+                                    showToast = true
+
+                                    if (sucesso) {
+                                        viewModel.carregarAtletas()
+                                    }
                                 }
                                 showPasswordDialog = false
                                 senhaParaApagar = ""
@@ -305,13 +370,11 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                 value = senhaParaApagar,
                                 onValueChange = { senhaParaApagar = it },
                                 label = {
-                                    Text(
-                                        "Insere a tua password",
-                                        color = colorScheme.secondary
-                                    )
+                                    Text("Insere a tua password", color = colorScheme.secondary)
                                 },
                                 singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = PasswordVisualTransformation(),
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     },

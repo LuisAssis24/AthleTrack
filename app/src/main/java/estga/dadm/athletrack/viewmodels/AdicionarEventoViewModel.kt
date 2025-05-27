@@ -148,13 +148,13 @@ class AdicionarEventoViewModel : ViewModel() {
                     evento.descricao == descricao
         }
 
-        if (eventoDuplicado) {
+        /*if (eventoDuplicado) {
             onResult(false)
         } else {
             val novoId = (eventosAdicionados.maxOfOrNull { it.id } ?: 0) + 1 // Gera um ID único
             eventosAdicionados.add(Evento(novoId, local, data, hora, descricao))
             onResult(true)
-        }
+        }*/
     }
 
 }

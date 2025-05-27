@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import estga.dadm.backend.model.Treino
 import estga.dadm.backend.repository.*
 import estga.dadm.backend.services.PasswordUtil
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.time.LocalTime
 
@@ -180,7 +181,8 @@ class TreinoController(
             ?: return ResponseEntity.badRequest().body("Professor não encontrado.")
 
         if (!PasswordUtil.matches(request.password, professor.password)) {
-            return ResponseEntity.status(401).body("Senha incorreta.")
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Não foi possível apagar o treino: palavra-passe inválida.")
         }
 
         val treino = treinoRepository.findByQrCode(request.qrCode)

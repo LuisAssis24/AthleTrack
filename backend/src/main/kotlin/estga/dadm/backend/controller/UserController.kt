@@ -5,6 +5,7 @@ import estga.dadm.backend.model.SocioModalidade
 import estga.dadm.backend.model.User
 import estga.dadm.backend.repository.*
 import estga.dadm.backend.services.PasswordUtil
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -122,7 +123,8 @@ class UserController(
         val autenticado = userRepository.findById(loginRequest.idSocio).orElse(null)
 
         if (autenticado == null || !PasswordUtil.matches(loginRequest.password, autenticado.password)) {
-            return ResponseEntity.status(401).body("Senha inválida.")
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Não foi possível apagar Utilizador: palavra-passe inválida.")
         }
 
         val user = userRepository.findById(idParaEliminar).orElse(null)
@@ -133,9 +135,9 @@ class UserController(
                 socioModalidadeRepository.delete(socioModalidade)
             }
             userRepository.delete(user)
-            ResponseEntity.ok("Usuário eliminado com sucesso.")
+            ResponseEntity.ok("Utilizador eliminado com sucesso.")
         } else {
-            ResponseEntity.status(404).body("Usuário não encontrado.")
+            ResponseEntity.status(404).body("Utilizador não encontrado.")
         }
     }
 }

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.other.UserPreferences
 import estga.dadm.athletrack.viewmodels.LoginViewModel
+import estga.dadm.athletrack.other.FloatingPopupToast
 
 @Composable
 fun LoginScreen(
@@ -30,6 +32,9 @@ fun LoginScreen(
     var socio by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    var popupMessage by remember { mutableStateOf("") }
+    var showPopup by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -93,14 +98,36 @@ fun LoginScreen(
         val context = LocalContext.current
 
         Button(
-            onClick = {viewModel.login(
-                socio = socio.toInt(),
-                password = password,
-                onSuccess = { user -> onLoginClick(user) },
-                onError = { msg -> Toast.makeText(context, msg, Toast.LENGTH_SHORT).show() }
-            )
-
+            onClick = {
+                when {
+                    socio.isBlank() -> {
+                        popupMessage = "Insere o ID de sócio"
+                        showPopup = true
+                    }
+                    password.isBlank() -> {
+                        popupMessage = "Insere a palavra-passe"
+                        showPopup = true
+                    }
+                    else -> {
+                        try {
+                            viewModel.login(
+                                socio = socio.toInt(),
+                                password = password,
+                                onSuccess = { user -> onLoginClick(user) },
+                                onError = { msg ->
+                                    // Aqui tratamos caso as credenciais estejam erradas
+                                    popupMessage = msg.ifBlank { "Credenciais inválidas ou utilizador não encontrado." }
+                                    showPopup = true
+                                }
+                            )
+                        } catch (e: Exception) {
+                            popupMessage = "Erro de autenticação: ${e.message}"
+                            showPopup = true
+                        }
+                    }
+                }
             },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -111,6 +138,15 @@ fun LoginScreen(
                 style = typography.labelMedium,
                 color = colorScheme.background
             )
+        }
+    }
+    if (showPopup) {
+        FloatingPopupToast(
+            message = popupMessage,
+            icon = Icons.Default.Warning,
+            color = MaterialTheme.colorScheme.error
+        ) {
+            showPopup = false
         }
     }
 }

@@ -14,7 +14,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -27,16 +29,17 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.components.QrCameraScanner
+import androidx.compose.ui.graphics.Color
 import com.google.gson.Gson
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.UserPreferences
 import java.net.URLEncoder
+import estga.dadm.athletrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -277,39 +280,9 @@ fun HomeAtleta(
             ModalBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = bottomSheetState,
-                containerColor = colorScheme.primaryContainer,
-                dragHandle = null
+                containerColor = colorScheme.primaryContainer, // COR DO DRAWER
+                dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
             ) {
-                // Botão de Refresh
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            // Ação de refresh: aqui chamas a função de carregamento
-                            scope.launch {
-                                // Exemplo de chamada fictícia
-                                viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
-                                showBottomSheet = false // Fecha o drawer
-                            }
-                        }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Atualizar Treinos",
-                        tint = colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        "Atualizar Treinos",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorScheme.primary
-                    )
-                }
-
-                // Botão de Logout (mantido como estava)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
