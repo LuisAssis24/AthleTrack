@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import estga.dadm.athletrack.other.FloatingPopupToast
+import estga.dadm.athletrack.components.PasswordConfirmDialog
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.SuccessPopupToast
 import estga.dadm.athletrack.ui.theme.*
@@ -229,14 +230,17 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                 popupMessage = "Preencha o nome."
                                 showPopup = true
                             }
+
                             password.isBlank() -> {
                                 popupMessage = "Preencha a senha."
                                 showPopup = true
                             }
+
                             modalidadesSelecionadas.isEmpty() -> {
                                 popupMessage = "Selecione pelo menos uma modalidade."
                                 showPopup = true
                             }
+
                             else -> {
                                 viewModel.criarAtleta(
                                     UserCreate(password, nome, "atleta", modalidadesSelecionadas)
@@ -307,80 +311,29 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 }
             }
 
-            if (showPasswordDialog && atletaParaApagar != null) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showPasswordDialog = false
-                        senhaParaApagar = ""
-                        atletaParaApagar = null
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                viewModel.apagarAtletaComSenha(
-                                    idAtleta = atletaParaApagar!!.idSocio,
-                                    idProfessor = user.idSocio,
-                                    senha = senhaParaApagar
-                                ) { sucesso, resposta ->
-                                    val mensagemFinal = if (!sucesso && resposta.contains("Senha incorreta", ignoreCase = true)) {
-                                        "Password inválida"
-                                    } else {
-                                        resposta
-                                    }
-
-                                    toastMessage = mensagemFinal
-                                    isToastSuccess = sucesso
-                                    showToast = true
-
-                                    if (sucesso) {
-                                        viewModel.carregarAtletas()
-                                    }
-                                }
-                                showPasswordDialog = false
-                                senhaParaApagar = ""
-                                atletaParaApagar = null
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
-                        ) {
-                            Text("Eliminar", color = colorScheme.inversePrimary)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                showPasswordDialog = false
-                                senhaParaApagar = ""
-                                atletaParaApagar = null
+            PasswordConfirmDialog(
+                showDialog = showPasswordDialog,
+                descricao = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar?.nome} (ID: ${atletaParaApagar?.idSocio})?",
+                onDismiss = {
+                    showPasswordDialog = false
+                    senhaParaApagar = ""
+                    atletaParaApagar = null
+                },
+                onConfirm = { senha ->
+                    atletaParaApagar?.let { atleta ->
+                        viewModel.apagarAtletaComSenha(
+                            idAtleta = atleta.idSocio,
+                            idProfessor = user.idSocio,
+                            senha = senha
+                        ) { sucesso, resposta ->
+                            coroutineScope.launch {
+                                Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
                             }
-                        ) {
-                            Text("Cancelar", color = colorScheme.primary)
+                            if (sucesso) viewModel.carregarAtletas()
                         }
-                    },
-                    title = {
-                        Text("Confirmar eliminação", color = colorScheme.primary)
-                    },
-                    text = {
-                        Column {
-                            Text(
-                                "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar!!.nome} (ID: ${atletaParaApagar!!.idSocio})?",
-                                color = colorScheme.primary,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                            OutlinedTextField(
-                                value = senhaParaApagar,
-                                onValueChange = { senhaParaApagar = it },
-                                label = {
-                                    Text("Insere a tua password", color = colorScheme.secondary)
-                                },
-                                singleLine = true,
-                                visualTransformation = PasswordVisualTransformation(),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    },
-                    containerColor = colorScheme.surface
-                )
-            }
+                    }
+                }
+            )
         }
     }
 }

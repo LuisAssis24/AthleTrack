@@ -218,7 +218,7 @@ fun AdicionarEventoScreen(
                         expanded = isDropdownExpanded,
                         onDismissRequest = { isDropdownExpanded = false },
                         tonalElevation = 0.dp, // remove sombra escura
-                        modifier = Modifier.width(with(LocalDensity.current) { remember { mutableStateOf(0) }.value.toDp() }) // Define 90% da largura do pai
+                        modifier = Modifier.fillMaxWidth(0.9f) // Define 80% da largura do pai
                         .background(colorScheme.primaryContainer) // aplica ao menu inteiro
                     ) {
                         modalidades.forEach { modalidade ->

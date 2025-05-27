@@ -3,6 +3,7 @@ package estga.dadm.athletrack.api
 import retrofit2.Call
 import retrofit2.http.*
 import okhttp3.ResponseBody
+import retrofit2.Response
 
 // Define os modelos de dados e serviços para comunicação com a API.
 
@@ -101,10 +102,10 @@ interface TreinosService {
     suspend fun listarTodosOsTreinos(@Body request: idRequest): List<Treino>
 
     @POST("/api/treinos/apagar")
-    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): retrofit2.Response<ResponseBody>
+    suspend fun apagarTreino(@Body request: TreinoDeleteRequest): Response<ResponseBody>
 
     @POST("/api/treinos/criar")
-    suspend fun criarTreino(@Body request: TreinoCreateRequest): retrofit2.Response<ResponseBody>
+    suspend fun criarTreino(@Body request: TreinoCreateRequest): Response<ResponseBody>
 }
 
 // Modelo da Request dos eventos.
@@ -122,12 +123,18 @@ data class Evento(
 )
 
 // Modelo de dados para criação de evento.
-data class EventoCriarRequestDTO(
+data class EventoCriarRequest(
     val data: String,
     val hora: String,
     val localEvento: String,
     val descricao: String,
     val modalidades: List<Int>
+)
+
+data class EventoApagarRequest(
+    val id: Int,
+    val idProfessor: Int,
+    val password: String
 )
 
 // Interface para serviços relacionados a eventos.
@@ -136,10 +143,10 @@ interface EventosService {
     suspend fun getEventos(@Body request: EventosRequest): List<Evento>
 
     @POST("/api/eventos/criar")
-    suspend fun criarEvento(@Body request: EventoCriarRequestDTO)
+    suspend fun criarEvento(@Body request: EventoCriarRequest)
 
     @POST("/api/eventos/apagar")
-    suspend fun apagarEvento(@Body request: idRequest): retrofit2.Response<ResponseBody>
+    suspend fun apagarEvento(@Body request: EventoApagarRequest): Response<ResponseBody>
 }
 
 // Modelo da Request de presença.

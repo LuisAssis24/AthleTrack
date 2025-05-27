@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.*
 import estga.dadm.athletrack.api.*
+import estga.dadm.athletrack.api.RetrofitClient.eventosService
 import org.jetbrains.annotations.TestOnly
 
 /**
@@ -68,7 +69,7 @@ class CalendarViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 // Faz a chamada ao serviço remoto para obter os eventos.
-                val response = RetrofitClient.eventosService.getEventos(EventosRequest(idSocio = idSocio))
+                val response = eventosService.getEventos(EventosRequest(idSocio = idSocio))
                 _eventos.value = response
             } catch (e: Exception) {
                 // Imprime o erro no log em caso de falha.
@@ -76,6 +77,31 @@ class CalendarViewModel : ViewModel() {
             }
         }
     }
+
+    fun apagarEvento(
+        idEvento: Int,
+        idProfessor: Int,
+        password: String,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = eventosService.apagarEvento(
+                    EventoApagarRequest(idEvento, idProfessor, password)
+                )
+
+                if (response.isSuccessful) {
+                    onResult(true, "Evento eliminado com sucesso.")
+                } else {
+                    onResult(false, "Erro ao eliminar evento: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                onResult(false, "Exceção ao eliminar evento: ${e.message}")
+            }
+        }
+    }
+
+
 
     /**
      * Carrega eventos hardcoded para testes ou desenvolvimento.

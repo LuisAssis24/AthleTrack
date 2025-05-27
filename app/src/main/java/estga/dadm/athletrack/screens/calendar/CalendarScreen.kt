@@ -1,5 +1,6 @@
 package estga.dadm.athletrack.screens.calendar
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +13,6 @@ import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -24,15 +24,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
+import estga.dadm.athletrack.api.Evento
 import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.viewmodels.CalendarViewModel
+import estga.dadm.athletrack.components.PasswordConfirmDialog
 import java.net.URLEncoder
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
-import estga.dadm.athletrack.ui.theme.*
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Tela de calendário que exibe eventos e permite interação com as datas.
@@ -67,6 +69,12 @@ fun CalendarScreen(
         val dataEvento = LocalDate.parse(evento.data)
         dataEvento == selectedDate
     }
+
+    // Variáveis para controle de diálogo de confirmação de senha
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var eventoSelecionado by remember { mutableStateOf<Evento?>(null) }
+    var password by remember { mutableStateOf("") }
+
 
     // Calcula os dias no mês e o primeiro dia da semana
     val daysInMonth = currentMonth.lengthOfMonth()
@@ -178,7 +186,6 @@ fun CalendarScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         // Geração do calendário
-
                         val totalSlots = firstDayOfWeek + daysInMonth
                         val weeks = (totalSlots + 6) / 7
                         for (week in 0 until weeks) {
@@ -319,28 +326,54 @@ fun CalendarScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
+                                IconButton(onClick = {
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.AddCircle,
+                                        contentDescription = "Detalhes",
+                                        tint = colorScheme.primary,
+                                    )
+                                }
+                            }
+                            IconButton(onClick = {
+                                showPasswordDialog = true
+                                eventoSelecionado = evento
+                            }) {
                                 Icon(
-                                    imageVector = Icons.Default.AddCircle,
-                                    contentDescription = "Detalhes",
-                                    tint = colorScheme.primary,
-                                    modifier = Modifier.clickable {
-                                        // TODO: abrir detalhes do evento
-                                    }
-                                )
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Eliminar",
-                                    tint = colorScheme.error,
-                                    modifier = Modifier.clickable {
-
-                                    }
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar",
+                                tint = colorScheme.error
                                 )
                             }
                         }
-
                     }
+
                 }
             }
         }
     }
+
+    PasswordConfirmDialog(
+        showDialog = showPasswordDialog,
+        onDismiss = {
+            showPasswordDialog = false
+            eventoSelecionado = null
+            password = ""
+        },
+        descricao = "Tem a certeza que quer eliminar este evento? Esta ação não pode ser desfeita.",
+                onConfirm = {
+                    eventoSelecionado?.let { evento ->
+                        viewModel.apagarEvento(
+                            idEvento = evento.id,
+                            idProfessor = user.idSocio,
+                            password = password
+                        ) { sucesso, mensagem ->
+                            if (sucesso) {
+                                viewModel.carregarEventosParaMes(user.idSocio)
+                                showPasswordDialog = false
+                            }
+                        }
+                    }
+                }
+            )
 }

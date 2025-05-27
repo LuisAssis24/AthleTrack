@@ -176,7 +176,7 @@ class TreinoController(
      * @return ResponseEntity com mensagem de sucesso ou erro.
      */
     @PostMapping("/apagar")
-    fun apagarTreino(@RequestBody request: TreinoApagarRequest): ResponseEntity<String> {
+    fun apagarTreino(@RequestBody request: TreinoApagarRequestDTO): ResponseEntity<String> {
         val professor = userRepository.findById(request.idSocio).orElse(null)
             ?: return ResponseEntity.badRequest().body("Professor não encontrado.")
 

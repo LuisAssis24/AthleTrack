@@ -37,9 +37,8 @@ import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.other.LoadingScreen
 import kotlinx.coroutines.delay
+import estga.dadm.athletrack.components.PasswordConfirmDialog
 import java.time.LocalTime
-
-
 
 @Composable
 fun GestaoTreinosScreen(user: User, navController: NavHostController) {
@@ -104,7 +103,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
             },
             containerColor = colorScheme.surface
         ) { padding ->
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -120,9 +118,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     }
                 }
             }
-
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -233,14 +228,17 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                 popupMessage = "Seleciona um dia da semana"
                                 showPopup = true
                             }
+
                             modalidadeSelecionada == null -> {
                                 popupMessage = "Seleciona uma modalidade"
                                 showPopup = true
                             }
+
                             horaSelecionada.toString().isBlank() -> {
                                 popupMessage = "Seleciona uma hora"
                                 showPopup = true
                             }
+
                             else -> {
                                 viewModel.criarTreino(
                                     diaSemana = diaSelecionado!!,
@@ -321,87 +319,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                     fontSize = 12.sp,
                                     color = colorScheme.primary,
                                 )
-                                if (showDialog && treinoSelecionado != null) {
-                                    AlertDialog(
-                                        onDismissRequest = {
-                                            showDialog = false
-                                            password = ""
-                                            treinoSelecionado = null
-                                        },
-                                        confirmButton = {
-                                            Button(
-                                                onClick = {
-                                                    viewModel.apagarTreino(
-                                                        idSocio = user.idSocio,
-                                                        password = password,
-                                                        qrCode = treinoSelecionado!!.qrCode
-                                                    ) { sucesso, resposta ->
-                                                        // Verifica se é erro de password
-                                                        val mensagemFinal = if (!sucesso && resposta.contains("Senha incorreta", ignoreCase = true)) {
-                                                            "Password inválida"
-                                                        } else {
-                                                            resposta
-                                                        }
-
-                                                        toastMessage = mensagemFinal
-                                                        isToastSuccess = sucesso
-                                                        showToast = true
-
-                                                        if (sucesso) {
-                                                            viewModel.carregarTodosOsTreinos(user.idSocio)
-                                                            showDialog = false
-                                                            treinoSelecionado = null
-                                                            password = ""
-                                                        }
-                                                    }
-                                                },
-                                                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
-                                            ) {
-                                                Text("Eliminar", color = colorScheme.inversePrimary)
-                                            }
-                                        },
-                                        dismissButton = {
-                                            TextButton(
-                                                onClick = {
-                                                    showDialog = false
-                                                    password = ""
-                                                    treinoSelecionado = null
-                                                }
-                                            ) {
-                                                Text("Cancelar", color = colorScheme.primary)
-                                            }
-                                        },
-                                        title = {
-                                            Text(
-                                                "Confirmar eliminação",
-                                                color = colorScheme.primary
-                                            )
-                                        },
-                                        text = {
-                                            Column {
-                                                Text(
-                                                    "Tens a certeza que queres eliminar este treino: ${treinoSelecionado!!.nomeModalidade} - ${treinoSelecionado!!.diaSemana} ${treinoSelecionado!!.hora}?",
-                                                    color = colorScheme.primary,
-                                                    modifier = Modifier.padding(bottom = 12.dp)
-                                                )
-                                                OutlinedTextField(
-                                                    value = password,
-                                                    onValueChange = { password = it },
-                                                    label = {
-                                                        Text(
-                                                            "Insere a tua password",
-                                                            color = colorScheme.secondary
-                                                        )
-                                                    },
-                                                    singleLine = true,
-                                                    visualTransformation = PasswordVisualTransformation(),
-                                                    modifier = Modifier.fillMaxWidth()
-                                                )
-                                            }
-                                        },
-                                        containerColor = colorScheme.surface
-                                    )
-                                }
                             }
                             IconButton(onClick = {
                                 treinoSelecionado = treino
@@ -414,10 +331,32 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                 )
                             }
                         }
-
                     }
                 }
             }
         }
+
+        PasswordConfirmDialog(
+            showDialog = showDialog && treinoSelecionado != null,
+            descricao = "Tens a certeza que queres eliminar este treino: ${treinoSelecionado?.nomeModalidade} - ${treinoSelecionado?.diaSemana} ${treinoSelecionado?.hora}?",
+            onDismiss = {
+                showDialog = false
+                treinoSelecionado = null
+            },
+            onConfirm = { passwordInput ->
+                viewModel.apagarTreino(
+                    idSocio = user.idSocio,
+                    password = passwordInput,
+                    qrCode = treinoSelecionado!!.qrCode
+                ) { sucesso, resposta ->
+                    Toast.makeText(context, resposta, Toast.LENGTH_SHORT).show()
+                    if (sucesso) {
+                        viewModel.carregarTodosOsTreinos(user.idSocio)
+                    }
+                }
+                showDialog = false
+                treinoSelecionado = null
+            }
+        )
     }
 }

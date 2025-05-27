@@ -5,7 +5,6 @@ import estga.dadm.backend.dto.IdRequestDTO
 import estga.dadm.backend.dto.treino.*
 import estga.dadm.backend.model.*
 import estga.dadm.backend.repository.*
-import estga.dadm.backend.services.PasswordUtil
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -120,7 +119,7 @@ class TreinoControllerTest {
         val professor = User(professorId, "Professor D", "PROFESSOR", senhaCodificada)
         val modalidade = Modalidade(1, "Zumba")
         val treino = Treino(treinoId, "SEG", LocalTime.of(10, 0), "SEG-10:00", modalidade, professor)
-        val request = TreinoApagarRequest("SEG-10:00", professorId, senhaProfessor)
+        val request = TreinoApagarRequestDTO("SEG-10:00", professorId, senhaProfessor)
 
         // Simulação de comportamento hardcoded
         val usuarios = listOf(professor)

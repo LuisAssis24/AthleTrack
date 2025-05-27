@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Modalidade
-import estga.dadm.athletrack.api.EventoCriarRequestDTO
+import estga.dadm.athletrack.api.EventoCriarRequest
 import estga.dadm.athletrack.api.EventosRequest
 import org.jetbrains.annotations.TestOnly
 
@@ -86,7 +86,7 @@ class AdicionarEventoViewModel : ViewModel() {
                 }
 
                 // Cria o evento se não for duplicado.
-                val request = EventoCriarRequestDTO(
+                val request = EventoCriarRequest(
                     data = data,
                     hora = hora,
                     localEvento = local,
