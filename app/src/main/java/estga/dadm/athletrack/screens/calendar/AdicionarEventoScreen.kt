@@ -28,6 +28,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.ui.platform.LocalDensity
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
 import java.net.URLEncoder
@@ -217,7 +218,7 @@ fun AdicionarEventoScreen(
                         expanded = isDropdownExpanded,
                         onDismissRequest = { isDropdownExpanded = false },
                         tonalElevation = 0.dp, // remove sombra escura
-                        modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+                        modifier = Modifier.width(with(LocalDensity.current) { remember { mutableStateOf(0) }.value.toDp() }) // Define 90% da largura do pai
                         .background(colorScheme.primaryContainer) // aplica ao menu inteiro
                     ) {
                         modalidades.forEach { modalidade ->
