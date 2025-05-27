@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import estga.dadm.athletrack.api.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.TestOnly
 import java.time.LocalDate
 
 /**
@@ -69,7 +70,8 @@ class HomeAtletaViewModel: ViewModel() {
      *
      * @param treinos Lista de treinos a serem carregados.
      */
-    fun carregarTreinosHardcoded(treinos: List<Treino>) {
+    @TestOnly
+    fun carregarTreinosTest(treinos: List<Treino>) {
         _treinos.value = treinos
     }
 }

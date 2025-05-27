@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.*
 import estga.dadm.athletrack.api.*
+import org.jetbrains.annotations.TestOnly
 
 /**
  * ViewModel responsável por gerenciar o estado e a lógica de negócios do calendário.
@@ -81,7 +82,8 @@ class CalendarViewModel : ViewModel() {
      *
      * @param eventos A lista de eventos a serem carregados.
      */
-    fun carregarEventosHardcoded(eventos: List<Evento>) {
+    @TestOnly
+    fun carregarEventosTest(eventos: List<Evento>) {
         _eventos.value = eventos
     }
 

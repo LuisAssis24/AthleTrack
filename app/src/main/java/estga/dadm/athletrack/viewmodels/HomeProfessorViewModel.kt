@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import estga.dadm.athletrack.api.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.TestOnly
 import java.time.LocalDate
 
 /**
@@ -210,7 +211,8 @@ class HomeProfessorViewModel : ViewModel() {
      *
      * @param treinos Lista de treinos a serem carregados.
      */
-    fun carregarTreinosHojeHardcoded(treinos: List<Treino>) {
+    @TestOnly
+    fun carregarTreinosHojeTest(treinos: List<Treino>) {
         _treinosHoje.value = treinos
     }
 
@@ -219,7 +221,8 @@ class HomeProfessorViewModel : ViewModel() {
      *
      * @param treinos Lista de treinos a serem carregados.
      */
-    fun carregarTreinosAmanhaHardcoded(treinos: List<Treino>) {
+    @TestOnly
+    fun carregarTreinosAmanhaTest(treinos: List<Treino>) {
         _treinosAmanha.value = treinos
     }
 
@@ -228,7 +231,8 @@ class HomeProfessorViewModel : ViewModel() {
      *
      * @param modalidades Lista de modalidades a serem carregadas.
      */
-    fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+    @TestOnly
+    fun carregarModalidadesTest(modalidades: List<Modalidade>) {
         _modalidades.value = modalidades
     }
 

@@ -38,7 +38,7 @@ class GestaoPresencasViewModelTest {
             PresencaListResponse(2, "Maria", false, false)
         )
 
-        viewModel.carregarPresencasHardcoded(treinoMock, presencasMock)
+        viewModel.carregarPresencasTest(treinoMock, presencasMock)
 
         val treino = viewModel.treinoInfo.first()
         val alunos = viewModel.alunos.first()
@@ -51,7 +51,7 @@ class GestaoPresencasViewModelTest {
 
     @Test
     fun `carregarPresencas deve retornar vazio em caso de erro`() = runTest {
-        viewModel.carregarPresencasHardcoded(null, emptyList())
+        viewModel.carregarPresencasTest(null, emptyList())
 
         val treino = viewModel.treinoInfo.first()
         val alunos = viewModel.alunos.first()
@@ -67,7 +67,7 @@ class GestaoPresencasViewModelTest {
             PresencaListResponse(2, "Maria", false, false)
         )
 
-        viewModel.carregarPresencasHardcoded(null, presencasMock)
+        viewModel.carregarPresencasTest(null, presencasMock)
         viewModel.atualizarPresenca(1, true)
 
         val alunos = viewModel.alunos.first()
@@ -82,8 +82,8 @@ class GestaoPresencasViewModelTest {
             PresencaListResponse(2, "Maria", false, false)
         )
 
-        viewModel.carregarPresencasHardcoded(null, presencasMock)
-        viewModel.salvarPresencasHardcoded("12345")
+        viewModel.carregarPresencasTest(null, presencasMock)
+        viewModel.salvarPresencasTest("12345")
 
         // Simula sucesso no salvamento
         assertEquals(2, viewModel.alunos.first().size)
@@ -96,8 +96,8 @@ class GestaoPresencasViewModelTest {
             PresencaListResponse(2, "Maria", false, false)
         )
 
-        viewModel.carregarPresencasHardcoded(null, presencasMock)
-        viewModel.salvarPresencasHardcoded("12345", simularErro = true)
+        viewModel.carregarPresencasTest(null, presencasMock)
+        viewModel.salvarPresencasTest("12345", simularErro = true)
 
         // Simula falha no salvamento
         assertEquals(2, viewModel.alunos.first().size)

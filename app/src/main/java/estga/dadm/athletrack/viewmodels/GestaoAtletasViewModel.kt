@@ -5,8 +5,9 @@ package estga.dadm.athletrack.viewmodels
     import kotlinx.coroutines.flow.*
     import kotlinx.coroutines.launch
     import okhttp3.ResponseBody
+    import org.jetbrains.annotations.TestOnly
 
-    /**
+/**
      * ViewModel responsável pela gestão de atletas e modalidades.
      */
     class GestaoAtletasViewModel : ViewModel() {
@@ -114,7 +115,8 @@ package estga.dadm.athletrack.viewmodels
          *
          * @param modalidades Lista de modalidades a serem carregadas.
          */
-        fun carregarAtletasHardcoded(atletas: List<User>) {
+        @TestOnly
+        fun carregarAtletasTest(atletas: List<User>) {
             _atletas.value = atletas
         }
 
@@ -125,7 +127,8 @@ package estga.dadm.athletrack.viewmodels
          * @param simularErro Se verdadeiro, simula um erro na criação.
          * @param callback Callback que recebe o resultado da operação.
          */
-        fun criarAtletaHardcoded(
+        @TestOnly
+        fun criarAtletaTest(
             request: UserCreate,
             simularErro: Boolean = false,
             callback: (Boolean, String) -> Unit
@@ -145,7 +148,8 @@ package estga.dadm.athletrack.viewmodels
          * @param simularErro Se verdadeiro, simula um erro na exclusão.
          * @param callback Callback que recebe o resultado da operação.
          */
-        fun apagarAtletaHardcoded(idAtleta: Int, simularErro: Boolean = false, callback: (Boolean, String) -> Unit) {
+        @TestOnly
+        fun apagarAtletaTest(idAtleta: Int, simularErro: Boolean = false, callback: (Boolean, String) -> Unit) {
             if (simularErro) {
                 callback(false, "Erro ao apagar atleta.")
             } else {
@@ -160,7 +164,8 @@ package estga.dadm.athletrack.viewmodels
          *
          * @param modalidades Lista de modalidades a serem carregadas.
          */
-        fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+        @TestOnly
+        fun carregarModalidadesTest(modalidades: List<Modalidade>) {
             _modalidades.value = modalidades
         }
 

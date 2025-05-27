@@ -37,7 +37,7 @@ class GestaoAtletasViewModelTest {
             User(1, "João", "atleta"),
             User(2, "Maria", "atleta")
         )
-        viewModel.carregarAtletasHardcoded(atletasMock)
+        viewModel.carregarAtletasTest(atletasMock)
         val atletas = viewModel.atletas.first()
         assertEquals(2, atletas.size)
         assertEquals("João", atletas[0].nome)
@@ -45,7 +45,7 @@ class GestaoAtletasViewModelTest {
 
     @Test
     fun `carregarAtletas deve retornar lista vazia em caso de erro`() = runTest {
-        viewModel.carregarAtletasHardcoded(emptyList())
+        viewModel.carregarAtletasTest(emptyList())
         val atletas = viewModel.atletas.first()
         assertEquals(0, atletas.size)
     }
@@ -53,7 +53,7 @@ class GestaoAtletasViewModelTest {
     @Test
     fun `criarAtleta deve criar atleta com sucesso`() = runTest {
         val request = UserCreate("senha123", "Carlos", "atleta", listOf(1))
-        viewModel.criarAtletaHardcoded(request) { sucesso, mensagem ->
+        viewModel.criarAtletaTest(request) { sucesso, mensagem ->
             assertEquals(true, sucesso)
             assertEquals("Atleta criado com sucesso!", mensagem)
         }
@@ -65,7 +65,7 @@ class GestaoAtletasViewModelTest {
     @Test
     fun `criarAtleta deve retornar erro em caso de falha`() = runTest {
         val request = UserCreate("senha123", "Carlos", "atleta", listOf(1))
-        viewModel.criarAtletaHardcoded(request, simularErro = true) { sucesso, mensagem ->
+        viewModel.criarAtletaTest(request, simularErro = true) { sucesso, mensagem ->
             assertEquals(false, sucesso)
             assertEquals("Erro ao criar atleta.", mensagem)
         }
@@ -77,8 +77,8 @@ class GestaoAtletasViewModelTest {
             User(1, "João", "atleta"),
             User(2, "Maria", "atleta")
         )
-        viewModel.carregarAtletasHardcoded(atletasMock)
-        viewModel.apagarAtletaHardcoded(1) { sucesso, mensagem ->
+        viewModel.carregarAtletasTest(atletasMock)
+        viewModel.apagarAtletaTest(1) { sucesso, mensagem ->
             assertEquals(true, sucesso)
             assertEquals("Atleta apagado com sucesso!", mensagem)
         }
@@ -89,7 +89,7 @@ class GestaoAtletasViewModelTest {
 
     @Test
     fun `apagarAtleta deve retornar erro em caso de falha`() = runTest {
-        viewModel.apagarAtletaHardcoded(1, simularErro = true) { sucesso, mensagem ->
+        viewModel.apagarAtletaTest(1, simularErro = true) { sucesso, mensagem ->
             assertEquals(false, sucesso)
             assertEquals("Erro ao apagar atleta.", mensagem)
         }
@@ -101,7 +101,7 @@ class GestaoAtletasViewModelTest {
             Modalidade(1, "Futebol"),
             Modalidade(2, "Basquete")
         )
-        viewModel.carregarModalidadesHardcoded(modalidadesMock)
+        viewModel.carregarModalidadesTest(modalidadesMock)
         val modalidades = viewModel.modalidades.first()
         assertEquals(2, modalidades.size)
         assertEquals("Futebol", modalidades[0].nomeModalidade)
@@ -109,7 +109,7 @@ class GestaoAtletasViewModelTest {
 
     @Test
     fun `carregarModalidades deve retornar lista vazia em caso de erro`() = runTest {
-        viewModel.carregarModalidadesHardcoded(emptyList())
+        viewModel.carregarModalidadesTest(emptyList())
         val modalidades = viewModel.modalidades.first()
         assertEquals(0, modalidades.size)
     }

@@ -43,7 +43,7 @@ class HomeProfessorViewModelTest {
             Treino(1, "Futebol", "SEG", "10:00", "qrCode1"),
             Treino(2, "Basquete", "SEG", "14:00", "qrCode2")
         )
-        viewModel.carregarTreinosHojeHardcoded(treinosMock)
+        viewModel.carregarTreinosHojeTest(treinosMock)
         val treinosHoje = viewModel.treinosHoje.first()
         assertEquals(2, treinosHoje.size)
         assertEquals("Futebol", treinosHoje[0].nomeModalidade)
@@ -55,7 +55,7 @@ class HomeProfessorViewModelTest {
             Treino(3, "Vôlei", "TER", "10:00", "qrCode3"),
             Treino(4, "Handebol", "TER", "16:00", "qrCode4")
         )
-        viewModel.carregarTreinosAmanhaHardcoded(treinosMock)
+        viewModel.carregarTreinosAmanhaTest(treinosMock)
         val treinosAmanha = viewModel.treinosAmanha.first()
         assertEquals(2, treinosAmanha.size)
         assertEquals("Vôlei", treinosAmanha[0].nomeModalidade)
@@ -63,8 +63,8 @@ class HomeProfessorViewModelTest {
 
     @Test
     fun `carregarTreinos deve retornar lista vazia em caso de erro`() = runTest {
-        viewModel.carregarTreinosHojeHardcoded(emptyList())
-        viewModel.carregarTreinosAmanhaHardcoded(emptyList())
+        viewModel.carregarTreinosHojeTest(emptyList())
+        viewModel.carregarTreinosAmanhaTest(emptyList())
         assertEquals(0, viewModel.treinosHoje.first().size)
         assertEquals(0, viewModel.treinosAmanha.first().size)
     }
@@ -75,7 +75,7 @@ class HomeProfessorViewModelTest {
             Modalidade(1, "Futebol"),
             Modalidade(2, "Basquete")
         )
-        viewModel.carregarModalidadesHardcoded(modalidadesMock)
+        viewModel.carregarModalidadesTest(modalidadesMock)
         val modalidades = viewModel.modalidades.first()
         assertEquals(2, modalidades.size)
         assertEquals("Futebol", modalidades[0].nomeModalidade)

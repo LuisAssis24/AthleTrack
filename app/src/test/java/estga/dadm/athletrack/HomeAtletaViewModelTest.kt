@@ -43,7 +43,7 @@ class HomeAtletaViewModelTest {
         )
 
         // Simula o carregamento de treinos
-        viewModel.carregarTreinosHardcoded(treinosMock)
+        viewModel.carregarTreinosTest(treinosMock)
 
         // Verifica se os treinos foram carregados corretamente
         val treinos = viewModel.treinos.first()
@@ -55,7 +55,7 @@ class HomeAtletaViewModelTest {
     @Test
     fun `carregarTreinos deve retornar lista vazia em caso de erro`() = runTest {
         // Simula erro ao carregar treinos
-        viewModel.carregarTreinosHardcoded(emptyList())
+        viewModel.carregarTreinosTest(emptyList())
 
         // Verifica se a lista de treinos está vazia
         val treinos = viewModel.treinos.first()

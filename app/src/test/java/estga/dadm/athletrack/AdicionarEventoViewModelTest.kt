@@ -1,6 +1,5 @@
 package estga.dadm.athletrack
 
-import estga.dadm.athletrack.api.Evento
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.viewmodels.AdicionarEventoViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +34,7 @@ class AdicionarEventoViewModelTest {
             Modalidade(1, "Futebol"),
             Modalidade(2, "Basquete")
         )
-        viewModel.carregarModalidadesHardcoded(modalidadesMock)
+        viewModel.carregarModalidadesTest(modalidadesMock)
         val modalidades = viewModel.modalidades.first()
         assertEquals(2, modalidades.size)
         assertEquals("Futebol", modalidades[0].nomeModalidade)
@@ -43,14 +42,14 @@ class AdicionarEventoViewModelTest {
 
     @Test
     fun `carregarModalidades deve retornar lista vazia em caso de erro`() = runTest {
-        viewModel.carregarModalidadesHardcoded(emptyList())
+        viewModel.carregarModalidadesTest(emptyList())
         val modalidades = viewModel.modalidades.first()
         assertEquals(0, modalidades.size)
     }
 
     @Test
     fun `adicionarEvento deve adicionar evento com sucesso`() = runTest {
-        viewModel.adicionarEventoHardcoded(
+        viewModel.adicionarEventoTest(
             data = "2023-12-25",
             hora = "10:00",
             local = "Ginásio",
@@ -64,7 +63,7 @@ class AdicionarEventoViewModelTest {
 
     @Test
     fun `adicionarEvento deve retornar erro para evento duplicado`() = runTest {
-        viewModel.adicionarEventoHardcoded(
+        viewModel.adicionarEventoTest(
             data = "2023-12-25",
             hora = "10:00",
             local = "Ginásio",
@@ -75,7 +74,7 @@ class AdicionarEventoViewModelTest {
             }
         )
 
-        viewModel.adicionarEventoHardcoded(
+        viewModel.adicionarEventoTest(
             data = "2023-12-25",
             hora = "10:00",
             local = "Ginásio",
@@ -89,7 +88,7 @@ class AdicionarEventoViewModelTest {
 
     @Test
     fun `adicionarEvento deve retornar erro em caso de falha`() = runTest {
-        viewModel.adicionarEventoHardcoded(
+        viewModel.adicionarEventoTest(
             data = "2023-12-25",
             hora = "10:00",
             local = "Ginásio",

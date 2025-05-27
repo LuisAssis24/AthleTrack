@@ -11,7 +11,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.YearMonth
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,19 +57,21 @@ class CalendarViewModelTest {
     fun `carregarEventosHardcoded deve carregar eventos corretamente`() = runTest {
         val eventosMock = listOf(
             Evento(
+                id = 1, // Adicionado o ID do evento
                 localEvento = "Ginásio",
                 data = "2023-12-25",
                 hora = "10:00",
                 descricao = "Treino de Natal"
             ),
             Evento(
+                id = 2, // Adicionado o ID do evento
                 localEvento = "Campo",
                 data = "2023-12-26",
                 hora = "15:00",
                 descricao = "Treino ao ar livre"
             )
         )
-        viewModel.carregarEventosHardcoded(eventosMock)
+        viewModel.carregarEventosTest(eventosMock)
         val eventos = viewModel.eventos.first()
         assertEquals(2, eventos.size)
         assertEquals("Ginásio", eventos[0].localEvento)
@@ -80,7 +81,7 @@ class CalendarViewModelTest {
     @Test
     fun `carregarEventosHardcoded deve retornar lista vazia quando nenhum evento for carregado`() =
         runTest {
-            viewModel.carregarEventosHardcoded(emptyList())
+            viewModel.carregarEventosTest(emptyList())
             val eventos = viewModel.eventos.first()
             assertEquals(0, eventos.size)
         }

@@ -10,6 +10,7 @@ import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.api.EventoCriarRequestDTO
 import estga.dadm.athletrack.api.EventosRequest
+import org.jetbrains.annotations.TestOnly
 
 /**
  * ViewModel responsável por gerenciar a lógica de negócios para adicionar eventos e carregar modalidades.
@@ -109,7 +110,8 @@ class AdicionarEventoViewModel : ViewModel() {
      *
      * @param modalidades Lista de modalidades a serem carregadas.
      */
-    fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+    @TestOnly
+    fun carregarModalidadesTest(modalidades: List<Modalidade>) {
         _modalidades.value = modalidades
     }
 
@@ -124,17 +126,18 @@ class AdicionarEventoViewModel : ViewModel() {
      * @param modalidades Lista de IDs das modalidades associadas ao evento.
      * @param onResult Callback que recebe um booleano indicando se o evento foi adicionado com sucesso.
      */
-    fun adicionarEventoHardcoded(
+    @TestOnly
+    fun adicionarEventoTest(
         data: String,
         hora: String,
         local: String,
         descricao: String,
         modalidades: List<Int>,
         onResult: (Boolean) -> Unit,
-        simularFalha: Boolean = false // Adiciona um parâmetro para simular falha
+        simularFalha: Boolean = false
     ) {
         if (simularFalha) {
-            onResult(false) // Retorna erro em caso de falha simulada
+            onResult(false)
             return
         }
 
@@ -146,10 +149,11 @@ class AdicionarEventoViewModel : ViewModel() {
         }
 
         if (eventoDuplicado) {
-            onResult(false) // Retorna erro para evento duplicado
+            onResult(false)
         } else {
-            eventosAdicionados.add(Evento(local, data, hora, descricao))
-            onResult(true) // Adiciona o evento com sucesso
+            val novoId = (eventosAdicionados.maxOfOrNull { it.id } ?: 0) + 1 // Gera um ID único
+            eventosAdicionados.add(Evento(novoId, local, data, hora, descricao))
+            onResult(true)
         }
     }
 

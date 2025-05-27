@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import estga.dadm.athletrack.api.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.TestOnly
 
 /**
  * ViewModel responsável pela gestão de presenças em treinos.
@@ -120,7 +121,8 @@ class GestaoPresencasViewModel : ViewModel() {
      * @param treino O treino a ser carregado.
      * @param presencas A lista de presenças a ser carregada.
      */
-    fun carregarPresencasHardcoded(treino: Treino?, presencas: List<PresencaListResponse>) {
+    @TestOnly
+    fun carregarPresencasTest(treino: Treino?, presencas: List<PresencaListResponse>) {
         _treinoInfo.value = treino
         _alunos.value = presencas
     }
@@ -131,7 +133,8 @@ class GestaoPresencasViewModel : ViewModel() {
      * @param qrCode O QR Code do treino.
      * @param simularErro Indica se deve simular um erro no salvamento.
      */
-    fun salvarPresencasHardcoded(qrCode: String, simularErro: Boolean = false) {
+    @TestOnly
+    fun salvarPresencasTest(qrCode: String, simularErro: Boolean = false) {
         if (simularErro) {
             // Simula erro no salvamento
             return
