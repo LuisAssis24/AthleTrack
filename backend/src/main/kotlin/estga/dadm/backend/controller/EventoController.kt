@@ -2,15 +2,19 @@ package estga.dadm.backend.controller
 
 import estga.dadm.backend.dto.evento.*
 import estga.dadm.backend.repository.*
-import estga.dadm.backend.repository.ModalidadeRepository
 import estga.dadm.backend.dto.evento.EventoCriarRequestDTO
-import estga.dadm.backend.model.Evento
-import estga.dadm.backend.model.EventoModalidade
+import estga.dadm.backend.model.*
 import estga.dadm.backend.repository.EventoRepository
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.LocalTime
 
+/**
+ * Controlador REST responsável pelas operações relacionadas a eventos.
+ *
+ * Fornece endpoints para listar eventos associados às modalidades de um sócio
+ * e para criar novos eventos vinculados a modalidades específicas.
+ */
 @RestController
 @RequestMapping("/api/eventos")
 class EventoController(
@@ -20,7 +24,12 @@ class EventoController(
     private val eventoRepository: EventoRepository
 ) {
 
-    // Lista eventos associados às modalidades do sócio informado
+    /**
+     * Lista eventos associados às modalidades do sócio informado.
+     *
+     * @param request Objeto EventoRequestDTO contendo o ID do sócio.
+     * @return Lista de EventoResponseDTO representando os eventos das modalidades do sócio.
+     */
     @PostMapping("/listar")
     fun listarPorIdSocio(@RequestBody request: EventoRequestDTO): List<EventoResponseDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
@@ -40,13 +49,21 @@ class EventoController(
         return eventos
     }
 
-    // Cria um novo evento e associa às modalidades informadas
+    /**
+     * Cria um novo evento e associa às modalidades informadas.
+     *
+     * @param request Objeto EventoCriarRequestDTO contendo os dados do evento e IDs das modalidades.
+     * @throws RuntimeException se ocorrer erro ao criar o evento ou associar modalidades.
+     */
     @PostMapping("/criar")
     fun criarEvento(@RequestBody request: EventoCriarRequestDTO) {
         try {
             // Verifica se já existe um evento igual
             val eventoExistente = eventoRepository.findByLocalEventoAndDataAndHoraAndDescricao(
-                request.localEvento, LocalDate.parse(request.data), LocalTime.parse(request.hora).withSecond(0), request.descricao
+                request.localEvento,
+                LocalDate.parse(request.data),
+                LocalTime.parse(request.hora).withSecond(0),
+                request.descricao
             )
             if (eventoExistente != null) {
                 throw IllegalArgumentException("Evento já existe com os mesmos dados.")

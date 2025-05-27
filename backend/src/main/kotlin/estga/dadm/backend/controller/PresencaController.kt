@@ -1,15 +1,19 @@
 package estga.dadm.backend.controller
 
 import estga.dadm.backend.dto.IdRequestDTO
-import estga.dadm.backend.dto.treino.PresencaListResponseDTO
-import estga.dadm.backend.dto.treino.PresencaRequestDTO
-import estga.dadm.backend.dto.treino.PresencaResponseDTO
+import estga.dadm.backend.dto.treino.*
 import estga.dadm.backend.keys.PresencaId
 import estga.dadm.backend.model.Presenca
 import estga.dadm.backend.repository.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Controlador REST para operações relacionadas a presenças em treinos.
+ *
+ * Fornece endpoints para registar presença via QR code, registar presenças manualmente
+ * e listar presenças de um treino específico.
+ */
 @RestController
 @RequestMapping("/api/presencas")
 class PresencaController(
@@ -19,7 +23,12 @@ class PresencaController(
     private val socioModalidadeRepository: SocioModalidadeRepository
 ) {
 
-    // Registra presença via QR Code
+    /**
+     * Regista a presença de um sócio num treino através do QR code.
+     *
+     * @param request Dados da presença, incluindo o QR code e o ID do sócio.
+     * @return ResponseEntity com o resultado do registo da presença.
+     */
     @PostMapping("/registar")
     fun registarPresencaQr(@RequestBody request: PresencaRequestDTO): ResponseEntity<PresencaResponseDTO> {
         val treino = treinoRepository.findByQrCode(request.qrCode)
@@ -60,7 +69,12 @@ class PresencaController(
         return ResponseEntity.ok(PresencaResponseDTO(sucesso = true, mensagem = "Presença registada com sucesso."))
     }
 
-    // Registra presenças manualmente (lista de presenças)
+    /**
+     * Regista presenças manualmente para uma lista de sócios e treinos.
+     *
+     * @param requests Lista de dados de presença a serem registados.
+     * @return ResponseEntity indicando sucesso ou falha do registo.
+     */
     @PostMapping("/registarmanual")
     fun registarPresencasManuais(@RequestBody requests: List<PresencaRequestDTO>): ResponseEntity<Boolean> {
         return try {
@@ -93,7 +107,12 @@ class PresencaController(
         }
     }
 
-    // Lista presenças de um treino específico
+    /**
+     * Lista as presenças de um treino específico, indicando o estado de presença de cada sócio.
+     *
+     * @param request Objeto contendo o ID do treino.
+     * @return Lista de presenças dos sócios para o treino especificado.
+     */
     @PostMapping("/listar")
     fun listarPresencas(@RequestBody request: IdRequestDTO): List<PresencaListResponseDTO> {
         val treino = treinoRepository.findById(request.id).orElse(null)

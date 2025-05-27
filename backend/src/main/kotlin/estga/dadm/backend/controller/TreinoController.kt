@@ -9,6 +9,12 @@ import estga.dadm.backend.services.PasswordUtil
 import org.springframework.http.ResponseEntity
 import java.time.LocalTime
 
+/**
+ * Controlador REST responsável pelas operações relacionadas a treinos.
+ *
+ * Fornece endpoints para listar treinos de professores e alunos, criar e apagar treinos,
+ * além de utilitários para manipulação de dias da semana.
+ */
 @RestController
 @RequestMapping("/api/treinos")
 class TreinoController(
@@ -18,7 +24,12 @@ class TreinoController(
     private val userRepository: UserRepository,
     private val presencaRepository: PresencaRepository
 ) {
-    // Lista todos os treinos de um professor, ordenados por dia da semana
+    /**
+     * Lista todos os treinos de um professor, ordenados por dia da semana.
+     *
+     * @param request Objeto contendo o ID do professor.
+     * @return Lista de treinos do professor, agrupados por dia da semana.
+     */
     @PostMapping
     fun listarTodosOsTreinos(@RequestBody request: IdRequestDTO): List<TreinoProfResponseDTO> {
 
@@ -44,7 +55,12 @@ class TreinoController(
         }
     }
 
-    // Lista treinos do professor para o dia atual
+    /**
+     * Lista os treinos do professor para o dia atual, considerando uma margem de 4 horas.
+     *
+     * @param request Objeto contendo o ID do professor e o dia da semana.
+     * @return Lista de treinos do professor para o dia atual.
+     */
     @PostMapping("/hoje")
     fun getTreinosHoje(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
         val agora = LocalTime.now()
@@ -66,7 +82,12 @@ class TreinoController(
             }
     }
 
-    // Lista treinos do professor para o dia seguinte
+    /**
+     * Lista os treinos do professor para o dia seguinte.
+     *
+     * @param request Objeto contendo o ID do professor e o dia da semana.
+     * @return Lista de treinos do professor para o dia seguinte.
+     */
     @PostMapping("/amanha")
     fun getTreinosAmanha(@RequestBody request: TreinoRequestDTO): List<TreinoProfResponseDTO> {
         val amanha = calculaAmanha(request.diaSemana)
@@ -83,7 +104,12 @@ class TreinoController(
             }
     }
 
-    // Lista treinos disponíveis para um aluno, considerando a suas modalidades
+    /**
+     * Lista treinos disponíveis para um aluno, considerando suas modalidades e horários.
+     *
+     * @param request Objeto contendo o ID do sócio e o dia da semana.
+     * @return Lista de treinos disponíveis para o aluno.
+     */
     @PostMapping("/aluno")
     fun getTreinosAluno(@RequestBody request: TreinoRequestDTO): List<TreinoAlunoResponseDTO> {
         val socioModalidades = socioModalidadeRepository.findBySocioId(request.idSocio)
@@ -112,7 +138,12 @@ class TreinoController(
         }
     }
 
-    // Cria um treino
+    /**
+     * Cria um novo treino, gerando um QR code único para identificação.
+     *
+     * @param request Objeto contendo os dados necessários para criação do treino.
+     * @return ResponseEntity com mensagem de sucesso ou erro.
+     */
     @PostMapping("/criar")
     fun criarTreino(@RequestBody request: TreinoCriarRequestDTO): ResponseEntity<String> {
         val professor = userRepository.findById(request.idProfessor).orElseThrow()
@@ -136,7 +167,13 @@ class TreinoController(
         return ResponseEntity.ok("Treino criado com sucesso.")
     }
 
-    // Apaga um treino, validando o professor e senha
+    /**
+     * Apaga um treino, validando o professor e a senha fornecida.
+     * Remove também todas as presenças associadas ao treino.
+     *
+     * @param request Objeto contendo o ID do professor, senha e QR code do treino.
+     * @return ResponseEntity com mensagem de sucesso ou erro.
+     */
     @PostMapping("/apagar")
     fun apagarTreino(@RequestBody request: TreinoApagarRequest): ResponseEntity<String> {
         val professor = userRepository.findById(request.idSocio).orElse(null)
@@ -163,7 +200,12 @@ class TreinoController(
         return ResponseEntity.ok("Treino apagado com sucesso.")
     }
 
-    // Calcula o próximo dia da semana
+    /**
+     * Calcula o próximo dia da semana a partir do dia informado.
+     *
+     * @param dia Dia da semana atual (ex: "SEG").
+     * @return Próximo dia da semana.
+     */
     fun calculaAmanha(dia: String): String? {
         when (dia) {
             "SEG" -> return "TER"
@@ -177,7 +219,12 @@ class TreinoController(
         return null
     }
 
-    // Retorna a ordem dos dias da semana a partir de um dia específico
+    /**
+     * Retorna a ordem dos dias da semana a partir de um dia específico.
+     *
+     * @param dia Dia da semana inicial.
+     * @return Lista ordenada dos dias da semana começando pelo dia informado.
+     */
     fun ordenarDias(dia: String): List<String?> {
         when (dia) {
             "SEG" -> return listOf("SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM")

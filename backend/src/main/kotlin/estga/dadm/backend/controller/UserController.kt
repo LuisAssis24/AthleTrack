@@ -1,18 +1,19 @@
 package estga.dadm.backend.controller
 
-import estga.dadm.backend.dto.user.LoginRequestDTO
-import estga.dadm.backend.dto.user.UserResponseDTO
-import estga.dadm.backend.dto.user.UserCreateRequestDTO
-import estga.dadm.backend.dto.user.UserDeleteRequestDTO
+import estga.dadm.backend.dto.user.*
 import estga.dadm.backend.model.SocioModalidade
 import estga.dadm.backend.model.User
-import estga.dadm.backend.repository.ModalidadeRepository
-import estga.dadm.backend.repository.SocioModalidadeRepository
-import estga.dadm.backend.repository.UserRepository
+import estga.dadm.backend.repository.*
 import estga.dadm.backend.services.PasswordUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Controlador REST responsável pelas operações relacionadas a utilizadores.
+ *
+ * Fornece endpoints para ‘login’, listagem, criação e eliminação de utilizadores,
+ * bem como associação de utilizadores a modalidades.
+ */
 @RestController
 @RequestMapping("/api/user")
 class UserController(
@@ -20,7 +21,12 @@ class UserController(
     private val modalidadeRepository: ModalidadeRepository,
     private val socioModalidadeRepository: SocioModalidadeRepository
 ) {
-    // Realiza login do usuário
+    /**
+     * Realiza ‘login’ do utilizador.
+     *
+     * @param request Objeto LoginRequestDTO contendo o ID do sócio e a senha.
+     * @return ResponseEntity com UserResponseDTO se autenticado, ou 401 se falhar.
+     */
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequestDTO): ResponseEntity<UserResponseDTO> {
         val user = userRepository.findById(request.idSocio).orElse(null)
@@ -37,7 +43,11 @@ class UserController(
         return ResponseEntity.status(401).build()
     }
 
-    // Lista todos os usuários, ordenando por tipo
+    /**
+     * Lista todos os utilizadores, ordenando por tipo (professor, atleta, outros).
+     *
+     * @return Lista de UserResponseDTO representando todos os usuários.
+     */
     @PostMapping("/listar")
     fun listarTodos(): List<UserResponseDTO> {
         val users = userRepository.findAll()
@@ -59,7 +69,12 @@ class UserController(
         return users
     }
 
-    // Cria um novo usuário e associa às modalidades informadas
+    /**
+     * Cria um novo usuário e associa às modalidades informadas.
+     *
+     * @param request Objeto UserCreateRequestDTO com dados do usuário e IDs das modalidades.
+     * @return ResponseEntity com mensagem de sucesso ou erro.
+     */
     @PostMapping("/criar")
     fun criarUser(@RequestBody request: UserCreateRequestDTO): ResponseEntity<String> {
         return try {
@@ -91,7 +106,14 @@ class UserController(
         }
     }
 
-    // Elimina um usuário, validando a senha do solicitante
+    /**
+     * Elimina um usuário, validando a senha do solicitante.
+     * Remove também todas as associações do usuário com modalidades.
+     *
+     * @param loginRequest Objeto LoginRequestDTO com credenciais do solicitante.
+     * @param idParaEliminar ID do usuário a ser eliminado.
+     * @return ResponseEntity com mensagem de sucesso ou erro.
+     */
     @PostMapping("/eliminar/{idParaEliminar}")
     fun eliminarUser(
         @RequestBody loginRequest: LoginRequestDTO,
