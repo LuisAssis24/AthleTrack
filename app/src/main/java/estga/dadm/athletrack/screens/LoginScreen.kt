@@ -63,9 +63,9 @@ fun LoginScreen(
             label = { Text("Número de Sócio") },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorScheme.onPrimary, // Alterado para onPrimary
+                focusedBorderColor = colorScheme.onPrimary,
                 unfocusedBorderColor = colorScheme.secondary,
-                focusedLabelColor =colorScheme.onPrimary, // Alterado para onPrimary
+                focusedLabelColor =colorScheme.onPrimary,
                 unfocusedLabelColor = colorScheme.primary,
                 cursorColor = colorScheme.primary
             )

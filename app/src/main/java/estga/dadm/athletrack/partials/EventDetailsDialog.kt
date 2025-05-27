@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.components
+package estga.dadm.athletrack.partials
 
 import android.content.Context
 import android.content.Intent
@@ -13,9 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import estga.dadm.athletrack.api.Evento
 import estga.dadm.athletrack.ui.theme.BackgroundBlueDark
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 @Composable

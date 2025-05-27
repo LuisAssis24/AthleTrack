@@ -6,18 +6,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
+
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.Treino
@@ -29,18 +25,15 @@ import androidx.compose.ui.platform.LocalContext
 import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.zIndex
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.other.LoadingScreen
 import kotlinx.coroutines.delay
-import estga.dadm.athletrack.components.PasswordConfirmDialog
+import estga.dadm.athletrack.partials.PasswordConfirmDialog
+import estga.dadm.athletrack.components.TreinoItem
 import java.time.LocalTime
 
 @Composable
@@ -48,7 +41,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
     val viewModel: HomeProfessorViewModel = viewModel()
     val treinos by viewModel.treinosTodos.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf("") }
     var treinoSelecionado by remember { mutableStateOf<Treino?>(null) }
     val context = LocalContext.current
     var horaSelecionada by remember { mutableStateOf(LocalTime.of(9, 0)) }
@@ -59,7 +51,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
     var diaSelecionado by remember { mutableStateOf<String?>(null) }
     var diaDropdownExpanded by remember { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
     var mensagem by remember { mutableStateOf("") }
     var showPopup by remember { mutableStateOf(false) }
     var popupMessage by remember { mutableStateOf("") }
@@ -145,7 +136,8 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     DropdownMenu(
                         expanded = diaDropdownExpanded,
                         onDismissRequest = { diaDropdownExpanded = false },
-                        modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
                             .background(colorScheme.primaryContainer) // aplica ao menu inteiro
                     ) {
                         diasSemana.forEach { dia ->
@@ -207,7 +199,8 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         expanded = dropdownExpanded,
                         onDismissRequest = { dropdownExpanded = false },
                         tonalElevation = 0.dp, // remove sombra escura
-                        modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
                             .background(colorScheme.primaryContainer) // aplica ao menu inteiro
                     ) {
                         modalidades.forEach { modalidade ->
@@ -302,66 +295,39 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         .padding(bottom = 16.dp)
                 ) {
                     items(treinos) { treino ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .background(
-                                    colorScheme.primaryContainer,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column {
-                                Text(
-                                    "${treino.nomeModalidade} - ${treino.diaSemana} ${treino.hora}",
-                                    color = colorScheme.primary
-                                )
-                                Text(
-                                    "QR: ${treino.qrCode}",
-                                    fontSize = 12.sp,
-                                    color = colorScheme.primary,
-                                )
-                            }
-                            IconButton(onClick = {
+                        TreinoItem(
+                            treino = treino,
+                            onDeleteClick = {
                                 treinoSelecionado = treino
                                 showDialog = true
-                            }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Apagar",
-                                    tint = colorScheme.error
-                                )
                             }
-                        }
+                        )
                     }
                 }
             }
         }
-
-        PasswordConfirmDialog(
-            showDialog = showDialog && treinoSelecionado != null,
-            descricao = "Tens a certeza que queres eliminar este treino: ${treinoSelecionado?.nomeModalidade} - ${treinoSelecionado?.diaSemana} ${treinoSelecionado?.hora}?",
-            onDismiss = {
-                showDialog = false
-                treinoSelecionado = null
-            },
-            onConfirm = { passwordInput ->
-                viewModel.apagarTreino(
-                    idSocio = user.idSocio,
-                    password = passwordInput,
-                    qrCode = treinoSelecionado!!.qrCode
-                ) { sucesso, resposta ->
-                    Toast.makeText(context, resposta, Toast.LENGTH_SHORT).show()
-                    if (sucesso) {
-                        viewModel.carregarTodosOsTreinos(user.idSocio)
-                    }
-                }
-                showDialog = false
-                treinoSelecionado = null
-            }
-        )
     }
+
+    PasswordConfirmDialog(
+        showDialog = showDialog && treinoSelecionado != null,
+        descricao = "Tens a certeza que queres eliminar este treino: ${treinoSelecionado?.nomeModalidade} - ${treinoSelecionado?.diaSemana} ${treinoSelecionado?.hora}?",
+        onDismiss = {
+            showDialog = false
+            treinoSelecionado = null
+        },
+        onConfirm = { passwordInput ->
+            viewModel.apagarTreino(
+                idSocio = user.idSocio,
+                password = passwordInput,
+                qrCode = treinoSelecionado!!.qrCode
+            ) { sucesso, resposta ->
+                Toast.makeText(context, resposta, Toast.LENGTH_SHORT).show()
+                if (sucesso) {
+                    viewModel.carregarTodosOsTreinos(user.idSocio)
+                }
+            }
+            showDialog = false
+            treinoSelecionado = null
+        }
+    )
 }

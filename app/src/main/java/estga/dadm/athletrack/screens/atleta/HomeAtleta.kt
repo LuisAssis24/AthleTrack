@@ -14,9 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -33,13 +31,13 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
-import estga.dadm.athletrack.components.QrCameraScanner
-import androidx.compose.ui.graphics.Color
+import estga.dadm.athletrack.partials.QrCameraScanner
 import com.google.gson.Gson
+import estga.dadm.athletrack.components.BottomMenu
+import estga.dadm.athletrack.components.TopBar
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.UserPreferences
 import java.net.URLEncoder
-import estga.dadm.athletrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,92 +89,26 @@ fun HomeAtleta(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // TOP BAR
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                        .background(colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = { showBottomSheet = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = "Perfil",
-                                    tint = colorScheme.primary,
-                                    modifier = Modifier.size(32.dp)
-                                )
+                TopBar(
+                    user = user,
+                    navController = navController,
+                    onBottomSheet = { showBottomSheet = true },
+                    qrCodeClick = {
+                        // Verifica se a permissão da câmara está concedida
+                        when {
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED -> {
+                                showCameraDialog = true
                             }
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Column {
-                                Text(
-                                    text = user.nome,
-                                    style = Typography.titleMedium,
-                                    color = colorScheme.primary
-                                )
-                                Text(
-                                    text = "Sócio nº ${user.idSocio}",
-                                    style = Typography.labelMedium,
-                                    color = colorScheme.secondary
-                                )
-                            }
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            // Botão QR Code
-                            IconButton(onClick = {
-                                when {
-                                    ContextCompat.checkSelfPermission(
-                                        context,
-                                        android.Manifest.permission.CAMERA
-                                    ) == PackageManager.PERMISSION_GRANTED -> {
-                                        showCameraDialog = true
-                                    }
-
-                                    else -> {
-                                        launcher.launch(android.Manifest.permission.CAMERA)
-                                    }
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.QrCode,
-                                    contentDescription = "QR Code",
-                                    tint = colorScheme.primary,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
-
-                            VerticalDivider(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .padding(horizontal = 8.dp),
-                                color = colorScheme.secondary,
-                                thickness = 1.dp
-                            )
-
-                            // Botão Calendário - redireciona para a tela de calendário
-                            IconButton(onClick = {
-                                val userJson = URLEncoder.encode(gson.toJson(user), "UTF-8")
-                                navController.navigate("calendar/$userJson")
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.CalendarMonth,
-                                    contentDescription = "Calendário",
-                                    tint = colorScheme.primary,
-                                    modifier = Modifier.size(28.dp)
-                                )
+                            else -> {
+                                // Solicita a permissão da câmara
+                                launcher.launch(android.Manifest.permission.CAMERA)
                             }
                         }
                     }
-                }
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -277,39 +209,21 @@ fun HomeAtleta(
 
 
         if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = bottomSheetState,
-                containerColor = colorScheme.primaryContainer, // COR DO DRAWER
-                dragHandle = null // REMOVER A BARRA AZUL SUPERIOR
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            scope.launch {
-                                userPreferences.clearLoginState()
-                                navController.navigate("login") {
-                                    popUpTo(0)
-                                }
-                            }
-                        }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Logout",
-                        tint = colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        "Logout",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorScheme.primary
-                    )
+            BottomMenu(
+                showBottomSheet = showBottomSheet,
+                onDismiss = { showBottomSheet = false },
+                bottomSheetState = bottomSheetState,
+                scope = scope,
+                onRefresh = {
+                    viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
+                },
+                onLogout = {
+                    userPreferences.clearLoginState()
+                    navController.navigate("login") {
+                        popUpTo(0)
+                    }
                 }
-            }
+            )
         }
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +25,9 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.Modifier
+import estga.dadm.athletrack.components.AtletaItem
 import estga.dadm.athletrack.other.FloatingPopupToast
-import estga.dadm.athletrack.components.PasswordConfirmDialog
+import estga.dadm.athletrack.partials.PasswordConfirmDialog
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.SuccessPopupToast
 import estga.dadm.athletrack.ui.theme.*
@@ -185,7 +185,8 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                         expanded = showModalidadesMenu,
                         onDismissRequest = { showModalidadesMenu = false },
                         tonalElevation = 0.dp, // remove sombra escura
-                        modifier = Modifier.fillMaxWidth(0.9f) // Define 90% da largura do pai
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
                             .background(colorScheme.primaryContainer) // aplica ao menu inteiro
 
                     ) {
@@ -273,65 +274,46 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                LazyColumn(modifier = Modifier.weight(1f).padding(bottom = 16.dp)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = 16.dp)
+                ) {
                     items(atletas) { atleta ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .background(colorScheme.primaryContainer, RoundedCornerShape(12.dp))
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column {
-                                Text(atleta.nome, color = colorScheme.primary)
-                                Text(
-                                    "ID: ${atleta.idSocio}",
-                                    color = colorScheme.primary,
-                                    style = Typography.labelSmall
-                                )
-                            }
-                            IconButton(onClick = {
+                        AtletaItem(
+                            atleta = atleta,
+                            onDeleteClick = {
                                 atletaParaApagar = atleta
                                 showPasswordDialog = true
-                            }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Apagar",
-                                    tint = colorScheme.error
-                                )
                             }
-                        }
+                        )
                     }
                 }
-            }
 
-            PasswordConfirmDialog(
-                showDialog = showPasswordDialog,
-                descricao = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar?.nome} (ID: ${atletaParaApagar?.idSocio})?",
-                onDismiss = {
-                    showPasswordDialog = false
-                    atletaParaApagar = null
-                },
-                onConfirm = { password ->
-                    atletaParaApagar?.let { atleta ->
-                        viewModel.apagarAtleta(
-                            idAtleta = atleta.idSocio,
-                            idProfessor = user.idSocio,
-                            password = password
-                        ) { sucesso, resposta ->
-                            coroutineScope.launch {
-                                Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
+                PasswordConfirmDialog(
+                    showDialog = showPasswordDialog,
+                    descricao = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar?.nome} (ID: ${atletaParaApagar?.idSocio})?",
+                    onDismiss = {
+                        showPasswordDialog = false
+                        atletaParaApagar = null
+                    },
+                    onConfirm = { password ->
+                        atletaParaApagar?.let { atleta ->
+                            viewModel.apagarAtleta(
+                                idAtleta = atleta.idSocio,
+                                idProfessor = user.idSocio,
+                                password = password
+                            ) { sucesso, resposta ->
+                                coroutineScope.launch {
+                                    Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
+                                }
+                                if (sucesso) viewModel.carregarAtletas()
                             }
-                            if (sucesso) viewModel.carregarAtletas()
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
-
-
 

@@ -1,6 +1,6 @@
 package estga.dadm.athletrack.screens.calendar
 
-import android.widget.Toast
+import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -28,13 +28,13 @@ import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.viewmodels.CalendarViewModel
-import estga.dadm.athletrack.components.PasswordConfirmDialog
+import estga.dadm.athletrack.partials.PasswordConfirmDialog
 import java.net.URLEncoder
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
 import androidx.compose.ui.platform.LocalContext
-import estga.dadm.athletrack.components.EventDetailsDialog
+import estga.dadm.athletrack.partials.EventDetailsDialog
 import estga.dadm.athletrack.components.EventoItem
 
 /**
@@ -292,7 +292,7 @@ fun CalendarScreen(
                             evento = evento,
                             onDetailsClick = {
                                 eventoParaDetalhes = evento
-                                permissionLauncher.launch(android.Manifest.permission.WRITE_CALENDAR)
+                                permissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
                             }
                             ,
                             onDeleteClick = {

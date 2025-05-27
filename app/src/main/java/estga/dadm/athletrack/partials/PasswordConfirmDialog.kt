@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.components
+package estga.dadm.athletrack.partials
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
