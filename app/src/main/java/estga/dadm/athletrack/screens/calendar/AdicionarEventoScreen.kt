@@ -185,14 +185,17 @@ fun AdicionarEventoScreen(
                     value = descricao,
                     onValueChange = { descricao = it },
                     label = { Text("Descrição") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp), // Define altura para simular uma área de texto
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorScheme.primary,
                         unfocusedBorderColor = colorScheme.secondary,
                         focusedLabelColor = colorScheme.primary,
                         unfocusedLabelColor = colorScheme.secondary,
                         cursorColor = colorScheme.primary
-                    )
+                    ),
+                    maxLines = 5 // Permite múltiplas linhas
                 )
 
                 // MultiSelect para Modalidades

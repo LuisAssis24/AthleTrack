@@ -45,13 +45,13 @@ fun LoginScreen(
     ) {
         Text(
             text = "AthleTrack",
-            style = typography.titleLarge,
+            style = typography.displayLarge,
             color = colorScheme.onPrimary,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Acompanhe o seu treino",
-            style = typography.displayLarge,
+            style = typography.titleLarge,
             color = colorScheme.primary
         )
 

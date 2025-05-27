@@ -1,6 +1,8 @@
 package estga.dadm.athletrack.screens.calendar
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,9 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -35,6 +34,8 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
 import androidx.compose.ui.platform.LocalContext
+import estga.dadm.athletrack.components.EventDetailsDialog
+import estga.dadm.athletrack.components.EventoItem
 
 /**
  * Tela de calendário que exibe eventos e permite interação com as datas.
@@ -69,12 +70,6 @@ fun CalendarScreen(
         val dataEvento = LocalDate.parse(evento.data)
         dataEvento == selectedDate
     }
-
-    // Variáveis para controle de diálogo de confirmação de senha
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var eventoSelecionado by remember { mutableStateOf<Evento?>(null) }
-    var password by remember { mutableStateOf("") }
-
 
     // Calcula os dias no mês e o primeiro dia da semana
     val daysInMonth = currentMonth.lengthOfMonth()
@@ -269,110 +264,80 @@ fun CalendarScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                var showEventDialog by remember { mutableStateOf(false) }
+                var eventoParaDetalhes by remember { mutableStateOf<Evento?>(null) }
+
+                var showPasswordDialog by remember { mutableStateOf(false) }
+                var eventoSelecionado by remember { mutableStateOf<Evento?>(null) }
+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    if (isGranted) {
+                        showEventDialog = true
+                    } else {
+                        //Toast.makeText(context, "Permissão negada para escrever no calendário", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
                 // Lista de eventos filtrados
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
+
+
                     items(eventosFiltrados) { evento ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .background(
-                                    colorScheme.primaryContainer,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Seção principal com data, local e hora
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                // Data ao lado esquerdo
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        "${selectedDate.dayOfMonth}",
-                                        style = Typography.titleMedium,
-                                        color = colorScheme.primary
-                                    )
-                                    Text(
-                                        selectedDate.month.getDisplayName(
-                                            TextStyle.SHORT,
-                                            Locale("pt", "PT")
-                                        ).replaceFirstChar { it.uppercase() },
-                                        style = Typography.labelSmall,
-                                        color = colorScheme.secondary
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(12.dp))
-
-                                // Nome e Hora
-                                Column {
-                                    Text(evento.localEvento, color = colorScheme.primary)
-                                    Text(
-                                        evento.hora.take(5), // Apenas "hh:mm"
-                                        style = Typography.labelSmall,
-                                        color = colorScheme.secondary
-                                    )
-                                }
+                        EventoItem(
+                            selectedDate = selectedDate,
+                            evento = evento,
+                            onDetailsClick = {
+                                eventoParaDetalhes = evento
+                                permissionLauncher.launch(android.Manifest.permission.WRITE_CALENDAR)
                             }
-
-                            // Ícones: Detalhes e Eliminar
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                IconButton(onClick = {
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.AddCircle,
-                                        contentDescription = "Detalhes",
-                                        tint = colorScheme.primary,
-                                    )
-                                }
-                            }
-                            IconButton(onClick = {
+                            ,
+                            onDeleteClick = {
                                 showPasswordDialog = true
                                 eventoSelecionado = evento
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Eliminar",
-                                    tint = colorScheme.error
-                                )
+                            }
+                        )
+                    }
+                }
+
+                PasswordConfirmDialog(
+                    showDialog = showPasswordDialog,
+                    descricao = "Tem a certeza que quer eliminar este evento? Esta ação não pode ser desfeita.",
+                    onDismiss = {
+                        showPasswordDialog = false
+                        eventoSelecionado = null
+                    },
+
+                    onConfirm = { password -> eventoSelecionado?.let { evento ->
+                        viewModel.apagarEvento(
+                            idEvento = evento.id,
+                            idProfessor = user.idSocio,
+                            password = password,
+                        ) { sucesso, mensagem ->
+                            if (sucesso) {
+                                viewModel.carregarEventosParaMes(user.idSocio)
+                                showPasswordDialog = false
                             }
                         }
                     }
+                    }
+                )
 
+                eventoParaDetalhes?.let { evento ->
+                    EventDetailsDialog(
+                        evento = evento,
+                        onDismiss = {
+                            showEventDialog = false
+                            eventoParaDetalhes = null
+                        },
+                        context = LocalContext.current
+                    )
                 }
+
             }
         }
     }
-
-    PasswordConfirmDialog(
-        showDialog = showPasswordDialog,
-        descricao = "Tem a certeza que quer eliminar este evento? Esta ação não pode ser desfeita.",
-        onDismiss = {
-            showPasswordDialog = false
-            eventoSelecionado = null
-        },
-
-        onConfirm = { password -> eventoSelecionado?.let { evento ->
-                viewModel.apagarEvento(
-                    idEvento = evento.id,
-                    idProfessor = user.idSocio,
-                    password = password,
-                ) { sucesso, mensagem ->
-                    if (sucesso) {
-                        viewModel.carregarEventosParaMes(user.idSocio)
-                        showPasswordDialog = false
-                    }
-                }
-            }
-        }
-    )
 }
