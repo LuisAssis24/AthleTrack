@@ -13,7 +13,7 @@ import java.time.LocalTime
  * Controlador REST responsável pelas operações relacionadas a eventos.
  *
  * Fornece endpoints para listar eventos associados às modalidades de um sócio
- * e para criar novos eventos vinculados a modalidades específicas.
+ * e para criar eventos vinculados a modalidades específicas.
  */
 @RestController
 @RequestMapping("/api/eventos")
@@ -50,7 +50,7 @@ class EventoController(
     }
 
     /**
-     * Cria um novo evento e associa às modalidades informadas.
+     * Cria um evento e associa às modalidades informadas.
      *
      * @param request Objeto EventoCriarRequestDTO contendo os dados do evento e IDs das modalidades.
      * @throws RuntimeException se ocorrer erro ao criar o evento ou associar modalidades.

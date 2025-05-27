@@ -27,7 +27,7 @@ class TreinoController(
     /**
      * Lista todos os treinos de um professor, ordenados por dia da semana.
      *
-     * @param request Objeto contendo o ID do professor.
+     * @param request Objeto contendo o ‘ID’ do professor.
      * @return Lista de treinos do professor, agrupados por dia da semana.
      */
     @PostMapping
@@ -58,7 +58,7 @@ class TreinoController(
     /**
      * Lista os treinos do professor para o dia atual, considerando uma margem de 4 horas.
      *
-     * @param request Objeto contendo o ID do professor e o dia da semana.
+     * @param request Objeto contendo o ‘ID’ do professor e o dia da semana.
      * @return Lista de treinos do professor para o dia atual.
      */
     @PostMapping("/hoje")
@@ -85,7 +85,7 @@ class TreinoController(
     /**
      * Lista os treinos do professor para o dia seguinte.
      *
-     * @param request Objeto contendo o ID do professor e o dia da semana.
+     * @param request Objeto contendo o ‘ID’ do professor e o dia da semana.
      * @return Lista de treinos do professor para o dia seguinte.
      */
     @PostMapping("/amanha")
@@ -105,9 +105,9 @@ class TreinoController(
     }
 
     /**
-     * Lista treinos disponíveis para um aluno, considerando suas modalidades e horários.
+     * Lista treinos disponíveis para um aluno, considerando as suas modalidades e horários.
      *
-     * @param request Objeto contendo o ID do sócio e o dia da semana.
+     * @param request Objeto contendo o ‘ID’ do sócio e o dia da semana.
      * @return Lista de treinos disponíveis para o aluno.
      */
     @PostMapping("/aluno")
@@ -139,7 +139,7 @@ class TreinoController(
     }
 
     /**
-     * Cria um novo treino, gerando um QR code único para identificação.
+     * Cria um treino, gerando um QR code único para identificação.
      *
      * @param request Objeto contendo os dados necessários para criação do treino.
      * @return ResponseEntity com mensagem de sucesso ou erro.
@@ -171,7 +171,7 @@ class TreinoController(
      * Apaga um treino, validando o professor e a senha fornecida.
      * Remove também todas as presenças associadas ao treino.
      *
-     * @param request Objeto contendo o ID do professor, senha e QR code do treino.
+     * @param request Objeto contendo o ‘ID’ do professor, senha e QR code do treino.
      * @return ResponseEntity com mensagem de sucesso ou erro.
      */
     @PostMapping("/apagar")

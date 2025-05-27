@@ -24,7 +24,7 @@ class UserController(
     /**
      * Realiza ‘login’ do utilizador.
      *
-     * @param request Objeto LoginRequestDTO contendo o ID do sócio e a senha.
+     * @param request Objeto LoginRequestDTO contendo o ‘ID’ do sócio e a senha.
      * @return ResponseEntity com UserResponseDTO se autenticado, ou 401 se falhar.
      */
     @PostMapping("/login")
@@ -46,7 +46,7 @@ class UserController(
     /**
      * Lista todos os utilizadores, ordenando por tipo (professor, atleta, outros).
      *
-     * @return Lista de UserResponseDTO representando todos os usuários.
+     * @return Lista de UserResponseDTO representando todos os utilizadores.
      */
     @PostMapping("/listar")
     fun listarTodos(): List<UserResponseDTO> {
@@ -70,9 +70,9 @@ class UserController(
     }
 
     /**
-     * Cria um novo usuário e associa às modalidades informadas.
+     * Cria um utilizador e associa às modalidades informadas.
      *
-     * @param request Objeto UserCreateRequestDTO com dados do usuário e IDs das modalidades.
+     * @param request Objeto UserCreateRequestDTO com dados do utilizador e ‘IDs’ das modalidades.
      * @return ResponseEntity com mensagem de sucesso ou erro.
      */
     @PostMapping("/criar")
@@ -107,11 +107,11 @@ class UserController(
     }
 
     /**
-     * Elimina um usuário, validando a senha do solicitante.
-     * Remove também todas as associações do usuário com modalidades.
+     * Elimina um utilizador, validando a senha do solicitante.
+     * Remove também todas as associações do utilizador com modalidades.
      *
      * @param loginRequest Objeto LoginRequestDTO com credenciais do solicitante.
-     * @param idParaEliminar ID do usuário a ser eliminado.
+     * @param idParaEliminar ‘ID’ do utilizador a ser eliminado.
      * @return ResponseEntity com mensagem de sucesso ou erro.
      */
     @PostMapping("/eliminar/{idParaEliminar}")
