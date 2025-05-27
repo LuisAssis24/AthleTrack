@@ -112,4 +112,31 @@ class GestaoPresencasViewModel : ViewModel() {
             }
         }
     }
+
+
+    /**
+     * Carrega as presenças de um treino com dados hardcoded para testes.
+     *
+     * @param treino O treino a ser carregado.
+     * @param presencas A lista de presenças a ser carregada.
+     */
+    fun carregarPresencasHardcoded(treino: Treino?, presencas: List<PresencaListResponse>) {
+        _treinoInfo.value = treino
+        _alunos.value = presencas
+    }
+
+    /**
+     * Simula a criação de uma presença manual para testes.
+     *
+     * @param qrCode O QR Code do treino.
+     * @param simularErro Indica se deve simular um erro no salvamento.
+     */
+    fun salvarPresencasHardcoded(qrCode: String, simularErro: Boolean = false) {
+        if (simularErro) {
+            // Simula erro no salvamento
+            return
+        }
+        // Simula sucesso no salvamento
+    }
+
 }

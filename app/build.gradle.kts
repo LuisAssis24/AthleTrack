@@ -42,6 +42,13 @@ android {
 
 dependencies {
 
+    //Dependências de teste
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation ("org.mockito:mockito-core:5.5.0")
+    testImplementation ("net.bytebuddy:byte-buddy:1.14.6")
+    testImplementation ("net.bytebuddy:byte-buddy-agent:1.14.6")
+
     //Implementação do QR Code
     implementation("androidx.camera:camera-core:1.4.0")
     implementation("androidx.camera:camera-lifecycle:1.4.0")
@@ -74,6 +81,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.cronet.embedded)
+
 
 
     testImplementation(libs.junit)

@@ -75,5 +75,15 @@ class CalendarViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Carrega eventos hardcoded para testes ou desenvolvimento.
+     *
+     * @param eventos A lista de eventos a serem carregados.
+     */
+    fun carregarEventosHardcoded(eventos: List<Evento>) {
+        _eventos.value = eventos
+    }
+
 }
 

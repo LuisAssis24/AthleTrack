@@ -107,4 +107,61 @@ package estga.dadm.athletrack.viewmodels
                 }
             }
         }
+
+
+        /**
+         * Carrega modalidades hardcoded para testes ou desenvolvimento.
+         *
+         * @param modalidades Lista de modalidades a serem carregadas.
+         */
+        fun carregarAtletasHardcoded(atletas: List<User>) {
+            _atletas.value = atletas
+        }
+
+        /**
+         * Cria um atleta hardcoded para testes ou desenvolvimento.
+         *
+         * @param request Dados do atleta a ser criado.
+         * @param simularErro Se verdadeiro, simula um erro na criação.
+         * @param callback Callback que recebe o resultado da operação.
+         */
+        fun criarAtletaHardcoded(
+            request: UserCreate,
+            simularErro: Boolean = false,
+            callback: (Boolean, String) -> Unit
+        ) {
+            if (simularErro) {
+                callback(false, "Erro ao criar atleta.")
+            } else {
+                _atletas.value = _atletas.value + User(3, request.nome, request.tipo)
+                callback(true, "Atleta criado com sucesso!")
+            }
+        }
+
+        /**
+         * Apaga um atleta hardcoded para testes ou desenvolvimento.
+         *
+         * @param idAtleta ID do atleta a ser apagado.
+         * @param simularErro Se verdadeiro, simula um erro na exclusão.
+         * @param callback Callback que recebe o resultado da operação.
+         */
+        fun apagarAtletaHardcoded(idAtleta: Int, simularErro: Boolean = false, callback: (Boolean, String) -> Unit) {
+            if (simularErro) {
+                callback(false, "Erro ao apagar atleta.")
+            } else {
+                _atletas.value = _atletas.value.filter { it.idSocio != idAtleta }
+                callback(true, "Atleta apagado com sucesso!")
+            }
+        }
+
+        /**
+         * Carrega modalidades hardcoded para testes ou desenvolvimento.
+         * Substitui o estado interno `_modalidades` com a lista fornecida.
+         *
+         * @param modalidades Lista de modalidades a serem carregadas.
+         */
+        fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+            _modalidades.value = modalidades
+        }
+
     }

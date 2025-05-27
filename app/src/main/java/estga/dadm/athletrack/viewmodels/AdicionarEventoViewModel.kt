@@ -2,6 +2,7 @@ package estga.dadm.athletrack.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import estga.dadm.athletrack.api.Evento
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,6 +23,9 @@ class AdicionarEventoViewModel : ViewModel() {
      * Estado público que expõe a lista de modalidades para observação.
      */
     val modalidades: StateFlow<List<Modalidade>> = _modalidades
+
+    // Lista interna para armazenar eventos adicionados hardcoded.
+    private val eventosAdicionados = mutableListOf<Evento>() // Lista interna para eventos adicionados
 
     /**
      * Carrega a lista de modalidades disponíveis a partir do serviço remoto.
@@ -98,4 +102,55 @@ class AdicionarEventoViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Carrega modalidades hardcoded para testes ou desenvolvimento.
+     * Substitui o estado interno `_modalidades` com a lista fornecida.
+     *
+     * @param modalidades Lista de modalidades a serem carregadas.
+     */
+    fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+        _modalidades.value = modalidades
+    }
+
+    /**
+     * Adiciona um evento hardcoded para testes ou desenvolvimento.
+     * Verifica se já existe um evento com a mesma descrição e retorna o resultado.
+     *
+     * @param data A data do evento.
+     * @param hora A hora do evento.
+     * @param local O local do evento.
+     * @param descricao A descrição do evento.
+     * @param modalidades Lista de IDs das modalidades associadas ao evento.
+     * @param onResult Callback que recebe um booleano indicando se o evento foi adicionado com sucesso.
+     */
+    fun adicionarEventoHardcoded(
+        data: String,
+        hora: String,
+        local: String,
+        descricao: String,
+        modalidades: List<Int>,
+        onResult: (Boolean) -> Unit,
+        simularFalha: Boolean = false // Adiciona um parâmetro para simular falha
+    ) {
+        if (simularFalha) {
+            onResult(false) // Retorna erro em caso de falha simulada
+            return
+        }
+
+        val eventoDuplicado = eventosAdicionados.any { evento ->
+            evento.localEvento == local &&
+                    evento.data == data &&
+                    evento.hora == hora &&
+                    evento.descricao == descricao
+        }
+
+        if (eventoDuplicado) {
+            onResult(false) // Retorna erro para evento duplicado
+        } else {
+            eventosAdicionados.add(Evento(local, data, hora, descricao))
+            onResult(true) // Adiciona o evento com sucesso
+        }
+    }
+
 }

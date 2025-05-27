@@ -204,4 +204,32 @@ class HomeProfessorViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Carrega treinos hardcoded para testes ou desenvolvimento.
+     *
+     * @param treinos Lista de treinos a serem carregados.
+     */
+    fun carregarTreinosHojeHardcoded(treinos: List<Treino>) {
+        _treinosHoje.value = treinos
+    }
+
+    /**
+     * Carrega treinos de amanhã hardcoded para testes ou desenvolvimento.
+     *
+     * @param treinos Lista de treinos a serem carregados.
+     */
+    fun carregarTreinosAmanhaHardcoded(treinos: List<Treino>) {
+        _treinosAmanha.value = treinos
+    }
+
+    /**
+     * Carrega modalidades hardcoded para testes ou desenvolvimento.
+     *
+     * @param modalidades Lista de modalidades a serem carregadas.
+     */
+    fun carregarModalidadesHardcoded(modalidades: List<Modalidade>) {
+        _modalidades.value = modalidades
+    }
+
 }

@@ -63,4 +63,13 @@ class HomeAtletaViewModel: ViewModel() {
             else -> ""
         }
     }
+
+    /**
+     * Carrega treinos hardcoded para testes ou desenvolvimento.
+     *
+     * @param treinos Lista de treinos a serem carregados.
+     */
+    fun carregarTreinosHardcoded(treinos: List<Treino>) {
+        _treinos.value = treinos
+    }
 }
