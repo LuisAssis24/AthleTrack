@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.*
 class UserController(
     private val userRepository: UserRepository,
     private val modalidadeRepository: ModalidadeRepository,
-    private val socioModalidadeRepository: SocioModalidadeRepository
+    private val socioModalidadeRepository: SocioModalidadeRepository,
+    private val presencaRepository: PresencaRepository
 ) {
     /**
      * Realiza ‘login’ do utilizador.
@@ -129,10 +130,14 @@ class UserController(
 
         val user = userRepository.findById(idParaEliminar).orElse(null)
         val socioModalidades = socioModalidadeRepository.findBySocioId(idParaEliminar)
+        val presencas = presencaRepository.findBySocioId(idParaEliminar)
 
         return if (user != null) {
             socioModalidades.forEach { socioModalidade ->
                 socioModalidadeRepository.delete(socioModalidade)
+            }
+            presencas.forEach { presenca ->
+                presencaRepository.delete(presenca)
             }
             userRepository.delete(user)
             ResponseEntity.ok("Utilizador eliminado com sucesso.")

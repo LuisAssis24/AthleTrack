@@ -104,7 +104,7 @@ class CalendarViewModel : ViewModel() {
 
 
     /**
-     * Carrega eventos hardcoded para testes ou desenvolvimento.
+     * Carrega eventos hardcoded para testes
      *
      * @param eventos A lista de eventos a serem carregados.
      */

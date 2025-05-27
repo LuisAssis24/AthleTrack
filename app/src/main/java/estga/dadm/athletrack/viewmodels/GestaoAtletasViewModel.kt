@@ -2,6 +2,7 @@ package estga.dadm.athletrack.viewmodels
 
     import androidx.lifecycle.*
     import estga.dadm.athletrack.api.*
+    import estga.dadm.athletrack.api.RetrofitClient.loginService
     import kotlinx.coroutines.flow.*
     import kotlinx.coroutines.launch
     import okhttp3.ResponseBody
@@ -77,16 +78,16 @@ package estga.dadm.athletrack.viewmodels
          * @param senha Senha do professor para autenticação.
          * @param callback Callback a ser executado após a exclusão, indicando sucesso ou erro.
          */
-        fun apagarAtletaComSenha(
+        fun apagarAtleta(
             idAtleta: Int,
             idProfessor: Int,
-            senha: String,
+            password: String,
             callback: (Boolean, String) -> Unit
         ) {
             viewModelScope.launch {
                 try {
-                    val login = UserRequest(idProfessor, senha)
-                    val resposta: ResponseBody = RetrofitClient.loginService.eliminar(idAtleta, login)
+                    val login = UserRequest(idProfessor, password)
+                    val resposta: ResponseBody = loginService.eliminar(idAtleta, login)
                     carregarAtletas()
                     callback(true, resposta.string())
                 } catch (e: Exception) {

@@ -99,7 +99,7 @@ fun CalendarScreen(
                         navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar",
                             tint = colorScheme.primary,
                             modifier = Modifier.size(36.dp)
@@ -340,9 +340,9 @@ fun CalendarScreen(
                                 eventoSelecionado = evento
                             }) {
                                 Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Eliminar",
-                                tint = colorScheme.error
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar",
+                                    tint = colorScheme.error
                                 )
                             }
                         }
@@ -355,25 +355,24 @@ fun CalendarScreen(
 
     PasswordConfirmDialog(
         showDialog = showPasswordDialog,
+        descricao = "Tem a certeza que quer eliminar este evento? Esta ação não pode ser desfeita.",
         onDismiss = {
             showPasswordDialog = false
             eventoSelecionado = null
-            password = ""
         },
-        descricao = "Tem a certeza que quer eliminar este evento? Esta ação não pode ser desfeita.",
-                onConfirm = {
-                    eventoSelecionado?.let { evento ->
-                        viewModel.apagarEvento(
-                            idEvento = evento.id,
-                            idProfessor = user.idSocio,
-                            password = password
-                        ) { sucesso, mensagem ->
-                            if (sucesso) {
-                                viewModel.carregarEventosParaMes(user.idSocio)
-                                showPasswordDialog = false
-                            }
-                        }
+
+        onConfirm = { password -> eventoSelecionado?.let { evento ->
+                viewModel.apagarEvento(
+                    idEvento = evento.id,
+                    idProfessor = user.idSocio,
+                    password = password,
+                ) { sucesso, mensagem ->
+                    if (sucesso) {
+                        viewModel.carregarEventosParaMes(user.idSocio)
+                        showPasswordDialog = false
                     }
                 }
-            )
+            }
+        }
+    )
 }

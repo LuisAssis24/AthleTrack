@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 interface PresencaRepository : JpaRepository<Presenca, PresencaId> {
+    fun findBySocioId(socioId: Int): List<Presenca>
+
     /**
      * Busca uma presença por ID do sócio e ID do treino.
      */

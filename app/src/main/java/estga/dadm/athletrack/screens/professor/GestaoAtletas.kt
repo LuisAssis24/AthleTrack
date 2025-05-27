@@ -12,9 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.User
@@ -28,7 +26,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.components.PasswordConfirmDialog
 import estga.dadm.athletrack.other.LoadingScreen
@@ -48,7 +45,6 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
     var showModalidadesMenu by remember { mutableStateOf(false) }
 
     var showPasswordDialog by remember { mutableStateOf(false) }
-    var senhaParaApagar by remember { mutableStateOf("") }
     var atletaParaApagar by remember { mutableStateOf<User?>(null) }
 
     val listaModalidades by viewModel.modalidades.collectAsState()
@@ -316,15 +312,14 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 descricao = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar?.nome} (ID: ${atletaParaApagar?.idSocio})?",
                 onDismiss = {
                     showPasswordDialog = false
-                    senhaParaApagar = ""
                     atletaParaApagar = null
                 },
-                onConfirm = { senha ->
+                onConfirm = { password ->
                     atletaParaApagar?.let { atleta ->
-                        viewModel.apagarAtletaComSenha(
+                        viewModel.apagarAtleta(
                             idAtleta = atleta.idSocio,
                             idProfessor = user.idSocio,
-                            senha = senha
+                            password = password
                         ) { sucesso, resposta ->
                             coroutineScope.launch {
                                 Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()

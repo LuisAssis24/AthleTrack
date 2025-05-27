@@ -28,8 +28,11 @@ import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
@@ -86,7 +89,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar",
                             tint = colorScheme.primary,
                             modifier = Modifier.size(28.dp)
@@ -106,7 +109,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
+                    .padding()
             ) {
                 if (showToast && toastMessage != null) {
                     FloatingPopupToast(
@@ -283,7 +286,9 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 }
 
                 Spacer(Modifier.height(24.dp))
-                Divider(color = colorScheme.secondary)
+
+                HorizontalDivider(color = colorScheme.secondary)
+
                 Text(
                     "Todos os Treinos",
                     color = colorScheme.primary,
