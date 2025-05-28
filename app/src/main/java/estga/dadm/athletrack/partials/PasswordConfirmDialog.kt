@@ -32,7 +32,7 @@ fun PasswordConfirmDialog(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
                 ) {
-                    Text("Eliminar", color = colorScheme.inversePrimary)
+                    Text("Eliminar", color = colorScheme.primary)
                 }
             },
             dismissButton = {

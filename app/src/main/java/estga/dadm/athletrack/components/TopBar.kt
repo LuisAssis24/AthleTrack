@@ -67,7 +67,7 @@ fun TopBar(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Perfil",
                         tint = colorScheme.primary,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(48.dp)
                     )
                 }
 

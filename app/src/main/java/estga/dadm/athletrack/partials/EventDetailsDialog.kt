@@ -6,6 +6,7 @@ import android.provider.CalendarContract
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +29,7 @@ fun EventDetailsDialog(
                 adicionarEventoAoCalendario(context, evento)
                 onDismiss()
             }) {
-                Text("Adicionar ao Calendário")
+                Text("Adicionar ao Calendário", color = colorScheme.inversePrimary)
             }
         },
         dismissButton = {

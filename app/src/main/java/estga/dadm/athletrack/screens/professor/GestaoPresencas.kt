@@ -159,7 +159,7 @@ fun GestaoPresencas(
                 ) {
                     Text(
                         text = "Salvar Presenças",
-                        color = colorScheme.onPrimary
+                        color = colorScheme.inversePrimary
                     )
                 }
             }
