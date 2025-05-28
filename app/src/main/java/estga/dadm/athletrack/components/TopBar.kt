@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.User
+import estga.dadm.athletrack.other.getAdjustedTypography
 import estga.dadm.athletrack.ui.theme.Typography
 import java.net.URLEncoder
 
@@ -156,7 +157,7 @@ fun TopBar(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Gestão de Treinos",
-                    style = Typography.labelLarge,
+                    style = getAdjustedTypography(),
                     textAlign = TextAlign.Center,
                     color = colorScheme.primary
                 )
@@ -189,7 +190,7 @@ fun TopBar(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Gestão de Atletas",
-                    style = Typography.labelLarge,
+                    style = getAdjustedTypography(),
                     textAlign = TextAlign.Center,
                     color = colorScheme.primary
                 )
