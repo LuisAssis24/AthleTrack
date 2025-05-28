@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -30,14 +32,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import estga.dadm.athletrack.partials.QrCodeDialog
 import estga.dadm.athletrack.ui.theme.*
-import java.net.URLEncoder
-import com.google.gson.Gson
 import estga.dadm.athletrack.other.UserPreferences
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.SentimentSatisfied
 import estga.dadm.athletrack.components.BottomMenu
 import estga.dadm.athletrack.components.TopBar
 import estga.dadm.athletrack.other.LoadingScreen
+import kotlin.text.compareTo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,27 +105,33 @@ fun HomeProfessor(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                Text(
+                    text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
+                    style = Typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    thickness = 1.5.dp,
+                    color = colorScheme.secondary
+                )
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.7f)
                 ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
-                            style = Typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    val scrollState = rememberScrollState()
 
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            thickness = 1.5.dp,
-                            color = colorScheme.secondary
-                        )
-
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                    ) {
                         val aulasParaMostrar =
                             if (selected.value == "hoje") aulasHoje else aulasAmanha
 
@@ -137,16 +144,16 @@ fun HomeProfessor(
 
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center, // Centraliza verticalmente
+                                verticalArrangement = Arrangement.Center,
                                 modifier = Modifier
-                                    .fillMaxHeight(0.6f) // Preenche 60% da altura
+                                    .fillMaxHeight(0.6f)
                                     .fillMaxWidth()
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.SentimentSatisfied,
                                     contentDescription = "Sem aulas",
                                     tint = colorScheme.primary,
-                                    modifier = Modifier.size(148.dp) // Tamanho do smile
+                                    modifier = Modifier.size(148.dp)
                                 )
                             }
                         } else {
@@ -174,7 +181,6 @@ fun HomeProfessor(
                                         )
                                     }
                                 }
-
                             }
                         }
                     }

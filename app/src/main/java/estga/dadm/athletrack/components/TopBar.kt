@@ -1,14 +1,11 @@
 package estga.dadm.athletrack.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,10 +18,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode
-import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -152,19 +147,23 @@ fun TopBar(
                     .size(81.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.tertiary)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
-                    contentDescription = "GestaoTreinos",
-                    modifier = Modifier.size(40.dp),
-                    tint = colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Gestão de Treinos",
-                    style = Typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = colorScheme.primary
-                )
+                Column {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
+                        contentDescription = "GestaoTreinos",
+                        modifier = Modifier.weight(0.4f).
+                        align(Alignment.CenterHorizontally),
+                        tint = colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Gestão de Treinos",
+                        style = Typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = colorScheme.primary
+                    )
+                }
+
             }
 
 
@@ -185,19 +184,22 @@ fun TopBar(
                     .size(81.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "GestaoAtleta",
-                    modifier = Modifier.size(40.dp),
-                    tint = colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Gestão de Atletas",
-                    style = Typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = colorScheme.primary
-                )
+                Column {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "GestaoAtleta",
+                        modifier = Modifier.weight(0.4f).
+                        align(Alignment.CenterHorizontally),
+                        tint = colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Gestão de Atletas",
+                        style = Typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = colorScheme.primary
+                    )
+                }
             }
         }
     } else {

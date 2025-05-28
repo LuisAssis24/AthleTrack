@@ -13,8 +13,8 @@ object RetrofitClient {
      * - `http://10.0.2.2:8080/api/`: Usada para testes locais no emulador.
      * - `https://athletrack-backend.onrender.com`: Usada para produção.
      */
-    private const val BASE_URL = "http://10.0.2.2:8080/api/" // Emulador Local
-    //private const val BASE_URL = "https://athletrack-backend.onrender.com" // Produção
+    //private const val BASE_URL = "http://10.0.2.2:8080/api/" // Emulador Local
+    private const val BASE_URL = "https://athletrack-backend.onrender.com" // Produção
 
     /**
      * Instância do Retrofit configurada com a URL base e o conversor Gson.
