@@ -156,7 +156,7 @@ fun TopBar(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Gestão de Treinos",
-                    style = Typography.bodyMedium,
+                    style = Typography.labelLarge,
                     textAlign = TextAlign.Center,
                     color = colorScheme.primary
                 )
@@ -189,7 +189,7 @@ fun TopBar(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Gestão de Atletas",
-                    style = Typography.bodyMedium,
+                    style = Typography.labelLarge,
                     textAlign = TextAlign.Center,
                     color = colorScheme.primary
                 )

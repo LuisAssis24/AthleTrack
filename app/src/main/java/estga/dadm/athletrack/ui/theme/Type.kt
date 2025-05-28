@@ -26,6 +26,10 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontSize = 16.sp,
     ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontSize = 16.sp,
+    ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,
         fontSize = 12.sp,
