@@ -16,6 +16,13 @@ import estga.dadm.athletrack.api.Evento
 import estga.dadm.athletrack.ui.theme.BackgroundBlueDark
 import java.util.Calendar
 
+/**
+ * Componente que exibe um diálogo com os detalhes de um evento.
+ *
+ * @param evento Objeto contendo as informações do evento.
+ * @param onDismiss Função chamada ao fechar o diálogo.
+ * @param context Contexto da aplicação, utilizado para adicionar o evento ao calendário.
+ */
 @Composable
 fun EventDetailsDialog(
     evento: Evento,
@@ -52,7 +59,11 @@ fun EventDetailsDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text("Data e Hora:", color = Color.White)
-                Text("${evento.data} ${evento.hora}", fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    "${evento.data} ${evento.hora}",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -69,6 +80,12 @@ fun EventDetailsDialog(
     )
 }
 
+/**
+ * Função que adiciona um evento ao calendário do dispositivo.
+ *
+ * @param context Contexto da aplicação, necessário para iniciar a atividade de inserção no calendário.
+ * @param evento Objeto contendo as informações do evento a ser adicionado.
+ */
 fun adicionarEventoAoCalendario(context: Context, evento: Evento) {
     val intent = Intent(Intent.ACTION_INSERT).apply {
         data = CalendarContract.Events.CONTENT_URI
@@ -76,13 +93,12 @@ fun adicionarEventoAoCalendario(context: Context, evento: Evento) {
         putExtra(CalendarContract.Events.DESCRIPTION, evento.descricao)
 
         val startMillis = Calendar.getInstance().apply {
-            set(Calendar.YEAR, evento.data.substring(0,4).toInt())
-            set(Calendar.MONTH, evento.data.substring(5,7).toInt() - 1)
-            set(Calendar.DAY_OF_MONTH, evento.data.substring(8,10).toInt())
-            set(Calendar.HOUR_OF_DAY, evento.hora.substring(0,2).toInt())
-            set(Calendar.MINUTE, evento.hora.substring(3,5).toInt())
+            set(Calendar.YEAR, evento.data.substring(0, 4).toInt())
+            set(Calendar.MONTH, evento.data.substring(5, 7).toInt() - 1)
+            set(Calendar.DAY_OF_MONTH, evento.data.substring(8, 10).toInt())
+            set(Calendar.HOUR_OF_DAY, evento.hora.substring(0, 2).toInt())
+            set(Calendar.MINUTE, evento.hora.substring(3, 5).toInt())
         }.timeInMillis
-
 
         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
         putExtra(CalendarContract.EXTRA_EVENT_END_TIME, startMillis + 60 * 60 * 1000)

@@ -1,15 +1,12 @@
 package estga.dadm.athletrack.screens.atleta
 
 import android.content.pm.PackageManager
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,11 +20,7 @@ import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeAtletaViewModel
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.platform.LocalContext
@@ -35,13 +28,19 @@ import androidx.core.content.ContextCompat
 import estga.dadm.athletrack.api.PresencaRequest
 import estga.dadm.athletrack.partials.QrCameraScanner
 import com.google.gson.Gson
-import estga.dadm.athletrack.components.BottomMenu
+import estga.dadm.athletrack.partials.BottomMenu
 import estga.dadm.athletrack.components.TopBar
 import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.UserPreferences
-import java.net.URLEncoder
 
+/**
+ * Tela principal do atleta que exibe os próximos treinos e permite interações como leitura de QR Code e logout.
+ *
+ * @param user Objeto do usuário contendo informações como ID de sócio.
+ * @param navController Controlador de navegação para redirecionar o usuário entre telas.
+ * @param viewModel ViewModel responsável por gerenciar os dados e ações da tela.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAtleta(
@@ -49,6 +48,7 @@ fun HomeAtleta(
     navController: NavHostController,
     viewModel: HomeAtletaViewModel = viewModel()
 ) {
+    // Estado que armazena os treinos carregados.
     val treinos by viewModel.treinos.collectAsState()
     val scope = rememberCoroutineScope()
     var showCameraDialog by remember { mutableStateOf(false) }
@@ -56,14 +56,17 @@ fun HomeAtleta(
 
     val context = LocalContext.current
 
+    // Estados para exibir mensagens de toast.
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
     var isToastSuccess by remember { mutableStateOf(true) }
 
+    // Preferências do usuário para gerenciar estado de login.
     val userPreferences = remember { UserPreferences(context) }
     val bottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    // Lançador para solicitar permissão de câmera.
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -76,13 +79,15 @@ fun HomeAtleta(
         }
     }
 
-    val isLoading =
-        treinos.isEmpty() // Define se a tela está carregada com base na lista de treinos
+    // Define se a tela está carregada com base na lista de treinos.
+    val isLoading = treinos.isEmpty()
 
+    // Carrega os treinos ao iniciar a tela.
     LaunchedEffect(Unit) {
         viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
     }
 
+    // Exibe a tela principal com treinos e interações.
     LoadingScreen(isLoading = isLoading) {
         Scaffold(
             modifier = Modifier
@@ -98,12 +103,13 @@ fun HomeAtleta(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // Barra superior com opções de navegação e QR Code.
                 TopBar(
                     user = user,
                     navController = navController,
                     onBottomSheet = { showBottomSheet = true },
                     qrCodeClick = {
-                        // Verifica se a permissão da câmara está concedida
+                        // Verifica se a permissão da câmara está concedida.
                         when {
                             ContextCompat.checkSelfPermission(
                                 context,
@@ -111,8 +117,9 @@ fun HomeAtleta(
                             ) == PackageManager.PERMISSION_GRANTED -> {
                                 showCameraDialog = true
                             }
+
                             else -> {
-                                // Solicita a permissão da câmara
+                                // Solicita a permissão da câmara.
                                 launcher.launch(android.Manifest.permission.CAMERA)
                             }
                         }
@@ -121,6 +128,7 @@ fun HomeAtleta(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Título da seção de treinos.
                 Text(
                     text = "Próximos Treinos",
                     style = Typography.titleMedium,
@@ -137,6 +145,7 @@ fun HomeAtleta(
                     color = colorScheme.secondary
                 )
 
+                // Lista de treinos ou mensagem de ausência de treinos.
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -168,23 +177,21 @@ fun HomeAtleta(
                     }
                 }
 
-                // CÂMERA QR DIALOG
-                // Flag de leitura única
+                // Diálogo de leitura de QR Code.
                 var leituraCompleta by remember { mutableStateOf(false) }
 
-                // CÂMERA QR DIALOG
                 if (showCameraDialog) {
                     AlertDialog(
                         onDismissRequest = {
                             showCameraDialog = false
-                            leituraCompleta = false // permite nova leitura no futuro
+                            leituraCompleta = false // Permite nova leitura no futuro.
                         },
                         confirmButton = {},
                         title = { Text("Ler QR Code") },
                         text = {
                             QrCameraScanner(onCodeScanned = { codigo ->
                                 if (!leituraCompleta) {
-                                    leituraCompleta = true // impede leituras duplicadas
+                                    leituraCompleta = true // Impede leituras duplicadas.
 
                                     scope.launch {
                                         try {
@@ -211,6 +218,7 @@ fun HomeAtleta(
 
             }
 
+            // Exibe mensagens de toast.
             if (showToast) {
                 FloatingPopupToast(
                     message = toastMessage,
@@ -222,7 +230,7 @@ fun HomeAtleta(
             }
         }
 
-
+        // Exibe o menu inferior com opções de logout e atualização.
         if (showBottomSheet) {
             BottomMenu(
                 showBottomSheet = showBottomSheet,

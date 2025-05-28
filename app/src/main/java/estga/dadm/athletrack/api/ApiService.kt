@@ -11,7 +11,7 @@ import retrofit2.Response
  * Modelo de dados para quando é necessário enviar apenas o id do sócio.
  * @property id Identificador único do sócio.
  */
-data class idRequest(
+data class IdRequest(
     val id: Int
 )
 
@@ -179,7 +179,7 @@ interface TreinosService {
      * @return Retorna uma lista de treinos.
      */
     @POST("/api/treinos")
-    suspend fun listarTodosOsTreinos(@Body request: idRequest): List<Treino>
+    suspend fun listarTodosOsTreinos(@Body request: IdRequest): List<Treino>
 
     /**
      * Apaga um treino.
@@ -340,7 +340,7 @@ interface PresencasService {
      * @return Retorna uma lista de presenças.
      */
     @POST("/api/presencas/listar")
-    suspend fun listarPresencas(@Body request: idRequest): List<PresencaListResponse>
+    suspend fun listarPresencas(@Body request: IdRequest): List<PresencaListResponse>
 }
 
 /**

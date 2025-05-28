@@ -12,13 +12,13 @@ import estga.dadm.athletrack.navigation.AthleTrackNavGraph
 import estga.dadm.athletrack.ui.theme.AthleTrackTheme
 
 /**
- * A classe principal da aplicação que representa a atividade inicial.
+ * Classe principal da aplicação que representa a atividade inicial.
  * Responsável por configurar o tema, a navegação e o layout principal.
  */
 class MainActivity : ComponentActivity() {
 
     /**
-     * Chamado quando a atividade é criada.
+     * Métrodo chamado quando a atividade é criada.
      * Configura o layout da interface do usuário usando Jetpack Compose.
      *
      * @param savedInstanceState Estado salvo da atividade, usado para restaurar dados em recriações.

@@ -128,7 +128,7 @@ class HomeProfessorViewModel : ViewModel() {
     fun carregarTodosOsTreinos(idSocio: Int) {
         viewModelScope.launch {
             try {
-                val resposta = api.listarTodosOsTreinos(idRequest(idSocio))
+                val resposta = api.listarTodosOsTreinos(IdRequest(idSocio))
                 _treinosTodos.value = resposta
                 Log.d("DEBUG", "Carregando treinos para ID: $idSocio")
                 Log.d("DEBUG", "Recebido: ${resposta.map { it.nomeModalidade }}")

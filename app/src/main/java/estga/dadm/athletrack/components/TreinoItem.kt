@@ -16,6 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import estga.dadm.athletrack.api.Treino
 
+/**
+ * Componente que representa um item de treino na interface.
+ *
+ * @param treino Instância do objeto `Treino` que contém os dados do treino a ser exibido.
+ * @param onDeleteClick Função de callback executada ao clicar no botão de apagar.
+ */
 @Composable
 fun TreinoItem(
     treino: Treino,
@@ -23,32 +29,35 @@ fun TreinoItem(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .fillMaxWidth() // Preenche toda a largura disponível.
+            .padding(vertical = 8.dp) // Adiciona espaçamento vertical.
             .background(
-                colorScheme.primaryContainer,
-                shape = RoundedCornerShape(12.dp)
+                colorScheme.primaryContainer, // Define a cor de fundo do item.
+                shape = RoundedCornerShape(12.dp) // Define bordas arredondadas.
             )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(16.dp), // Adiciona espaçamento interno.
+        verticalAlignment = Alignment.CenterVertically, // Alinha os itens verticalmente ao centro.
+        horizontalArrangement = Arrangement.SpaceBetween // Distribui os itens horizontalmente com espaço entre eles.
     ) {
         Column {
+            // Exibe o nome da modalidade, dia da semana e hora do treino.
             Text(
                 "${treino.nomeModalidade} - ${treino.diaSemana} ${treino.hora}",
-                color = colorScheme.primary
+                color = colorScheme.primary // Define a cor do texto.
             )
+            // Exibe o código QR associado ao treino.
             Text(
                 "QR: ${treino.qrCode}",
-                fontSize = 12.sp,
-                color = colorScheme.primary,
+                fontSize = 12.sp, // Define o tamanho da fonte.
+                color = colorScheme.primary, // Define a cor do texto.
             )
         }
+        // Botão para apagar o treino.
         IconButton(onClick = onDeleteClick) {
             Icon(
-                Icons.Default.Delete,
-                contentDescription = "Apagar",
-                tint = colorScheme.error
+                Icons.Default.Delete, // Ícone de apagar.
+                contentDescription = "Apagar", // Descrição do ícone para acessibilidade.
+                tint = colorScheme.error // Define a cor do ícone.
             )
         }
     }

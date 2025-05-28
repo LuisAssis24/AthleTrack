@@ -17,8 +17,6 @@ import androidx.navigation.NavHostController
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.api.UserCreate
 import estga.dadm.athletrack.viewmodels.GestaoAtletasViewModel
-import kotlinx.coroutines.launch
-import android.widget.Toast
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
@@ -32,23 +30,35 @@ import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.SuccessPopupToast
 import estga.dadm.athletrack.ui.theme.*
 
+/**
+ * Tela de gestão de atletas que permite criar novos atletas, listar todos os atletas e excluir atletas existentes.
+ *
+ * @param user Objeto do usuário logado, contendo informações como ID de sócio.
+ * @param navController Controlador de navegação para gerenciar rotas entre telas.
+ */
 @Composable
-fun GestaoAtletasScreen(user: User, navController: NavHostController) {
+fun GestaoAtletas(user: User, navController: NavHostController) {
+    // ViewModel responsável por gerenciar os dados e ações da tela.
     val viewModel: GestaoAtletasViewModel = viewModel()
+    // Lista de atletas carregados.
     val atletas by viewModel.atletas.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    // Estados para armazenar os dados do novo atleta.
     var nome by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val modalidadesSelecionadas = remember { mutableStateListOf<Int>() }
     var showModalidadesMenu by remember { mutableStateOf(false) }
 
+    // Estados para gerenciar exclusão de atletas.
     var showPasswordDialog by remember { mutableStateOf(false) }
     var atletaParaApagar by remember { mutableStateOf<User?>(null) }
 
+    // Lista de modalidades disponíveis.
     val listaModalidades by viewModel.modalidades.collectAsState()
 
+    // Estados para exibir mensagens de toast e popups.
     val isLoading = atletas.isEmpty()
     var toastMessage by remember { mutableStateOf("") }
     var showToast by remember { mutableStateOf(false) }
@@ -58,8 +68,8 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
     var successMessage by remember { mutableStateOf("") }
     var showSuccessPopup by remember { mutableStateOf(false) }
 
+    // Carrega os atletas e modalidades ao iniciar a tela.
     LaunchedEffect(Unit) {
-
         try {
             viewModel.carregarAtletas()
             viewModel.carregarModalidades()
@@ -68,9 +78,11 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
         }
     }
 
+    // Exibe uma tela de carregamento enquanto os dados são carregados.
     LoadingScreen(isLoading = isLoading) {
         Scaffold(
             topBar = {
+                // Barra superior com título e botão de voltar.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -96,6 +108,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
             containerColor = colorScheme.surface
         ) { padding ->
 
+            // Exibe mensagens de toast e popups.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -129,13 +142,14 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 }
             }
 
-
+            // Estrutura principal da tela.
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                // Campo de texto para inserir o nome do atleta.
                 OutlinedTextField(
                     value = nome,
                     onValueChange = { nome = it },
@@ -149,6 +163,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 )
                 Spacer(Modifier.height(8.dp))
 
+                // Campo de texto para inserir a senha do atleta.
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -162,6 +177,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                 )
                 Spacer(Modifier.height(8.dp))
 
+                // Botão para selecionar modalidades.
                 Text(
                     "Modalidades",
                     color = colorScheme.primary
@@ -184,11 +200,10 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     DropdownMenu(
                         expanded = showModalidadesMenu,
                         onDismissRequest = { showModalidadesMenu = false },
-                        tonalElevation = 0.dp, // remove sombra escura
+                        tonalElevation = 0.dp,
                         modifier = Modifier
-                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
-                            .background(colorScheme.primaryContainer) // aplica ao menu inteiro
-
+                            .fillMaxWidth(0.9f)
+                            .background(colorScheme.primaryContainer)
                     ) {
                         listaModalidades.forEach { modalidade ->
                             DropdownMenuItem(
@@ -220,6 +235,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
 
                 Spacer(Modifier.height(12.dp))
 
+                // Botão para criar um novo atleta.
                 Button(
                     onClick = {
                         when {
@@ -274,6 +290,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
+                // Lista de atletas existentes.
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
@@ -290,6 +307,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                     }
                 }
 
+                // Diálogo de confirmação para excluir um atleta.
                 PasswordConfirmDialog(
                     showDialog = showPasswordDialog,
                     descricao = "Tens a certeza que queres eliminar o atleta: ${atletaParaApagar?.nome} (ID: ${atletaParaApagar?.idSocio})?",
@@ -305,7 +323,7 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                 password = password
                             ) { sucesso, resposta ->
 
-                                // Substitui a mensagem técnica se for erro 401 (não autorizado)
+                                // Substitui a mensagem técnica se for erro 401 (não autorizado).
                                 val mensagemFinal = if (!sucesso && resposta.contains("401")) {
                                     "Password inválida"
                                 } else {
@@ -327,4 +345,3 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
         }
     }
 }
-

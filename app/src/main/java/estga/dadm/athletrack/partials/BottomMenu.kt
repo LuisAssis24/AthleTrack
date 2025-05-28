@@ -1,4 +1,4 @@
-package estga.dadm.athletrack.components
+package estga.dadm.athletrack.partials
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,8 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import estga.dadm.athletrack.ui.theme.*
 
+/**
+ * Componente que exibe um menu inferior com opções de atualização e logout.
+ *
+ * @param showBottomSheet Indica se o menu inferior deve ser exibido.
+ * @param onDismiss Função chamada ao fechar o menu inferior.
+ * @param bottomSheetState Estado do menu inferior utilizado para controlar sua visibilidade.
+ * @param scope Escopo de corrotinas utilizado para executar ações assíncronas.
+ * @param onRefresh Função suspensa chamada ao clicar na opção de atualizar.
+ * @param onLogout Função suspensa chamada ao clicar na opção de logout.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomMenu(

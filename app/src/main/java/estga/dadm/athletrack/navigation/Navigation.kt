@@ -20,12 +20,17 @@ import estga.dadm.athletrack.screens.atleta.*
 import estga.dadm.athletrack.screens.professor.*
 import java.net.*
 import java.time.LocalDate
-import estga.dadm.athletrack.ui.theme.*
 
+/**
+ * Função que define o gráfico de navegação do aplicativo AthleTrack.
+ *
+ * @param navController Controlador de navegação usado para gerenciar as transições entre telas.
+ */
 @Composable
 fun AthleTrackNavGraph(navController: NavHostController) {
     val gson = Gson()
 
+    // Obtém o contexto atual e as preferências do usuário.
     val context = LocalContext.current
     val userPrefs = remember { UserPreferences(context) }
     val isLoggedIn = userPrefs.isLoggedIn.collectAsState(initial = false).value
@@ -33,6 +38,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
     val userId = userPrefs.getUserId.collectAsState(initial = null).value
     val userName = userPrefs.getUserName.collectAsState(initial = null).value.toString()
 
+    // Efeito lançado para verificar o estado de login e navegar para a tela apropriada.
     LaunchedEffect(isLoggedIn, userType, userId) {
         if (isLoggedIn && userId != null && userType != null) {
             val user = User(
@@ -52,15 +58,16 @@ fun AthleTrackNavGraph(navController: NavHostController) {
         }
     }
 
-
+    // Define as rotas de navegação.
     NavHost(navController, startDestination = "splash") {
+        // Tela de splash.
         composable("splash") {
             SplashScreen(
                 navController = navController,
             )
         }
 
-
+        // Tela de login.
         composable("login") {
             LoginScreen(
                 onLoginClick = { user ->
@@ -74,6 +81,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             )
         }
 
+        // Tela inicial do atleta.
         composable(
             "homeAtleta/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -86,6 +94,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             )
         }
 
+        // Tela inicial do professor.
         composable(
             "homeProfessor/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -98,25 +107,27 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             )
         }
 
+        // Tela de gestão de treinos.
         composable(
             "gestaotreinos/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            GestaoTreinosScreen(user, navController) // <-- passar o navController aqui
+            GestaoTreinos(user, navController)
         }
 
+        // Tela de gestão de atletas.
         composable(
             route = "gestaoatletas/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
         ) { backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("userJson") ?: ""
             val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
-            GestaoAtletasScreen(user, navController)
+            GestaoAtletas(user, navController)
         }
 
-
+        // Tela de calendário.
         composable(
             "calendar/{userJson}",
             arguments = listOf(navArgument("userJson") { type = NavType.StringType })
@@ -134,7 +145,7 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             }
         }
 
-
+        // Tela para adicionar evento ao calendário.
         composable(
             "adicionarEvento/{userJson}/{selectedDate}",
             arguments = listOf(
@@ -158,10 +169,15 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             }
 
             if (user != null) {
-                AdicionarEventoScreen(user = user, navController = navController, selectedDate = selectedDate)
+                AdicionarEventoScreen(
+                    user = user,
+                    navController = navController,
+                    selectedDate = selectedDate
+                )
             }
         }
 
+        // Tela de gestão de presenças.
         composable(
             "gestaoPresencas/{userJson}/{qrCode}",
             arguments = listOf(
@@ -174,9 +190,5 @@ fun AthleTrackNavGraph(navController: NavHostController) {
             val user = Gson().fromJson(URLDecoder.decode(userJson, "UTF-8"), User::class.java)
             GestaoPresencas(user = user, qrCode = qrCode, navController = navController)
         }
-
-
-
-
     }
 }

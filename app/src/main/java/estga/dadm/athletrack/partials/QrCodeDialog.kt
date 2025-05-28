@@ -24,8 +24,21 @@ import com.google.zxing.qrcode.QRCodeWriter
 import estga.dadm.athletrack.api.User
 import java.net.URLEncoder
 
+/**
+ * Componente que exibe um diálogo contendo um código QR e opções de interação.
+ *
+ * @param qrCode Código QR a ser exibido.
+ * @param onDismiss Função chamada ao fechar o diálogo.
+ * @param user Objeto do usuário utilizado para navegação.
+ * @param navController Controlador de navegação para redirecionar o usuário.
+ */
 @Composable
-fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit, user: User, navController: NavHostController) {
+fun QrCodeDialog(
+    qrCode: String,
+    onDismiss: () -> Unit,
+    user: User,
+    navController: NavHostController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -38,7 +51,6 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit, user: User, navControlle
                 .padding(16.dp)
                 .width(360.dp)
                 .background(colorScheme.primary, shape = RoundedCornerShape(16.dp)),
-            //.clickable(enabled = false),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -81,6 +93,12 @@ fun QrCodeDialog(qrCode: String, onDismiss: () -> Unit, user: User, navControlle
     }
 }
 
+/**
+ * Componente que gera e exibe um código QR com base nos dados fornecidos.
+ *
+ * @param data Dados a serem codificados no código QR.
+ * @param size Tamanho do código QR gerado (padrão: 768).
+ */
 @Composable
 fun QrCodeGenerator(data: String, size: Int = 768) {
     val bitmap = remember(data) {
@@ -92,17 +110,20 @@ fun QrCodeGenerator(data: String, size: Int = 768) {
     }
 }
 
+/**
+ * Função que gera um bitmap de código QR com base nos dados fornecidos.
+ *
+ * @param data Dados a serem codificados no código QR.
+ * @param size Tamanho do código QR gerado.
+ * @return Bitmap contendo o código QR ou `null` em caso de erro.
+ */
 fun generateQrCodeBitmap(data: String, size: Int): Bitmap? {
     return try {
         val bitMatrix = QRCodeWriter().encode(data, BarcodeFormat.QR_CODE, size, size)
         val bmp = createBitmap(size, size, Bitmap.Config.RGB_565)
         for (x in 0 until size) {
             for (y in 0 until size) {
-                bmp[x, y] = if (bitMatrix.get(
-                        x,
-                        y
-                    )
-                ) Color.BLACK else Color.WHITE
+                bmp[x, y] = if (bitMatrix.get(x, y)) Color.BLACK else Color.WHITE
             }
         }
         bmp
@@ -110,7 +131,3 @@ fun generateQrCodeBitmap(data: String, size: Int): Bitmap? {
         null
     }
 }
-
-
-
-

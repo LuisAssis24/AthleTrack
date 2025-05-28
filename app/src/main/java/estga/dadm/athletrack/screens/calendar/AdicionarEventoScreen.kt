@@ -3,44 +3,44 @@ package estga.dadm.athletrack.screens.calendar
 import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalContext
 import estga.dadm.athletrack.ui.theme.*
 import kotlinx.coroutines.launch
-import estga.dadm.athletrack.api.RetrofitClient
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.AdicionarEventoViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import android.app.DatePickerDialog
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.ui.platform.LocalDensity
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
 import estga.dadm.athletrack.other.FloatingPopupToast
 import java.net.URLEncoder
-import estga.dadm.athletrack.ui.theme.*
 
 import java.util.*
 
+/**
+ * Tela para adicionar um novo evento ao calendário.
+ *
+ * @param user Objeto do usuário contendo informações como ID de sócio.
+ * @param navController Controlador de navegação para redirecionar o usuário entre telas.
+ * @param selectedDate Data inicial selecionada para o evento.
+ * @param viewModel ViewModel responsável por gerenciar os dados e ações da tela.
+ */
 @Composable
 fun AdicionarEventoScreen(
     user: User,
@@ -48,6 +48,7 @@ fun AdicionarEventoScreen(
     selectedDate: LocalDate,
     viewModel: AdicionarEventoViewModel = viewModel()
 ) {
+    // Estado para armazenar os valores do evento.
     var data by remember { mutableStateOf(selectedDate) }
     var hora by remember { mutableStateOf(LocalTime.now()) }
     var local by remember { mutableStateOf("") }
@@ -63,6 +64,7 @@ fun AdicionarEventoScreen(
     var toastMessage by remember { mutableStateOf("") }
     var isToastSuccess by remember { mutableStateOf(true) }
 
+    // Carrega as modalidades ao iniciar a tela.
     LaunchedEffect(Unit) {
         isLoading = true
         try {
@@ -73,6 +75,7 @@ fun AdicionarEventoScreen(
         isLoading = false
     }
 
+    // Estrutura principal da tela.
     Scaffold(
         topBar = {
             Row(
@@ -98,6 +101,7 @@ fun AdicionarEventoScreen(
     ) { padding ->
 
         if (isLoading) {
+            // Exibe um indicador de carregamento enquanto as modalidades são carregadas.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -123,7 +127,7 @@ fun AdicionarEventoScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botão para selecionar a data
+                // Botão para selecionar a data do evento.
                 OutlinedButton(
                     onClick = {
                         val datePicker = DatePickerDialog(
@@ -138,8 +142,8 @@ fun AdicionarEventoScreen(
                         datePicker.show()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
-                    shape = RoundedCornerShape(4.dp), // Menos arredondado
+                    border = BorderStroke(1.dp, colorScheme.onPrimary),
+                    shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = colorScheme.primaryContainer,
                         contentColor = colorScheme.secondary
@@ -148,7 +152,7 @@ fun AdicionarEventoScreen(
                     Text("Data: ${data.toString()}")
                 }
 
-                // Botão para selecionar a hora
+                // Botão para selecionar a hora do evento.
                 OutlinedButton(
                     onClick = {
                         val timePicker = TimePickerDialog(
@@ -163,8 +167,8 @@ fun AdicionarEventoScreen(
                         timePicker.show()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
-                    shape = RoundedCornerShape(4.dp), // Menos arredondado
+                    border = BorderStroke(1.dp, colorScheme.onPrimary),
+                    shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = colorScheme.primaryContainer,
                         contentColor = colorScheme.secondary
@@ -173,6 +177,7 @@ fun AdicionarEventoScreen(
                     Text("Hora: ${hora.toString()}")
                 }
 
+                // Campo de texto para inserir o local do evento.
                 OutlinedTextField(
                     value = local,
                     onValueChange = { local = it },
@@ -187,13 +192,14 @@ fun AdicionarEventoScreen(
                     )
                 )
 
+                // Campo de texto para inserir a descrição do evento.
                 OutlinedTextField(
                     value = descricao,
                     onValueChange = { descricao = it },
                     label = { Text("Descrição") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp), // Define altura para simular uma área de texto
+                        .height(150.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorScheme.primary,
                         unfocusedBorderColor = colorScheme.secondary,
@@ -201,10 +207,10 @@ fun AdicionarEventoScreen(
                         unfocusedLabelColor = colorScheme.secondary,
                         cursorColor = colorScheme.primary
                     ),
-                    maxLines = 5 // Permite múltiplas linhas
+                    maxLines = 5
                 )
 
-                // MultiSelect para Modalidades
+                // MultiSelect para selecionar modalidades.
                 Text("Modalidades", color = colorScheme.primary)
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -216,7 +222,7 @@ fun AdicionarEventoScreen(
                             containerColor = colorScheme.primaryContainer,
                             contentColor = colorScheme.secondary
                         ),
-                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                        border = BorderStroke(1.dp, colorScheme.onPrimary),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
@@ -228,9 +234,10 @@ fun AdicionarEventoScreen(
                     DropdownMenu(
                         expanded = isDropdownExpanded,
                         onDismissRequest = { isDropdownExpanded = false },
-                        tonalElevation = 0.dp, // remove sombra escura
-                        modifier = Modifier.fillMaxWidth(0.9f) // Define 80% da largura do pai
-                        .background(colorScheme.primaryContainer) // aplica ao menu inteiro
+                        tonalElevation = 0.dp,
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .background(colorScheme.primaryContainer)
                     ) {
                         modalidades.forEach { modalidade ->
                             DropdownMenuItem(
@@ -241,12 +248,11 @@ fun AdicionarEventoScreen(
                                         modalidadesSelecionadas.add(modalidade)
                                     }
                                 },
-                                modifier = Modifier
-                                    .fillMaxSize(),
+                                modifier = Modifier.fillMaxSize(),
                                 text = {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.fillMaxWidth() // Garante que o conteúdo ocupe toda a largura
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Checkbox(
                                             checked = modalidade in modalidadesSelecionadas,
@@ -267,6 +273,7 @@ fun AdicionarEventoScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Botão para salvar o evento.
                 Button(
                     onClick = {
                         if (local.isBlank() || descricao.isBlank() || modalidadesSelecionadas.isEmpty()) {
@@ -288,8 +295,9 @@ fun AdicionarEventoScreen(
                                             isToastSuccess = true
                                             showToast = true
 
-                                            // Navegação após sucesso
-                                            val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                            // Navegação após sucesso.
+                                            val userJson =
+                                                URLEncoder.encode(Gson().toJson(user), "UTF-8")
                                             navController.navigate("calendar/$userJson") {
                                                 popUpTo("calendar/$userJson") { inclusive = true }
                                             }
@@ -304,7 +312,8 @@ fun AdicionarEventoScreen(
                                     )
                                 } catch (e: Exception) {
                                     coroutineScope.launch {
-                                        toastMessage = "Erro ao criar evento: ${e.message ?: "Erro desconhecido"}"
+                                        toastMessage =
+                                            "Erro ao criar evento: ${e.message ?: "Erro desconhecido"}"
                                         isToastSuccess = false
                                         showToast = true
                                     }

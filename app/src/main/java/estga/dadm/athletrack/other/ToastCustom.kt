@@ -26,6 +26,14 @@ import estga.dadm.athletrack.ui.theme.Gray
 import estga.dadm.athletrack.ui.theme.GreenSuccess
 import kotlinx.coroutines.delay
 
+/**
+ * Componente que exibe um toast flutuante com ícone e mensagem.
+ *
+ * @param message Mensagem a ser exibida no toast.
+ * @param icon Ícone a ser exibido ao lado da mensagem. Por padrão, utiliza o ícone de check.
+ * @param color Cor de fundo do toast. Por padrão, utiliza a cor primária do tema.
+ * @param onDismiss Função de callback executada ao fechar o toast.
+ */
 @Composable
 fun FloatingPopupToast(
     message: String,
@@ -68,6 +76,12 @@ fun FloatingPopupToast(
     }
 }
 
+/**
+ * Componente que exibe um toast de sucesso com ícone e mensagem.
+ *
+ * @param message Mensagem a ser exibida no toast.
+ * @param onDismiss Função de callback executada ao fechar o toast.
+ */
 @Composable
 fun SuccessPopupToast(
     message: String,
@@ -80,7 +94,7 @@ fun SuccessPopupToast(
         Surface(
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 12.dp,
-            color = GreenSuccess, // verde de sucesso
+            color = GreenSuccess, // Cor verde indicando sucesso.
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .wrapContentWidth()
@@ -112,6 +126,12 @@ fun SuccessPopupToast(
     }
 }
 
+/**
+ * Componente que exibe um toast simples com mensagem.
+ *
+ * @param message Mensagem a ser exibida no toast.
+ * @param onDismiss Função de callback executada ao fechar o toast.
+ */
 @Composable
 fun PopupToast(
     message: String,
@@ -124,7 +144,7 @@ fun PopupToast(
         Surface(
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 12.dp,
-            color = Gray, // verde de sucesso
+            color = Gray, // Cor cinza para o fundo do toast.
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .wrapContentWidth()

@@ -9,19 +9,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,13 +26,18 @@ import androidx.navigation.NavHostController
 import estga.dadm.athletrack.partials.QrCodeDialog
 import estga.dadm.athletrack.ui.theme.*
 import estga.dadm.athletrack.other.UserPreferences
-import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.SentimentSatisfied
-import estga.dadm.athletrack.components.BottomMenu
+import estga.dadm.athletrack.partials.BottomMenu
 import estga.dadm.athletrack.components.TopBar
 import estga.dadm.athletrack.other.LoadingScreen
-import kotlin.text.compareTo
 
+/**
+ * Tela principal do professor que exibe as aulas de hoje e amanhã, permite alternar entre as visualizações e realizar ações como logout ou recarregar dados.
+ *
+ * @param user Objeto do usuário logado, contendo informações como ID de sócio.
+ * @param navController Controlador de navegação para gerenciar rotas entre telas.
+ * @param viewModel ViewModel responsável por gerenciar os dados e ações da tela.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeProfessor(
@@ -47,36 +45,37 @@ fun HomeProfessor(
     navController: NavHostController,
     viewModel: HomeProfessorViewModel = viewModel()
 ) {
+    // Estado para exibir o QR Code.
     var showQrCode by remember { mutableStateOf(false) }
     var qrCodeAtivo by remember { mutableStateOf("") }
 
+    // Estados para armazenar as aulas de hoje e amanhã.
     val aulasHoje by viewModel.treinosHoje.collectAsState()
     val aulasAmanha by viewModel.treinosAmanha.collectAsState()
 
-
+    // Estado para alternar entre "hoje" e "amanhã".
     val selected = remember { mutableStateOf("hoje") }
 
-
-
+    // Contexto e preferências do usuário.
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
     val bottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-
-    // Carregar as aulas assim que a composable for criada
+    // Estado para verificar se os dados estão carregando.
     val isTimedOut = remember { mutableStateOf(false) }
     val isLoading = remember {
         derivedStateOf { aulasHoje.isEmpty() && !isTimedOut.value }
     }
 
+    // Carrega as aulas ao iniciar a tela.
     LaunchedEffect(Unit) {
         viewModel.carregarTreinos(user.idSocio, viewModel.detetarDiaSemana())
-        kotlinx.coroutines.delay(500) // 5 segundos
+        kotlinx.coroutines.delay(500) // Timeout de 500ms
         isTimedOut.value = true
     }
 
-
+    // Estrutura principal da tela.
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -92,6 +91,7 @@ fun HomeProfessor(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // Barra superior com informações do usuário e ações.
                 TopBar(
                     user = user,
                     navController = navController,
@@ -105,6 +105,7 @@ fun HomeProfessor(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Título da seção atual (hoje ou amanhã).
                 Text(
                     text = if (selected.value == "hoje") "Próximas Aulas Hoje" else "Aulas Amanhã",
                     style = Typography.titleMedium,
@@ -120,6 +121,7 @@ fun HomeProfessor(
                     color = colorScheme.secondary
                 )
 
+                // Lista de aulas.
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -136,6 +138,7 @@ fun HomeProfessor(
                             if (selected.value == "hoje") aulasHoje else aulasAmanha
 
                         if (aulasParaMostrar.isEmpty()) {
+                            // Exibe mensagem caso não haja aulas.
                             Text(
                                 text = "Sem aulas para ${if (selected.value == "hoje") "hoje" else "amanhã"}.",
                                 textAlign = TextAlign.Center,
@@ -157,6 +160,7 @@ fun HomeProfessor(
                                 )
                             }
                         } else {
+                            // Exibe a lista de aulas.
                             aulasParaMostrar.take(10).forEachIndexed { index, aula ->
                                 Column(
                                     modifier = Modifier
@@ -188,6 +192,7 @@ fun HomeProfessor(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Botões para alternar entre "hoje" e "amanhã".
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -201,16 +206,16 @@ fun HomeProfessor(
                             shape = RoundedCornerShape(
                                 topStart = 12.dp,
                                 bottomStart = 12.dp
-                            ), // Aumenta o arredondamento
+                            ),
                             icon = {}
                         ) {
                             Text(
                                 "Hoje",
-                                fontSize = 18.sp, // Aumenta o tamanho do texto
+                                fontSize = 18.sp,
                                 modifier = Modifier.padding(
                                     vertical = 5.dp,
                                     horizontal = 10.dp
-                                ) // Aumenta o padding
+                                )
                             )
                         }
 
@@ -220,16 +225,16 @@ fun HomeProfessor(
                             shape = RoundedCornerShape(
                                 topEnd = 12.dp,
                                 bottomEnd = 12.dp
-                            ), // Aumenta o arredondamento
+                            ),
                             icon = {}
                         ) {
                             Text(
                                 "Amanhã",
-                                fontSize = 18.sp, // Aumenta o tamanho do texto
+                                fontSize = 18.sp,
                                 modifier = Modifier.padding(
                                     vertical = 5.dp,
                                     horizontal = 10.dp
-                                ) // Aumenta o padding
+                                )
                             )
                         }
                     }
@@ -237,8 +242,9 @@ fun HomeProfessor(
             }
         }
 
-        val scope = rememberCoroutineScope() // Necessário para o launch
+        val scope = rememberCoroutineScope()
 
+        // Exibe o menu inferior.
         if (showBottomSheet) {
             BottomMenu(
                 showBottomSheet = showBottomSheet,
@@ -257,6 +263,7 @@ fun HomeProfessor(
             )
         }
 
+        // Exibe o QR Code.
         if (showQrCode) {
             QrCodeDialog(
                 qrCode = qrCodeAtivo, onDismiss = { showQrCode = false },
@@ -265,4 +272,3 @@ fun HomeProfessor(
         }
     }
 }
-

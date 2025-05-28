@@ -21,21 +21,30 @@ import estga.dadm.athletrack.other.UserPreferences
 import estga.dadm.athletrack.viewmodels.LoginViewModel
 import estga.dadm.athletrack.other.FloatingPopupToast
 
+/**
+ * Tela de login que permite ao usuário inserir suas credenciais para autenticação.
+ *
+ * @param onLoginClick Função de callback chamada após o login bem-sucedido, recebendo o objeto `User`.
+ */
 @Composable
 fun LoginScreen(
     onLoginClick: (User) -> Unit = {},
 ) {
+    // Contexto da aplicação para exibir mensagens e acessar preferências.
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
     val viewModel = remember { LoginViewModel(userPreferences) }
 
+    // Estados para armazenar os valores dos campos de entrada.
     var socio by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    // Estados para exibir mensagens de erro ou popups.
     var popupMessage by remember { mutableStateOf("") }
     var showPopup by remember { mutableStateOf(false) }
 
+    // Layout principal da tela.
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,6 +52,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Título do aplicativo.
         Text(
             text = "AthleTrack",
             style = typography.displayLarge,
@@ -57,6 +67,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        // Campo de entrada para o número de sócio.
         OutlinedTextField(
             value = socio,
             onValueChange = { socio = it },
@@ -65,7 +76,7 @@ fun LoginScreen(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colorScheme.onPrimary,
                 unfocusedBorderColor = colorScheme.secondary,
-                focusedLabelColor =colorScheme.onPrimary,
+                focusedLabelColor = colorScheme.onPrimary,
                 unfocusedLabelColor = colorScheme.primary,
                 cursorColor = colorScheme.primary
             )
@@ -73,6 +84,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo de entrada para a senha.
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -81,13 +93,16 @@ fun LoginScreen(
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(Icons.Default.Visibility, contentDescription = "Mostrar ou ocultar password")
+                    Icon(
+                        Icons.Default.Visibility,
+                        contentDescription = "Mostrar ou ocultar password"
+                    )
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor =colorScheme.onPrimary, // Alterado para onPrimary
-                unfocusedBorderColor =colorScheme.secondary,
-                focusedLabelColor = colorScheme.onPrimary, // Alterado para onPrimary
+                focusedBorderColor = colorScheme.onPrimary,
+                unfocusedBorderColor = colorScheme.secondary,
+                focusedLabelColor = colorScheme.onPrimary,
                 unfocusedLabelColor = colorScheme.primary,
                 cursorColor = colorScheme.primary
             )
@@ -95,8 +110,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        val context = LocalContext.current
-
+        // Botão para realizar o login.
         Button(
             onClick = {
                 when {
@@ -104,10 +118,12 @@ fun LoginScreen(
                         popupMessage = "Insere o ID de sócio"
                         showPopup = true
                     }
+
                     password.isBlank() -> {
                         popupMessage = "Insere a palavra-passe"
                         showPopup = true
                     }
+
                     else -> {
                         try {
                             viewModel.login(
@@ -115,8 +131,9 @@ fun LoginScreen(
                                 password = password,
                                 onSuccess = { user -> onLoginClick(user) },
                                 onError = { msg ->
-                                    // Aqui tratamos caso as credenciais estejam erradas
-                                    popupMessage = msg.ifBlank { "Credenciais inválidas ou utilizador não encontrado." }
+                                    // Exibe mensagem de erro caso as credenciais estejam erradas.
+                                    popupMessage =
+                                        msg.ifBlank { "Credenciais inválidas ou utilizador não encontrado." }
                                     showPopup = true
                                 }
                             )
@@ -127,7 +144,6 @@ fun LoginScreen(
                     }
                 }
             },
-
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -140,6 +156,8 @@ fun LoginScreen(
             )
         }
     }
+
+    // Exibe um popup de erro, caso necessário.
     if (showPopup) {
         FloatingPopupToast(
             message = popupMessage,

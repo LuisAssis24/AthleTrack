@@ -25,7 +25,12 @@ import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.viewmodels.GestaoPresencasViewModel
 
 /**
+ * Tela de gestão de presenças que permite visualizar e atualizar a lista de presenças dos atletas em um treino específico.
  *
+ * @param user Objeto do usuário logado, contendo informações como ID de sócio.
+ * @param qrCode Código QR associado ao treino para carregar as presenças.
+ * @param navController Controlador de navegação para gerenciar rotas entre telas.
+ * @param viewModel ViewModel responsável por gerenciar os dados e ações da tela.
  */
 @Composable
 fun GestaoPresencas(
@@ -34,20 +39,24 @@ fun GestaoPresencas(
     navController: NavHostController,
     viewModel: GestaoPresencasViewModel = viewModel()
 ) {
+    // Estado que armazena as informações do treino.
     val treinoInfo by viewModel.treinoInfo.collectAsState()
+    // Estado que armazena a lista de atletas.
     val atletas by viewModel.alunos.collectAsState()
 
+    // Define se a tela está carregando com base nos estados.
     val isLoading = treinoInfo == null && atletas.isEmpty()
 
-
-    // Carregar informações do treino e atletas
+    // Carrega as informações do treino e a lista de presenças ao iniciar a tela.
     LaunchedEffect(qrCode) {
         viewModel.carregarPresencas(qrCode, user.idSocio)
     }
 
+    // Exibe a tela principal com as informações do treino e a lista de presenças.
     LoadingScreen(isLoading = isLoading) {
         Scaffold(
             topBar = {
+                // Barra superior com título e botão de voltar.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -83,7 +92,7 @@ fun GestaoPresencas(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Exibir informações do treino
+                // Exibe as informações do treino.
                 treinoInfo?.let { treino ->
                     Text(
                         text = "${treino.nomeModalidade} - ${treino.diaSemana}",
@@ -100,7 +109,7 @@ fun GestaoPresencas(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Listagem de atletas com estilização
+                // Lista de atletas com estilização e controle de presença.
                 LazyColumn(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -136,19 +145,18 @@ fun GestaoPresencas(
                                         viewModel.atualizarPresenca(atleta.id, it)
                                     }
                                 },
-                                enabled = !atleta.qrCode // desativa se foi lida por QR
+                                enabled = !atleta.qrCode // Desativa se a presença foi registrada por QR Code.
                             )
-
                         }
                     }
                 }
 
-                // Botão para salvar presenças
+                // Botão para salvar as presenças.
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         viewModel.salvarPresencas(qrCode)
-                        navController.popBackStack() // Voltar para a página anterior
+                        navController.popBackStack() // Volta para a página anterior.
                     },
                     modifier = Modifier
                         .fillMaxWidth()

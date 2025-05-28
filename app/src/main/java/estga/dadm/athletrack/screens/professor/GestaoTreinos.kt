@@ -6,13 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -20,12 +18,10 @@ import estga.dadm.athletrack.api.Treino
 import estga.dadm.athletrack.api.User
 import estga.dadm.athletrack.viewmodels.HomeProfessorViewModel
 import estga.dadm.athletrack.ui.theme.*
-import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import estga.dadm.athletrack.api.Modalidade
@@ -37,9 +33,17 @@ import estga.dadm.athletrack.components.TreinoItem
 import estga.dadm.athletrack.other.SuccessPopupToast
 import java.time.LocalTime
 
+/**
+ * Tela de gestão de treinos que permite criar novos treinos, listar todos os treinos e excluir treinos existentes.
+ *
+ * @param user Objeto do usuário logado, contendo informações como ID de sócio.
+ * @param navController Controlador de navegação para gerenciar rotas entre telas.
+ */
 @Composable
-fun GestaoTreinosScreen(user: User, navController: NavHostController) {
+fun GestaoTreinos(user: User, navController: NavHostController) {
+    // ViewModel responsável por gerenciar os dados e ações da tela.
     val viewModel: HomeProfessorViewModel = viewModel()
+    // Lista de treinos carregados.
     val treinos by viewModel.treinosTodos.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var treinoSelecionado by remember { mutableStateOf<Treino?>(null) }
@@ -60,17 +64,21 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
     var isToastSuccess by remember { mutableStateOf(true) }
     var showSuccessPopup by remember { mutableStateOf(false) }
 
+    // Define se a tela está carregando com base na lista de treinos.
     val isLoading = treinos.isEmpty()
 
+    // Carrega os dados necessários ao iniciar a tela.
     LaunchedEffect(Unit) {
         viewModel.carregarModalidades()
         viewModel.carregarDiasSemana()
         viewModel.carregarTodosOsTreinos(user.idSocio)
     }
 
+    // Exibe uma tela de carregamento enquanto os dados são carregados.
     LoadingScreen(isLoading = isLoading) {
         Scaffold(
             topBar = {
+                // Barra superior com título e botão de voltar.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -124,6 +132,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     .padding(padding)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                // Campo para selecionar o dia da semana.
                 Text("Dia da Semana", color = colorScheme.primary)
                 Box(Modifier.fillMaxWidth()) {
                     OutlinedButton(
@@ -133,7 +142,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                             containerColor = colorScheme.primaryContainer,
                             contentColor = colorScheme.secondary
                         ),
-                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                        border = BorderStroke(1.dp, colorScheme.onPrimary),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(diaSelecionado ?: "Selecionar Dia")
@@ -143,8 +152,8 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         expanded = diaDropdownExpanded,
                         onDismissRequest = { diaDropdownExpanded = false },
                         modifier = Modifier
-                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
-                            .background(colorScheme.primaryContainer) // aplica ao menu inteiro
+                            .fillMaxWidth(0.9f)
+                            .background(colorScheme.primaryContainer)
                     ) {
                         diasSemana.forEach { dia ->
                             DropdownMenuItem(
@@ -159,6 +168,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 }
                 Spacer(Modifier.height(8.dp))
 
+                // Campo para selecionar a hora.
                 Text("Hora", color = colorScheme.primary)
                 OutlinedButton(
                     onClick = {
@@ -179,13 +189,14 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         containerColor = colorScheme.primaryContainer,
                         contentColor = colorScheme.secondary
                     ),
-                    border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                    border = BorderStroke(1.dp, colorScheme.onPrimary),
                 ) {
                     Text("Hora: ${horaSelecionada}")
                 }
 
                 Spacer(Modifier.height(8.dp))
 
+                // Campo para selecionar a modalidade.
                 Text("Modalidade", color = colorScheme.primary)
                 Box(Modifier.fillMaxWidth()) {
                     OutlinedButton(
@@ -195,7 +206,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                             containerColor = colorScheme.primaryContainer,
                             contentColor = colorScheme.secondary
                         ),
-                        border = BorderStroke(1.dp, colorScheme.onPrimary), // Igual ao TextBox
+                        border = BorderStroke(1.dp, colorScheme.onPrimary),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(modalidadeSelecionada?.nomeModalidade ?: "Selecionar Modalidade")
@@ -204,10 +215,10 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     DropdownMenu(
                         expanded = dropdownExpanded,
                         onDismissRequest = { dropdownExpanded = false },
-                        tonalElevation = 0.dp, // remove sombra escura
+                        tonalElevation = 0.dp,
                         modifier = Modifier
-                            .fillMaxWidth(0.9f) // Define 90% da largura do pai
-                            .background(colorScheme.primaryContainer) // aplica ao menu inteiro
+                            .fillMaxWidth(0.9f)
+                            .background(colorScheme.primaryContainer)
                     ) {
                         modalidades.forEach { modalidade ->
                             DropdownMenuItem(
@@ -223,6 +234,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
 
                 Spacer(Modifier.height(12.dp))
 
+                // Botão para criar um novo treino.
                 Button(
                     onClick = {
                         when {
@@ -230,14 +242,17 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                 popupMessage = "Seleciona um dia da semana"
                                 showPopup = true
                             }
+
                             modalidadeSelecionada == null -> {
                                 popupMessage = "Seleciona uma modalidade"
                                 showPopup = true
                             }
+
                             horaSelecionada.toString().isBlank() -> {
                                 popupMessage = "Seleciona uma hora"
                                 showPopup = true
                             }
+
                             else -> {
                                 viewModel.criarTreino(
                                     diaSemana = diaSelecionado!!,
@@ -271,7 +286,6 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     Text("Criar Treino", color = colorScheme.background)
                 }
 
-
                 LaunchedEffect(mensagem) {
                     if (mensagem.isNotEmpty()) {
                         toastMessage = mensagem
@@ -286,13 +300,14 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
 
                 HorizontalDivider(color = colorScheme.secondary)
 
+                // Título para a lista de treinos.
                 Text(
                     "Todos os Treinos",
                     color = colorScheme.primary,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                // Scroll apenas nesta parte
+                // Lista de treinos existentes.
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
@@ -312,6 +327,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
         }
     }
 
+    // Diálogo de confirmação para excluir um treino.
     PasswordConfirmDialog(
         showDialog = showDialog && treinoSelecionado != null,
         descricao = "Tens a certeza que queres eliminar este treino: ${treinoSelecionado?.nomeModalidade} - ${treinoSelecionado?.diaSemana} ${treinoSelecionado?.hora}?",

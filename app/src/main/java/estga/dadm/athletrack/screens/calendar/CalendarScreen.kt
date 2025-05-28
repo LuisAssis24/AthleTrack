@@ -293,8 +293,7 @@ fun CalendarScreen(
                             onDetailsClick = {
                                 eventoParaDetalhes = evento
                                 permissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
-                            }
-                            ,
+                            },
                             onDeleteClick = {
                                 showPasswordDialog = true
                                 eventoSelecionado = evento
@@ -311,18 +310,19 @@ fun CalendarScreen(
                         eventoSelecionado = null
                     },
 
-                    onConfirm = { password -> eventoSelecionado?.let { evento ->
-                        viewModel.apagarEvento(
-                            idEvento = evento.id,
-                            idProfessor = user.idSocio,
-                            password = password,
-                        ) { sucesso, mensagem ->
-                            if (sucesso) {
-                                viewModel.carregarEventosParaMes(user.idSocio)
-                                showPasswordDialog = false
+                    onConfirm = { password ->
+                        eventoSelecionado?.let { evento ->
+                            viewModel.apagarEvento(
+                                idEvento = evento.id,
+                                idProfessor = user.idSocio,
+                                password = password,
+                            ) { sucesso, mensagem ->
+                                if (sucesso) {
+                                    viewModel.carregarEventosParaMes(user.idSocio)
+                                    showPasswordDialog = false
+                                }
                             }
                         }
-                    }
                     }
                 )
 

@@ -43,14 +43,14 @@ class GestaoPresencasViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 // Buscar treino pelo QR Code.
-                val treino = treinosService.listarTodosOsTreinos(idRequest(idSocio))
+                val treino = treinosService.listarTodosOsTreinos(IdRequest(idSocio))
                     .find { it.qrCode == qrCode }
 
                 if (treino != null) {
                     _treinoInfo.value = treino
 
                     // Buscar todos os atletas inscritos na modalidade do treino.
-                    val atletasInscritos = presencasService.listarPresencas(idRequest(treino.idTreino))
+                    val atletasInscritos = presencasService.listarPresencas(IdRequest(treino.idTreino))
 
                     // Atualizar estado dos atletas com presença registrada.
                     _alunos.value = atletasInscritos.map { atleta ->
