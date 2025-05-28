@@ -17,3 +17,4 @@ data class EventoCriarRequestDTO(
     val localEvento: String,         // Local onde o evento será realizado
     val descricao: String,           // Descrição do evento
     val modalidades: List<Int>,      // Lista de IDs das modalidades associadas ao evento
+)
