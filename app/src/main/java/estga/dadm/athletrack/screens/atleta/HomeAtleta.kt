@@ -25,8 +25,10 @@ import estga.dadm.athletrack.viewmodels.HomeAtletaViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -35,6 +37,7 @@ import estga.dadm.athletrack.partials.QrCameraScanner
 import com.google.gson.Gson
 import estga.dadm.athletrack.components.BottomMenu
 import estga.dadm.athletrack.components.TopBar
+import estga.dadm.athletrack.other.FloatingPopupToast
 import estga.dadm.athletrack.other.LoadingScreen
 import estga.dadm.athletrack.other.UserPreferences
 import java.net.URLEncoder
@@ -53,6 +56,10 @@ fun HomeAtleta(
 
     val context = LocalContext.current
 
+    var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+    var isToastSuccess by remember { mutableStateOf(true) }
+
     val userPreferences = remember { UserPreferences(context) }
     val bottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -63,7 +70,9 @@ fun HomeAtleta(
         if (isGranted) {
             showCameraDialog = true
         } else {
-            Toast.makeText(context, "Permissão da câmara é necessária", Toast.LENGTH_SHORT).show()
+            toastMessage = "Permissão da câmara é necessária"
+            isToastSuccess = false
+            showToast = true
         }
     }
 
@@ -182,17 +191,13 @@ fun HomeAtleta(
                                             val response = viewModel.apiPresencas.registarPresenca(
                                                 PresencaRequest(user.idSocio, codigo, true)
                                             )
-                                            Toast.makeText(
-                                                context,
-                                                response.mensagem,
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                            toastMessage = response.mensagem
+                                            isToastSuccess = true
+                                            showToast = true
                                         } catch (e: Exception) {
-                                            Toast.makeText(
-                                                context,
-                                                "Erro: ${e.message}",
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                            toastMessage = "Erro: ${e.message}"
+                                            isToastSuccess = false
+                                            showToast = true
                                         } finally {
                                             showCameraDialog = false
                                             leituraCompleta = false
@@ -204,6 +209,16 @@ fun HomeAtleta(
                     )
                 }
 
+            }
+
+            if (showToast) {
+                FloatingPopupToast(
+                    message = toastMessage,
+                    icon = if (isToastSuccess) Icons.Default.Check else Icons.Default.Warning,
+                    color = if (isToastSuccess) GreenSuccess else MaterialTheme.colorScheme.error
+                ) {
+                    showToast = false
+                }
             }
         }
 

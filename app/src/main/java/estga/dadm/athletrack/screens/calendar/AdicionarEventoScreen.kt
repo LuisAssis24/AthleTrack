@@ -28,11 +28,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.ui.platform.LocalDensity
 import com.google.gson.Gson
 import estga.dadm.athletrack.api.Modalidade
+import estga.dadm.athletrack.other.FloatingPopupToast
 import java.net.URLEncoder
 import estga.dadm.athletrack.ui.theme.*
 
@@ -56,6 +59,9 @@ fun AdicionarEventoScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+    var isToastSuccess by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         isLoading = true
@@ -264,11 +270,9 @@ fun AdicionarEventoScreen(
                 Button(
                     onClick = {
                         if (local.isBlank() || descricao.isBlank() || modalidadesSelecionadas.isEmpty()) {
-                            Toast.makeText(
-                                context,
-                                "Preencha todos os campos obrigatórios",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            toastMessage = "Preencha todos os campos obrigatórios"
+                            isToastSuccess = false
+                            showToast = true
                         } else {
                             coroutineScope.launch {
                                 try {
@@ -280,27 +284,29 @@ fun AdicionarEventoScreen(
                                         descricao = descricao,
                                         modalidades = modalidadesSelecionadas.map { it.id },
                                         onSuccess = {
-                                            val userJson =
-                                                URLEncoder.encode(Gson().toJson(user), "UTF-8")
+                                            toastMessage = "Evento criado com sucesso"
+                                            isToastSuccess = true
+                                            showToast = true
+
+                                            // Navegação após sucesso
+                                            val userJson = URLEncoder.encode(Gson().toJson(user), "UTF-8")
                                             navController.navigate("calendar/$userJson") {
                                                 popUpTo("calendar/$userJson") { inclusive = true }
                                             }
                                         },
                                         onError = { errorMessage ->
                                             coroutineScope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    message = "Erro ao criar evento: $errorMessage",
-                                                    actionLabel = "Fechar"
-                                                )
+                                                toastMessage = "Erro ao criar evento: $errorMessage"
+                                                isToastSuccess = false
+                                                showToast = true
                                             }
                                         }
                                     )
                                 } catch (e: Exception) {
                                     coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = "Erro ao criar evento: ${e.message}",
-                                            actionLabel = "Fechar"
-                                        )
+                                        toastMessage = "Erro ao criar evento: ${e.message ?: "Erro desconhecido"}"
+                                        isToastSuccess = false
+                                        showToast = true
                                     }
                                 }
                             }
@@ -310,6 +316,15 @@ fun AdicionarEventoScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
                     Text("Guardar", color = colorScheme.background)
+                }
+            }
+            if (showToast) {
+                FloatingPopupToast(
+                    message = toastMessage,
+                    icon = if (isToastSuccess) Icons.Default.Check else Icons.Default.Warning,
+                    color = if (isToastSuccess) GreenSuccess else MaterialTheme.colorScheme.error
+                ) {
+                    showToast = false
                 }
             }
         }

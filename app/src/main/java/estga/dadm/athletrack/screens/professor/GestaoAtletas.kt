@@ -304,10 +304,21 @@ fun GestaoAtletasScreen(user: User, navController: NavHostController) {
                                 idProfessor = user.idSocio,
                                 password = password
                             ) { sucesso, resposta ->
-                                coroutineScope.launch {
-                                    Toast.makeText(context, resposta, Toast.LENGTH_LONG).show()
+
+                                // Substitui a mensagem técnica se for erro 401 (não autorizado)
+                                val mensagemFinal = if (!sucesso && resposta.contains("401")) {
+                                    "Password inválida"
+                                } else {
+                                    resposta
                                 }
-                                if (sucesso) viewModel.carregarAtletas()
+
+                                toastMessage = mensagemFinal
+                                isToastSuccess = sucesso
+                                showToast = true
+
+                                if (sucesso) {
+                                    viewModel.carregarAtletas()
+                                }
                             }
                         }
                     }

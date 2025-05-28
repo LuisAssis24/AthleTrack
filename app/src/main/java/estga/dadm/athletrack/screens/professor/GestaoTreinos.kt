@@ -34,6 +34,7 @@ import estga.dadm.athletrack.other.LoadingScreen
 import kotlinx.coroutines.delay
 import estga.dadm.athletrack.partials.PasswordConfirmDialog
 import estga.dadm.athletrack.components.TreinoItem
+import estga.dadm.athletrack.other.SuccessPopupToast
 import java.time.LocalTime
 
 @Composable
@@ -57,6 +58,7 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
     var toastMessage by remember { mutableStateOf("") }
     var showToast by remember { mutableStateOf(false) }
     var isToastSuccess by remember { mutableStateOf(true) }
+    var showSuccessPopup by remember { mutableStateOf(false) }
 
     val isLoading = treinos.isEmpty()
 
@@ -102,13 +104,17 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                     .fillMaxSize()
                     .padding()
             ) {
-                if (showToast && toastMessage != null) {
+                if (showPopup) {
                     FloatingPopupToast(
-                        message = toastMessage!!,
-                        icon = if (isToastSuccess) Icons.Default.Check else Icons.Default.Warning,
-                        color = if (isToastSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error
-                    ) {
-                        showToast = false
+                        message = popupMessage,
+                        icon = Icons.Default.Warning,
+                        color = MaterialTheme.colorScheme.error
+                    ) { showPopup = false }
+                }
+
+                if (showSuccessPopup) {
+                    SuccessPopupToast(message = toastMessage) {
+                        showSuccessPopup = false
                     }
                 }
             }
@@ -224,17 +230,14 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                 popupMessage = "Seleciona um dia da semana"
                                 showPopup = true
                             }
-
                             modalidadeSelecionada == null -> {
                                 popupMessage = "Seleciona uma modalidade"
                                 showPopup = true
                             }
-
                             horaSelecionada.toString().isBlank() -> {
                                 popupMessage = "Seleciona uma hora"
                                 showPopup = true
                             }
-
                             else -> {
                                 viewModel.criarTreino(
                                     diaSemana = diaSelecionado!!,
@@ -242,15 +245,18 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                                     idModalidade = modalidadeSelecionada!!.id,
                                     idProfessor = user.idSocio
                                 ) { sucesso, resposta ->
-                                    toastMessage = resposta
-                                    isToastSuccess = sucesso
-                                    showToast = true
-
                                     if (sucesso) {
-                                        viewModel.carregarTodosOsTreinos(user.idSocio)
-                                        // Limpar campos (opcional)
+                                        toastMessage = resposta
+                                        showSuccessPopup = true
+
+                                        // Limpar campos
                                         diaSelecionado = null
                                         modalidadeSelecionada = null
+
+                                        viewModel.carregarTodosOsTreinos(user.idSocio)
+                                    } else {
+                                        popupMessage = resposta
+                                        showPopup = true
                                     }
                                 }
                             }
@@ -260,13 +266,11 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorScheme.primary,
-                        contentColor = colorScheme.background
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
                     Text("Criar Treino", color = colorScheme.background)
                 }
+
 
                 LaunchedEffect(mensagem) {
                     if (mensagem.isNotEmpty()) {
@@ -321,9 +325,15 @@ fun GestaoTreinosScreen(user: User, navController: NavHostController) {
                 password = passwordInput,
                 qrCode = treinoSelecionado!!.qrCode
             ) { sucesso, resposta ->
-                Toast.makeText(context, resposta, Toast.LENGTH_SHORT).show()
                 if (sucesso) {
+                    toastMessage = resposta
+                    showSuccessPopup = true
                     viewModel.carregarTodosOsTreinos(user.idSocio)
+                } else {
+                    popupMessage = if (resposta.contains("senha", ignoreCase = true)) {
+                        "Password inválida"
+                    } else resposta
+                    showPopup = true
                 }
             }
             showDialog = false
