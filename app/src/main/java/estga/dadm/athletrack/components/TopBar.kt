@@ -147,23 +147,19 @@ fun TopBar(
                     .size(81.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.tertiary)
             ) {
-                Column {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
-                        contentDescription = "GestaoTreinos",
-                        modifier = Modifier.weight(0.4f).
-                        align(Alignment.CenterHorizontally),
-                        tint = colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Gestão de Treinos",
-                        style = Typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = colorScheme.primary
-                    )
-                }
-
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
+                    contentDescription = "GestaoTreinos",
+                    modifier = Modifier.size(40.dp),
+                    tint = colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Gestão de Treinos",
+                    style = Typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.primary
+                )
             }
 
 
@@ -184,22 +180,19 @@ fun TopBar(
                     .size(81.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
             ) {
-                Column {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "GestaoAtleta",
-                        modifier = Modifier.weight(0.4f).
-                        align(Alignment.CenterHorizontally),
-                        tint = colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Gestão de Atletas",
-                        style = Typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = colorScheme.primary
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "GestaoAtleta",
+                    modifier = Modifier.size(40.dp),
+                    tint = colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Gestão de Atletas",
+                    style = Typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.primary
+                )
             }
         }
     } else {

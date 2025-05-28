@@ -26,6 +26,14 @@ import java.time.LocalDate
 import java.util.Locale
 import java.time.format.TextStyle
 
+/**
+ * Componente que representa um item de evento na interface.
+ *
+ * @param selectedDate Data selecionada para exibição.
+ * @param evento Instância do objeto `Evento` que contém os dados do evento.
+ * @param onDetailsClick Função de callback executada ao clicar no botão de detalhes.
+ * @param onDeleteClick Função de callback executada ao clicar no botão de apagar.
+ */
 @Composable
 fun EventoItem(
     selectedDate: LocalDate,
@@ -35,28 +43,30 @@ fun EventoItem(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .fillMaxWidth() // Preenche toda a largura disponível.
+            .padding(vertical = 8.dp) // Adiciona espaçamento vertical.
             .background(
                 colorScheme.primaryContainer,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp) // Define bordas arredondadas.
             )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(16.dp), // Adiciona espaçamento interno.
+        verticalAlignment = Alignment.CenterVertically, // Alinha os itens verticalmente ao centro.
+        horizontalArrangement = Arrangement.SpaceBetween // Distribui os itens horizontalmente com espaço entre eles.
     ) {
-        // Data ao lado esquerdo
+        // Exibição da data ao lado esquerdo.
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row {
                 Column(
-                    modifier = Modifier.padding(top = 3.dp), // Adiciona espaçamento acima da data
+                    modifier = Modifier.padding(top = 3.dp), // Adiciona espaçamento acima da data.
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Exibe o dia do mês.
                     Text(
                         "${selectedDate.dayOfMonth}",
                         style = typography.titleMedium,
                         color = colorScheme.primary
                     )
+                    // Exibe o mês com estilo abreviado e em maiúsculas.
                     Text(
                         selectedDate.month.getDisplayName(
                             TextStyle.SHORT,
@@ -67,12 +77,14 @@ fun EventoItem(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(12.dp)) // Adiciona espaçamento horizontal.
 
                 Column {
+                    // Exibe o local do evento.
                     Text(evento.localEvento, color = colorScheme.primary)
+                    // Exibe a hora do evento no formato "hh:mm".
                     Text(
-                        evento.hora.take(5), // Apenas "hh:mm"
+                        evento.hora.take(5),
                         style = typography.labelSmall,
                         color = colorScheme.secondary
                     )
@@ -80,22 +92,22 @@ fun EventoItem(
             }
         }
         Row {
-            // Ações à direita
+            // Botão para exibir detalhes do evento.
             IconButton(onClick = onDetailsClick) {
                 Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = "Detalhes",
-                    tint = colorScheme.primary,
+                    imageVector = Icons.Default.AddCircle, // Ícone de adicionar.
+                    contentDescription = "Detalhes", // Descrição do ícone para acessibilidade.
+                    tint = colorScheme.primary // Define a cor do ícone.
                 )
             }
+            // Botão para apagar o evento.
             IconButton(onClick = onDeleteClick) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar",
-                    tint = colorScheme.error
+                    imageVector = Icons.Default.Delete, // Ícone de lixeira.
+                    contentDescription = "Eliminar", // Descrição do ícone para acessibilidade.
+                    tint = colorScheme.error // Define a cor do ícone como erro (vermelho).
                 )
             }
         }
-
     }
 }
