@@ -53,7 +53,7 @@ fun EventDetailsDialog(
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text("Nome:", color = Color.White)
+                Text("Local:", color = Color.White)
                 Text(evento.localEvento, fontWeight = FontWeight.Bold, color = Color.White)
 
                 Spacer(modifier = Modifier.height(8.dp))
