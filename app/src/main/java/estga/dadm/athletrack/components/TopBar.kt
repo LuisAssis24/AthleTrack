@@ -217,6 +217,6 @@ fun TopBar(
             }
         }
     } else {
-        Spacer(modifier = Modifier.height(48.dp)) // Adiciona espaçamento vertical.
+        Spacer(modifier = Modifier.height(24.dp)) // Adiciona espaçamento vertical.
     }
 }

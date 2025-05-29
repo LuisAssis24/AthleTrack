@@ -149,8 +149,7 @@ fun HomeAtleta(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
+                        .weight(1f) // Faz a lista ocupar o espaço restante.
                         .padding(bottom = 24.dp)
                 ) {
                     if (treinos.isEmpty()) {
@@ -163,7 +162,7 @@ fun HomeAtleta(
                                 .padding(top = 24.dp)
                         )
                     } else {
-                        treinos.forEach {
+                        treinos.take(12).forEach {
                             Text(
                                 "${it.nomeModalidade} - ${it.diaSemana} - ${it.hora}",
                                 color = White,
@@ -223,7 +222,7 @@ fun HomeAtleta(
                 FloatingPopupToast(
                     message = toastMessage,
                     icon = if (isToastSuccess) Icons.Default.Check else Icons.Default.Warning,
-                    color = if (isToastSuccess) GreenSuccess else MaterialTheme.colorScheme.error
+                    color = if (isToastSuccess) GreenSuccess else colorScheme.error
                 ) {
                     showToast = false
                 }
