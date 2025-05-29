@@ -174,7 +174,7 @@ fun AdicionarEventoScreen(
                         contentColor = colorScheme.secondary
                     )
                 ) {
-                    Text("Hora: ${hora.toString()}")
+                    Text("Hora: ${hora.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"))}")
                 }
 
                 // Campo de texto para inserir o local do evento.
