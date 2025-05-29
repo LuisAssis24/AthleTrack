@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import estga.dadm.athletrack.api.Evento
+import estga.dadm.athletrack.api.User
 import java.time.LocalDate
 import java.util.Locale
 import java.time.format.TextStyle
@@ -36,6 +37,7 @@ import java.time.format.TextStyle
  */
 @Composable
 fun EventoItem(
+    user: User,
     selectedDate: LocalDate,
     evento: Evento,
     onDetailsClick: () -> Unit,
@@ -91,23 +93,26 @@ fun EventoItem(
                 }
             }
         }
-        Row {
-            // Botão para exibir detalhes do evento.
-            IconButton(onClick = onDetailsClick) {
-                Icon(
-                    imageVector = Icons.Default.AddCircle, // Ícone de adicionar.
-                    contentDescription = "Detalhes", // Descrição do ícone para acessibilidade.
-                    tint = colorScheme.primary // Define a cor do ícone.
-                )
-            }
-            // Botão para apagar o evento.
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete, // Ícone de lixeira.
-                    contentDescription = "Eliminar", // Descrição do ícone para acessibilidade.
-                    tint = colorScheme.error // Define a cor do ícone como erro (vermelho).
-                )
+        if (user.tipo == "professor"){
+            Row {
+                // Botão para exibir detalhes do evento.
+                IconButton(onClick = onDetailsClick) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle, // Ícone de adicionar.
+                        contentDescription = "Detalhes", // Descrição do ícone para acessibilidade.
+                        tint = colorScheme.primary // Define a cor do ícone.
+                    )
+                }
+                // Botão para apagar o evento.
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete, // Ícone de lixeira.
+                        contentDescription = "Eliminar", // Descrição do ícone para acessibilidade.
+                        tint = colorScheme.error // Define a cor do ícone como erro (vermelho).
+                    )
+                }
             }
         }
+
     }
 }

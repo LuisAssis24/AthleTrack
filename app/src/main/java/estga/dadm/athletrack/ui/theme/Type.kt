@@ -18,6 +18,13 @@ import androidx.compose.ui.unit.sp
  * - `labelSmall`: Estilo para rótulos pequenos.
  */
 val Typography: Typography = Typography(
+
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 48.sp,
+    ),
+
     /**
      * Estilo para textos de destaque, como títulos principais.
      * - Fonte padrão.

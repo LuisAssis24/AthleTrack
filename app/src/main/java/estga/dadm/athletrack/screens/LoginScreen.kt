@@ -55,7 +55,7 @@ fun LoginScreen(
         // Título do aplicativo.
         Text(
             text = "AthleTrack",
-            style = typography.displayLarge,
+            style = typography.headlineLarge,
             color = colorScheme.onPrimary,
         )
         Spacer(modifier = Modifier.height(8.dp))

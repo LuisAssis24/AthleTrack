@@ -60,7 +60,7 @@ fun BottomMenu(
                     tint = colorScheme.primary,
                     modifier = Modifier.size(28.dp)
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Atualizar Treinos",
                     style = MaterialTheme.typography.titleMedium,
@@ -81,12 +81,13 @@ fun BottomMenu(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Logout",
                     tint = colorScheme.primary
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Logout",
                     style = MaterialTheme.typography.titleMedium,

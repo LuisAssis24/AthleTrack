@@ -288,6 +288,7 @@ fun CalendarScreen(
 
                     items(eventosFiltrados) { evento ->
                         EventoItem(
+                            user = user,
                             selectedDate = selectedDate,
                             evento = evento,
                             onDetailsClick = {

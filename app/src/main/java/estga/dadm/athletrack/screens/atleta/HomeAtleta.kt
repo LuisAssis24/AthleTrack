@@ -202,7 +202,7 @@ fun HomeAtleta(
                                             isToastSuccess = true
                                             showToast = true
                                         } catch (e: Exception) {
-                                            toastMessage = "Erro: ${e.message}"
+                                            toastMessage = "Aluno não inscrito nesta modalidade."
                                             isToastSuccess = false
                                             showToast = true
                                         } finally {
