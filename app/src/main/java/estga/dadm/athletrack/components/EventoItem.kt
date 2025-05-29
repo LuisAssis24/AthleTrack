@@ -93,16 +93,16 @@ fun EventoItem(
                 }
             }
         }
-        if (user.tipo == "professor"){
-            Row {
-                // Botão para exibir detalhes do evento.
-                IconButton(onClick = onDetailsClick) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle, // Ícone de adicionar.
-                        contentDescription = "Detalhes", // Descrição do ícone para acessibilidade.
-                        tint = colorScheme.primary // Define a cor do ícone.
-                    )
-                }
+        Row {
+            // Botão para exibir detalhes do evento.
+            IconButton(onClick = onDetailsClick) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle, // Ícone de adicionar.
+                    contentDescription = "Detalhes", // Descrição do ícone para acessibilidade.
+                    tint = colorScheme.primary // Define a cor do ícone.
+                )
+            }
+            if (user.tipo == "professor") {
                 // Botão para apagar o evento.
                 IconButton(onClick = onDeleteClick) {
                     Icon(
