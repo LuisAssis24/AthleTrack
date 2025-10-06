@@ -1,6 +1,6 @@
 ﻿# AthleTrack
 
-AthleTrack is a mobile-first training, attendance, and events companion designed for the Mobile Applications Development course at ESTGA. The project pairs an Android app built with Jetpack Compose and a Kotlin Spring Boot backend to help coaches manage squads, sessions, QR based check-ins, and shared calendars for their athletes.
+AthleTrack is a mobile-first training, attendance, and events companion designed for the Mobile Applications Development module in the Information Technologies course at the University of Aveiro. The project pairs an Android app built with Jetpack Compose and a Kotlin Spring Boot backend to help coaches manage squads, sessions, QR based check-ins, and shared calendars for their athletes.
 
 ## Core Capabilities
 - **Athlete experience**: daily timetable, QR attendance scanning via CameraX + ML Kit, upcoming events, and persistent login via DataStore.
@@ -77,3 +77,4 @@ AthleTrack is a mobile-first training, attendance, and events companion designed
 - `Relatorio AthleTrack.pdf` captures the academic context, architectural decisions, and evaluation criteria for the project.
 - Consider externalising secrets (Retrofit key, database credentials) into environment variables or encrypted stores before publishing the repository.
 - Future enhancements the team discussed include push notifications for upcoming events, offline attendance caching, and tighter CI around the two Gradle builds.
+
